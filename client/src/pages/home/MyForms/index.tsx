@@ -18,6 +18,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
+import { Link } from 'react-router-dom';
 
 const DrawerHeader = styled('div')(({ theme }) => ({
     display: 'flex',
@@ -99,7 +100,7 @@ function MyForms() {
         <div>
             <DrawerHeader />
             <Box sx={{ backgroundColor: 'white', border: "2px solid #DEDEDE" }}>
-                <Typography sx={{ color: '#364F6B', padding: '15px' }} variant="h6" noWrap component="div">
+                <Typography sx={{ color: '#364F6B', padding: '15px', fontWeight: 600 }} variant="h6" noWrap component="div">
                     FORMS CỦA TÔI
                 </Typography>
                 <Divider />
@@ -143,7 +144,7 @@ function MyForms() {
                             backgroundColor: '#176B87', // Màu nền thay đổi khi hover
                         },
                     }}>
-                        <Typography sx={{ color: 'white', paddingX: '10px', paddingY: '4px' }} variant="body2" noWrap component="div">
+                        <Typography sx={{ fontWeight: 500, color: 'white', paddingX: '10px', paddingY: '4px' }} variant="body2" noWrap component="div">
                             Thêm Form
                         </Typography>
                     </Button>
@@ -154,13 +155,13 @@ function MyForms() {
                     <TableContainer component={Paper}>
                         <Table sx={{ minWidth: 650 }} aria-label="simple table">
                             <TableHead>
-                                <TableRow>
-                                    <TableCell align="center">STT</TableCell>
-                                    <TableCell align="center">Tên Form</TableCell>
-                                    <TableCell align="center">Chủ sở hữu</TableCell>
-                                    <TableCell align="center">Phản hồi</TableCell>
-                                    <TableCell align="center">Chi tiết form</TableCell>
-                                    <TableCell align="center">Tình trạng</TableCell>
+                                <TableRow >
+                                    <TableCell sx={{ fontWeight: 800, fontSize: '1rem' }} align="left">STT</TableCell>
+                                    <TableCell sx={{ fontWeight: 800, fontSize: '1rem' }} align="left">Tên Form</TableCell>
+                                    <TableCell sx={{ fontWeight: 800, fontSize: '1rem' }} align="center">Chủ sở hữu</TableCell>
+                                    <TableCell sx={{ fontWeight: 800, fontSize: '1rem' }} align="center">Phản hồi</TableCell>
+                                    <TableCell sx={{ fontWeight: 800, fontSize: '1rem' }} align="center">Chi tiết form</TableCell>
+                                    <TableCell sx={{ fontWeight: 800, fontSize: '1rem' }} align="center">Tình trạng</TableCell>
                                 </TableRow >
                             </TableHead>
                             <TableBody>
@@ -169,24 +170,26 @@ function MyForms() {
                                         key={row.name}
                                         sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                     >
-                                        <TableCell component="th" scope="row" align="center">
+                                        <TableCell sx={{ fontWeight: 500, fontSize: '1.05rem' }} component="th" scope="row" align="left">
                                             {index + 1}
                                         </TableCell>
-                                        <TableCell align="center">{row.name}</TableCell>
-                                        <TableCell align="center">{row.owner}</TableCell>
-                                        <TableCell align="center">{row.response}</TableCell>
+                                        <TableCell sx={{ fontWeight: 400, fontSize: '1.05rem' }} align="left">{row.name}</TableCell>
+                                        <TableCell sx={{ fontWeight: 400, fontSize: '1.05rem' }} align="center">{row.owner}</TableCell>
+                                        <TableCell sx={{ fontWeight: 400, fontSize: '1.05rem' }} align="center">{row.response}</TableCell>
                                         <TableCell align="center">
-                                            <Button sx={{
-                                                backgroundColor: '#364F6B',
-                                                margin: '10px',
-                                                '&:hover': {
-                                                    backgroundColor: '#176B87', // Màu nền thay đổi khi hover
-                                                },
-                                            }}>
-                                                <Typography sx={{ color: 'white', paddingX: '5px', paddingY: '2px' }} variant="body2" noWrap component="div">
-                                                    Xem chi tiết
-                                                </Typography>
-                                            </Button>
+                                            <Link to="/detail">
+                                                <Button sx={{
+                                                    backgroundColor: '#364F6B',
+                                                    margin: '10px',
+                                                    '&:hover': {
+                                                        backgroundColor: '#176B87', // Màu nền thay đổi khi hover
+                                                    },
+                                                }}>
+                                                    <Typography sx={{ color: 'white', paddingX: '5px', paddingY: '2px' }} variant="body2" noWrap component="div">
+                                                        Xem chi tiết
+                                                    </Typography>
+                                                </Button>
+                                            </Link>
                                         </TableCell>
                                         <TableCell align="center">
                                             {row.isOpen ?

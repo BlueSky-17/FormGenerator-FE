@@ -16,6 +16,9 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown';
 import ArrowCircleUpIcon from '@mui/icons-material/ArrowCircleUp';
 import DeleteIcon from '@mui/icons-material/Delete';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import PaletteIcon from '@mui/icons-material/Palette';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 
 import TextField from '@mui/material/TextField';
 import InputLabel from '@mui/material/InputLabel';
@@ -84,7 +87,7 @@ function DetailForm() {
             <DrawerHeader />
             <Box sx={{ backgroundColor: 'white', border: "2px solid #DEDEDE" }}>
                 <Box sx={{ display: 'flex' }}>
-                    <Typography sx={{ color: '#364F6B', padding: '15px' }} variant="h6" noWrap component="div">
+                    <Typography sx={{ color: '#364F6B', padding: '15px', fontWeight: 600 }} variant="h6" noWrap component="div">
                         FORMS CỦA TÔI
                     </Typography>
                     <Box sx={{ flexGrow: 1 }} />
@@ -92,27 +95,34 @@ function DetailForm() {
                         color: '#364F6B',
                         backgroundColor: 'white',
                         border: '2px solid #364F6B',
-                        borderRadius: '50px',
-                        marginY: '10px',
+                        borderRadius: '10px',
+                        fontSize: '0.8rem',
+                        marginY: '18px',
+                        textTransform:'initial',
                         '&:hover': {
                             backgroundColor: '#364F6B', // Màu nền thay đổi khi hover
                             color: 'white'
                         },
                     }}>
+                        <VisibilityIcon sx={{ marginRight: '5px', height: '90%' }} />
                         Xem trước
                     </Button>
                     <Button sx={{
                         color: '#364F6B',
                         backgroundColor: 'white',
                         border: '2px solid #364F6B',
-                        borderRadius: '50px',
-                        margin: '10px',
-                        paddingX: '15px',
+                        borderRadius: '10px',
+                        fontSize: '0.8rem',
+                        marginY: '18px',
+                        marginX: '15px',
+                        paddingX: '10px',
+                        textTransform:'initial',
                         '&:hover': {
                             backgroundColor: '#364F6B', // Màu nền thay đổi khi hover
                             color: 'white'
                         },
                     }}>
+                        <PaletteIcon sx={{ marginRight: '5px', height: '80%' }} />
                         Chủ đề
                     </Button>
                 </Box>
@@ -123,7 +133,7 @@ function DetailForm() {
                         color: 'white',
                         border: '2px solid #364F6B',
                         backgroundColor: '#364F6B',
-                        borderRadius: '50px',
+                        borderRadius: '10px',
                         marginY: '10px',
                         paddingX: '15px',
                         '&:hover': {
@@ -136,7 +146,7 @@ function DetailForm() {
                         color: '#364F6B',
                         backgroundColor: 'white',
                         border: '2px solid #364F6B',
-                        borderRadius: '50px',
+                        borderRadius: '10px',
                         margin: '10px',
                         paddingX: '15px',
                         '&:hover': {
@@ -151,7 +161,7 @@ function DetailForm() {
                 <Box sx={{ display: 'flex', alignContent: 'center', margin: '15px' }}>
                     <Box sx={{ display: 'flex', alignContent: 'center', flexDirection: 'column' }}>
                         <Typography variant='h4' component="div">Tiêu đề biểu mẫu</Typography>
-                        <Typography variant='inherit' component="div">Mô tả biểu mẫu</Typography>
+                        <Typography variant='body1' component="div">Mô tả biểu mẫu</Typography>
                     </Box>
                     <Box sx={{ flexGrow: 1 }} />
 
@@ -160,13 +170,13 @@ function DetailForm() {
                         sx={{
                             color: 'white',
                             backgroundColor: '#364F6B',
-                            borderRadius: '50px',
+                            borderRadius: '10px',
                             margin: '10px',
                             '&:hover': {
                                 backgroundColor: '#2E4155', // Màu nền thay đổi khi hover
                             },
                         }}>
-                        Chỉnh sửa
+                        Sửa tiêu đề
                     </Button>
 
                     <Modal
@@ -232,11 +242,11 @@ function DetailForm() {
                         <Table sx={{ minWidth: 650 }} aria-label="simple table">
                             <TableHead>
                                 <TableRow>
-                                    <TableCell align="center">STT</TableCell>
-                                    <TableCell align="center">Tiêu đề</TableCell>
-                                    <TableCell align="center">Dạng</TableCell>
-                                    <TableCell align="center">Ghi chú</TableCell>
-                                    <TableCell align="center">Chỉnh sửa</TableCell>
+                                    <TableCell sx={{ fontWeight: 800, fontSize: '1rem' }}  align="left">STT</TableCell>
+                                    <TableCell sx={{ fontWeight: 800, fontSize: '1rem' }}  align="left">Tiêu đề</TableCell>
+                                    <TableCell sx={{ fontWeight: 800, fontSize: '1rem' }}  align="left">Dạng</TableCell>
+                                    <TableCell sx={{ fontWeight: 800, fontSize: '1rem' }}  align="left">Ghi chú</TableCell>
+                                    <TableCell sx={{ fontWeight: 800, fontSize: '1rem' }}  align="center">Chỉnh sửa</TableCell>
                                 </TableRow >
                             </TableHead>
                             <TableBody>
@@ -245,13 +255,13 @@ function DetailForm() {
                                         key={row.title}
                                         sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                     >
-                                        <TableCell component="th" scope="row" align="center">
+                                        <TableCell sx={{ fontWeight: 500, fontSize: '1.05rem' }} component="th" scope="row" align="left">
                                             {index + 1}
                                         </TableCell>
-                                        <TableCell align="center">{row.title}</TableCell>
-                                        <TableCell align="center">{row.type}</TableCell>
-                                        <TableCell align="center">{row.note}</TableCell>
-                                        <TableCell align="center">
+                                        <TableCell sx={{ fontWeight: 400, fontSize: '1.05rem' }} align="left">{row.title}</TableCell>
+                                        <TableCell sx={{ fontWeight: 400, fontSize: '1.05rem' }} align="left">{row.type}</TableCell>
+                                        <TableCell sx={{ fontWeight: 400, fontSize: '1.05rem' }} align="left">{row.note}</TableCell>
+                                        <TableCell sx={{ fontWeight: 400, fontSize: '1.05rem' }} align="center">
                                             <IconButton sx={{
                                                 backgroundColor: '#364F6B',
                                                 color: 'white',
@@ -314,13 +324,14 @@ function DetailForm() {
                             sx={{
                                 color: 'white',
                                 backgroundColor: '#364F6B',
-                                borderRadius: '20px',
-                                paddingX: '20px',
+                                borderRadius: '15px',
+                                paddingX: '15px',
                                 margin: '15px',
                                 '&:hover': {
                                     backgroundColor: '#2E4155', // Màu nền thay đổi khi hover
                                 },
                             }}>
+                                <AddCircleOutlineIcon sx={{marginRight:'8px'}}/>
                             Thêm mới
                         </Button>
                     </Box>

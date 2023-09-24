@@ -19,11 +19,16 @@ import HomeIcon from '@mui/icons-material/Home';
 import InfoIcon from '@mui/icons-material/Info';
 import ArticleIcon from '@mui/icons-material/Article';
 import NotificationsIcon from '@mui/icons-material/Notifications';
+import LogoutIcon from '@mui/icons-material/Logout';
+
+import '@fontsource/roboto/300.css';
+import '@fontsource/roboto/400.css';
+import '@fontsource/roboto/500.css';
+import '@fontsource/roboto/700.css';
 
 import avatarimage from "../../assets/avatar.jpg"
 // import TempDrawer from './TempDrawer'
 import "./home.style.css";
-import MyForms from './MyForms';
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
     open?: boolean;
@@ -66,7 +71,7 @@ const AppBar = styled(MuiAppBar, {
 }));
 
 //Setting for Drawer
-const drawerWidth = 240;
+const drawerWidth = 300;
 
 const DrawerHeader = styled('div')(({ theme }) => ({
     display: 'flex',
@@ -111,10 +116,10 @@ function HomePage({ pageComponent: PageComponent }: ParentComponentProps): JSX.E
                     <Box sx={{ flexGrow: 1 }} />
 
                     <Box sx={{ display: 'flex', flexDirection: 'column', marginRight: '5px' }}>
-                        <Typography variant="subtitle1" color="black" noWrap component="div">
+                        <Typography sx={{ fontWeight: 500 }} variant="subtitle1" color="black" noWrap component="div">
                             Thành Đặng
                         </Typography>
-                        <Typography sx={{ color: '#364F6B' }} variant="body2" noWrap component="div">
+                        <Typography sx={{ fontWeight: 'bold', color: '#364F6B' }} variant="body2" noWrap component="div">
                             Khoa Khoa học và Kỹ thuật Máy tính
                         </Typography>
                     </Box>
@@ -155,15 +160,19 @@ function HomePage({ pageComponent: PageComponent }: ParentComponentProps): JSX.E
                     </DrawerHeader>
                     <Divider />
                     <List>
-                        {['Trang  chủ', 'Thông  tin cá nhân', 'Trang của tôi'].map((text, index) => (
-                            <ListItem key={text} disablePadding>
+                        {['Trang  chủ', 'Thông  tin cá nhân', 'Forms của tôi'].map((text, index) => (
+                            <ListItem key={text} sx={{paddingY:'5px'}} disablePadding>
                                 <ListItemButton>
-                                    <ListItemIcon>
+                                    <ListItemIcon sx={{marginLeft:'25px'}}>
                                         {index === 0 ? <HomeIcon sx={{ color: 'white' }} /> : ''}
                                         {index === 1 ? <InfoIcon sx={{ color: 'white' }} /> : ''}
                                         {index === 2 ? <ArticleIcon sx={{ color: 'white' }} /> : ''}
                                     </ListItemIcon>
-                                    <ListItemText sx={{ color: 'white' }} primary={text} />
+                                    <ListItemText>
+                                        <Typography sx={{ fontWeight: 400, fontSize: '1.1rem', color: 'white' }}>
+                                            {text}
+                                        </Typography>
+                                    </ListItemText>
                                 </ListItemButton>
                             </ListItem>
                         ))}
@@ -173,17 +182,27 @@ function HomePage({ pageComponent: PageComponent }: ParentComponentProps): JSX.E
                     <Box sx={{ flexGrow: 1 }} />
 
                     <List sx={{ backgroundColor: '#364F6B', alignItems: 'center', display: 'flex', justifyContent: 'center' }} >
-                        <Button>
-                            <Typography sx={{ color: 'white' }} variant="body2" noWrap component="div">
-                                Đăng xuất
-                            </Typography>
+                        <Button sx={{
+                            color: '#364F6B',
+                            backgroundColor: 'white',
+                            border: '2px solid #364F6B',
+                            borderRadius: '10px',
+                            margin: '20px',
+                            paddingX: '45px',
+                            '&:hover': {
+                                backgroundColor: 'white', // Màu nền thay đổi khi hover
+                                color: '#364F6B'
+                            },
+                        }}>
+                            <LogoutIcon sx={{paddingRight:'5px'}}/>
+                            Đăng xuất
                         </Button>
                     </List>
                 </Box>
             </Drawer>
 
             <Main sx={{ backgroundColor: '#EBEBEB' }} open={open}>
-                <PageComponent/>
+                <PageComponent />
             </Main>
         </Box >
     );
