@@ -116,26 +116,6 @@ function MyForms() {
                         />
                     </Search>
                     <Box sx={{ flexGrow: 1 }} />
-                    <Typography>
-                        Số lượng/Trang:
-                    </Typography>
-                    <FormControl sx={{ m: 2, minWidth: 120 }} size="small">
-                        <InputLabel id="demo-select-small-label">Số lượng</InputLabel>
-                        <Select
-                            labelId="demo-select-small-label"
-                            id="demo-select-small"
-                            value={itemsPerPage}
-                            label="ItemsPerPage"
-                            onChange={handleChange}
-                        >
-                            <MenuItem value="">
-                                <em>None</em>
-                            </MenuItem>
-                            <MenuItem value={5}>5</MenuItem>
-                            <MenuItem value={10}>10</MenuItem>
-                            <MenuItem value={15}>15</MenuItem>
-                        </Select>
-                    </FormControl>
 
                     <Button sx={{
                         backgroundColor: '#364F6B',
@@ -145,7 +125,7 @@ function MyForms() {
                         },
                     }}>
                         <Typography sx={{ fontWeight: 500, color: 'white', paddingX: '10px', paddingY: '4px' }} variant="body2" noWrap component="div">
-                            Thêm Form
+                            Tạo Form
                         </Typography>
                     </Button>
                 </Box>
@@ -156,12 +136,12 @@ function MyForms() {
                         <Table sx={{ minWidth: 650 }} aria-label="simple table">
                             <TableHead>
                                 <TableRow >
-                                    <TableCell sx={{ fontWeight: 800, fontSize: '1rem' }} align="left">STT</TableCell>
-                                    <TableCell sx={{ fontWeight: 800, fontSize: '1rem' }} align="left">Tên Form</TableCell>
-                                    <TableCell sx={{ fontWeight: 800, fontSize: '1rem' }} align="center">Chủ sở hữu</TableCell>
-                                    <TableCell sx={{ fontWeight: 800, fontSize: '1rem' }} align="center">Phản hồi</TableCell>
-                                    <TableCell sx={{ fontWeight: 800, fontSize: '1rem' }} align="center">Chi tiết form</TableCell>
-                                    <TableCell sx={{ fontWeight: 800, fontSize: '1rem' }} align="center">Tình trạng</TableCell>
+                                    <TableCell sx={{padding: 2, fontWeight: 800, fontSize: '1rem' }} align="left">STT</TableCell>
+                                    <TableCell sx={{padding: 1, fontWeight: 800, fontSize: '1rem' }} align="left">Tên Form</TableCell>
+                                    <TableCell sx={{padding: 1, fontWeight: 800, fontSize: '1rem' }} align="center">Quyền truy cập</TableCell>
+                                    <TableCell sx={{padding: 1, fontWeight: 800, fontSize: '1rem' }} align="center">Phản hồi</TableCell>
+                                    <TableCell sx={{padding: 1, fontWeight: 800, fontSize: '1rem' }} align="center">Tình trạng</TableCell>
+                                    <TableCell sx={{padding: 1, fontWeight: 800, fontSize: '1rem' }} align="center">Thao tác</TableCell>
                                 </TableRow >
                             </TableHead>
                             <TableBody>
@@ -170,28 +150,13 @@ function MyForms() {
                                         key={row.name}
                                         sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                     >
-                                        <TableCell sx={{ fontWeight: 500, fontSize: '1.05rem' }} component="th" scope="row" align="left">
+                                        <TableCell sx={{ padding: 2, fontWeight: 500, fontSize: '1.05rem' }} component="th" scope="row" align="left">
                                             {index + 1}
                                         </TableCell>
-                                        <TableCell sx={{ fontWeight: 400, fontSize: '1.05rem' }} align="left">{row.name}</TableCell>
-                                        <TableCell sx={{ fontWeight: 400, fontSize: '1.05rem' }} align="center">{row.owner}</TableCell>
-                                        <TableCell sx={{ fontWeight: 400, fontSize: '1.05rem' }} align="center">{row.response}</TableCell>
-                                        <TableCell align="center">
-                                            <Link to="/detail">
-                                                <Button sx={{
-                                                    backgroundColor: '#364F6B',
-                                                    margin: '10px',
-                                                    '&:hover': {
-                                                        backgroundColor: '#176B87', // Màu nền thay đổi khi hover
-                                                    },
-                                                }}>
-                                                    <Typography sx={{ color: 'white', paddingX: '5px', paddingY: '2px' }} variant="body2" noWrap component="div">
-                                                        Xem chi tiết
-                                                    </Typography>
-                                                </Button>
-                                            </Link>
-                                        </TableCell>
-                                        <TableCell align="center">
+                                        <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="left">{row.name}</TableCell>
+                                        <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="center">{row.owner}</TableCell>
+                                        <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="center">{row.response}</TableCell>
+                                        <TableCell sx={{ padding: 1 }} align="center">
                                             {row.isOpen ?
                                                 <Button sx={{
                                                     backgroundColor: '#176B87',
@@ -217,12 +182,64 @@ function MyForms() {
                                                     </Typography>
                                                 </Button>}
                                         </TableCell>
+                                        <TableCell sx={{ padding: 1 }} align="center">
+                                            <Link to="/detail">
+                                                <Button sx={{
+                                                    backgroundColor: '#364F6B',
+                                                    margin: '10px',
+                                                    '&:hover': {
+                                                        backgroundColor: '#176B87', // Màu nền thay đổi khi hover
+                                                    },
+                                                }}>
+                                                    <Typography sx={{ color: 'white', paddingX: '5px', paddingY: '2px' }} variant="body2" noWrap component="div">
+                                                        Chỉnh sửa
+                                                    </Typography>
+                                                </Button>
+                                            </Link>
+                                            <Link to="/detail">
+                                                <Button sx={{
+                                                    backgroundColor: '#364F6B',
+                                                    margin: '10px',
+                                                    '&:hover': {
+                                                        backgroundColor: '#176B87', // Màu nền thay đổi khi hover
+                                                    },
+                                                }}>
+                                                    <Typography sx={{ color: 'white', paddingX: '5px', paddingY: '2px' }} variant="body2" noWrap component="div">
+                                                        Xem phản hồi
+                                                    </Typography>
+                                                </Button>
+                                            </Link>
+                                        </TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>
                         </Table>
                     </TableContainer>
                 </Box>
+
+                <Divider/>
+                    <Box sx={{display:'flex', alignItems:'center', justifyContent:'end'}}>
+                        <Typography>
+                            Số lượng/Trang:
+                        </Typography>
+                        <FormControl sx={{ m: 2, minWidth: 120 }} size="small">
+                            <InputLabel id="demo-select-small-label">Số lượng</InputLabel>
+                            <Select
+                                labelId="demo-select-small-label"
+                                id="demo-select-small"
+                                value={itemsPerPage}
+                                label="ItemsPerPage"
+                                onChange={handleChange}
+                            >
+                                <MenuItem value="">
+                                    <em>None</em>
+                                </MenuItem>
+                                <MenuItem value={5}>5</MenuItem>
+                                <MenuItem value={10}>10</MenuItem>
+                                <MenuItem value={15}>15</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </Box>
             </Box>
         </div>
     )

@@ -7,6 +7,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import Button from '@mui/material/Button';
 import Badge from '@mui/material/Badge';
 import InputBase from '@mui/material/InputBase';
+import { Link } from 'react-router-dom';
 
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
@@ -14,7 +15,6 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-
 import HomeIcon from '@mui/icons-material/Home';
 import InfoIcon from '@mui/icons-material/Info';
 import ArticleIcon from '@mui/icons-material/Article';
@@ -27,6 +27,7 @@ import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 
 import avatarimage from "../../assets/avatar.jpg"
+import logodrawer from "../../assets/logo.png"
 // import TempDrawer from './TempDrawer'
 import "./home.style.css";
 
@@ -151,30 +152,37 @@ function HomePage({ pageComponent: PageComponent }: ParentComponentProps): JSX.E
             >
                 <Box sx={{ display: 'flex', flexDirection: 'column', backgroundColor: "#364F6B", height: '100%' }}>
                     <DrawerHeader sx={{ backgroundColor: '#364F6B' }}>
-                        <Typography sx={{ color: 'white', marginRight: '40px' }} variant="h5" noWrap component="div">
+                        <Box sx={{ backgroundColor: '#364F6B', width: "100%", display: "grid", justifyItems: 'center', paddingTop:'4px' }}>
+                            <Link to="/">
+                                <img src={logodrawer} alt="no_img" height={55} />
+                            </Link>
+                        </Box>
+                        {/* <Typography sx={{ color: 'white', marginRight: '40px' }} variant="h5" noWrap component="div">
                             My  Logo
-                        </Typography>
+                        </Typography> */}
                         <IconButton onClick={handleDrawerClose}>
                             {theme.direction === 'ltr' ? <ChevronLeftIcon sx={{ color: 'white' }} /> : <ChevronRightIcon sx={{ color: 'white' }} />}
                         </IconButton>
                     </DrawerHeader>
                     <Divider />
                     <List>
-                        {['Trang  chủ', 'Thông  tin cá nhân', 'Forms của tôi'].map((text, index) => (
-                            <ListItem key={text} sx={{paddingY:'5px'}} disablePadding>
-                                <ListItemButton>
-                                    <ListItemIcon sx={{marginLeft:'25px'}}>
-                                        {index === 0 ? <HomeIcon sx={{ color: 'white' }} /> : ''}
-                                        {index === 1 ? <InfoIcon sx={{ color: 'white' }} /> : ''}
-                                        {index === 2 ? <ArticleIcon sx={{ color: 'white' }} /> : ''}
-                                    </ListItemIcon>
-                                    <ListItemText>
-                                        <Typography sx={{ fontWeight: 400, fontSize: '1.1rem', color: 'white' }}>
-                                            {text}
-                                        </Typography>
-                                    </ListItemText>
-                                </ListItemButton>
-                            </ListItem>
+                        {[{id: 1, text: 'Trang chủ', path: '/' }, { id: 2, text: 'Thông tin cá nhân', path: '/' }, { id: 3, text: 'Forms của tôi', path: '/' }].map((item) => (
+                            <Link to={item.path}>
+                                <ListItem key={item.text} sx={{ paddingY: '5px' }} disablePadding>
+                                    <ListItemButton>
+                                        <ListItemIcon sx={{ marginLeft: '25px' }}>
+                                            {item.id === 1 ? <HomeIcon sx={{ color: 'white' }} /> : ''}
+                                            {item.id === 2 ? <InfoIcon sx={{ color: 'white' }} /> : ''}
+                                            {item.id === 3 ? <ArticleIcon sx={{ color: 'white' }} /> : ''}
+                                        </ListItemIcon>
+                                        <ListItemText>
+                                            <Typography sx={{ fontWeight: 400, fontSize: '1.1rem', color: 'white' }}>
+                                                {item.text}
+                                            </Typography>
+                                        </ListItemText>
+                                    </ListItemButton>
+                                </ListItem>
+                            </Link>
                         ))}
                     </List>
                     <Divider />
@@ -194,12 +202,12 @@ function HomePage({ pageComponent: PageComponent }: ParentComponentProps): JSX.E
                                 color: '#364F6B'
                             },
                         }}>
-                            <LogoutIcon sx={{paddingRight:'5px'}}/>
+                            <LogoutIcon sx={{ paddingRight: '5px' }} />
                             Đăng xuất
                         </Button>
                     </List>
                 </Box>
-            </Drawer>
+            </Drawer >
 
             <Main sx={{ backgroundColor: '#EBEBEB' }} open={open}>
                 <PageComponent />

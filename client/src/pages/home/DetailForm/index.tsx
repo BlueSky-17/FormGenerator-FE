@@ -17,7 +17,7 @@ import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown';
 import ArrowCircleUpIcon from '@mui/icons-material/ArrowCircleUp';
 import DeleteIcon from '@mui/icons-material/Delete';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import PaletteIcon from '@mui/icons-material/Palette';
+import SettingsIcon from '@mui/icons-material/Settings';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
@@ -54,7 +54,7 @@ function createData(
     return { title, type, note, isHead };
 }
 
-const rows = [
+let rows = [
     createData('Họ và tên', 'Điền ngắn', 'K', true, false),
     createData('Giới tính', 'Trắc nghiệm', 'Nam | Nữ', false, false),
     createData('Ngày sinh', 'Lựa chọn', 'Ngày | Tháng | Năm', false, false),
@@ -86,16 +86,24 @@ function DetailForm() {
         setType(event.target.value as string);
     };
 
+    const [deleted,setDelete] = React.useState('');
+
+    const handleDelete = (title: string) => (event: any) => {
+        rows = rows.filter(row => row.title !== title);
+        console.log(rows);
+        setDelete(title);
+    }
+
     return (
         <div>
             <DrawerHeader />
-            <Box sx={{ backgroundColor: 'white', border: "2px solid #DEDEDE" }}>
+            <Box sx={{ backgroundColor: 'white' }}>
                 <Box sx={{ display: 'flex' }}>
-                    <Typography sx={{ color: '#364F6B', padding: '15px', fontWeight: 600 }} variant="h6" noWrap component="div">
-                        FORMS CỦA TÔI
+                    <Typography sx={{ color: '#364F6B', padding: '12px', fontWeight: 600 }} variant="h4" noWrap component="div">
+                        KHẢO SÁT CHẤT LƯỢNG SINH VIÊN K22
                     </Typography>
                     <Box sx={{ flexGrow: 1 }} />
-                    <Button sx={{
+                    {/* <Button sx={{
                         color: '#364F6B',
                         backgroundColor: 'white',
                         border: '2px solid #364F6B',
@@ -110,28 +118,33 @@ function DetailForm() {
                     }}>
                         <VisibilityIcon sx={{ marginRight: '5px', height: '90%' }} />
                         Xem trước
+                    </Button> */}
+
+                    <Button
+                        sx={{
+                            color: 'white',
+                            backgroundColor: '#364F6B',
+                            borderRadius: '10px',
+                            marginY: '12px',
+                            '&:hover': {
+                                backgroundColor: '#2E4155', // Màu nền thay đổi khi hover
+                            },
+                        }}>
+                        Lưu
                     </Button>
-                    <Button sx={{
+
+                    <IconButton sx={{
                         color: '#364F6B',
                         backgroundColor: 'white',
-                        border: '2px solid #364F6B',
-                        borderRadius: '10px',
-                        fontSize: '0.8rem',
-                        marginY: '18px',
-                        marginX: '15px',
-                        paddingX: '10px',
-                        textTransform: 'initial',
-                        '&:hover': {
-                            backgroundColor: '#364F6B', // Màu nền thay đổi khi hover
-                            color: 'white'
-                        },
+                        margin: '5px',
+                        marginY: '15px',
                     }}>
-                        <PaletteIcon sx={{ marginRight: '5px', height: '80%' }} />
-                        Chủ đề
-                    </Button>
+                        <SettingsIcon />
+                    </IconButton>
                 </Box>
 
                 <Divider />
+
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '5px', borderBottom: "10px solid #364F6B" }}>
                     <Button sx={{
                         color: 'white',
@@ -163,25 +176,7 @@ function DetailForm() {
                 </Box>
 
                 <Box sx={{ display: 'flex', alignContent: 'center', margin: '15px' }}>
-                    <Box sx={{ display: 'flex', alignContent: 'center', flexDirection: 'column' }}>
-                        <Typography variant='h4' component="div">Tiêu đề biểu mẫu</Typography>
-                        <Typography variant='body1' component="div">Mô tả biểu mẫu</Typography>
-                    </Box>
-                    <Box sx={{ flexGrow: 1 }} />
-
-                    <Button
-                        onClick={handleOpen}
-                        sx={{
-                            color: 'white',
-                            backgroundColor: '#364F6B',
-                            borderRadius: '10px',
-                            margin: '10px',
-                            '&:hover': {
-                                backgroundColor: '#2E4155', // Màu nền thay đổi khi hover
-                            },
-                        }}>
-                        Sửa tiêu đề
-                    </Button>
+                    <Typography sx={{}} variant='body1' component="div">Mô tả biểu mẫu</Typography>
 
                     <Modal
                         open={open}
@@ -297,11 +292,11 @@ function DetailForm() {
                         <Table sx={{ minWidth: 650 }} aria-label="simple table">
                             <TableHead>
                                 <TableRow>
-                                    <TableCell sx={{ fontWeight: 800, fontSize: '1rem' }} align="left">STT</TableCell>
-                                    <TableCell sx={{ fontWeight: 800, fontSize: '1rem' }} align="left">Tiêu đề</TableCell>
-                                    <TableCell sx={{ fontWeight: 800, fontSize: '1rem' }} align="left">Dạng</TableCell>
-                                    <TableCell sx={{ fontWeight: 800, fontSize: '1rem' }} align="left">Ghi chú</TableCell>
-                                    <TableCell sx={{ fontWeight: 800, fontSize: '1rem' }} align="center">Chỉnh sửa</TableCell>
+                                    <TableCell sx={{ padding: 1, fontWeight: 800, fontSize: '1rem' }} align="left">Tiêu đề</TableCell>
+                                    <TableCell sx={{ padding: 1, fontWeight: 800, fontSize: '1rem' }} align="left">STT</TableCell>
+                                    <TableCell sx={{ padding: 1, fontWeight: 800, fontSize: '1rem' }} align="left">Dạng</TableCell>
+                                    <TableCell sx={{ padding: 1, fontWeight: 800, fontSize: '1rem' }} align="left">Ghi chú</TableCell>
+                                    <TableCell sx={{ padding: 1, fontWeight: 800, fontSize: '1rem' }} align="center">Chỉnh sửa</TableCell>
                                 </TableRow >
                             </TableHead>
                             <TableBody>
@@ -310,14 +305,16 @@ function DetailForm() {
                                         key={row.title}
                                         sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                     >
-                                        <TableCell sx={{ fontWeight: 500, fontSize: '1.05rem' }} component="th" scope="row" align="left">
+                                        <TableCell sx={{ padding: 1, fontWeight: 500, fontSize: '1.05rem' }} component="th" scope="row" align="left">
                                             {index + 1}
                                         </TableCell>
-                                        <TableCell sx={{ fontWeight: 400, fontSize: '1.05rem' }} align="left">{row.title}</TableCell>
-                                        <TableCell sx={{ fontWeight: 400, fontSize: '1.05rem' }} align="left">{row.type}</TableCell>
-                                        <TableCell sx={{ fontWeight: 400, fontSize: '1.05rem' }} align="left">{row.note}</TableCell>
-                                        <TableCell sx={{ fontWeight: 400, fontSize: '1.05rem' }} align="center">
-                                            <IconButton sx={{
+                                        <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="left">{row.title}</TableCell>
+                                        <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="left">{row.type}</TableCell>
+                                        <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="left">{row.note}</TableCell>
+                                        <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="center">
+                                            <IconButton 
+                                            onClick={handleOpen}
+                                            sx={{
                                                 backgroundColor: '#364F6B',
                                                 color: 'white',
                                                 margin: '5px',
@@ -357,7 +354,9 @@ function DetailForm() {
                                             }}>
                                                 <ArrowCircleUpIcon />
                                             </IconButton>
-                                            <IconButton sx={{
+                                            <IconButton 
+                                            onClick={handleDelete(row.title)}
+                                            sx={{
                                                 backgroundColor: '#364F6B',
                                                 color: 'white',
                                                 margin: '5px',
