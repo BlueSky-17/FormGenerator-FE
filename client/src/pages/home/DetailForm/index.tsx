@@ -10,6 +10,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
+import Popover from '@mui/material/Popover';
 
 import EditIcon from '@mui/icons-material/Edit';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
@@ -34,6 +35,13 @@ import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormLabel from '@mui/material/FormLabel';
 import Checkbox from '@mui/material/Checkbox';
+import { isConstructorDeclaration } from 'typescript';
+
+import Pagination from '@mui/material/Pagination';
+import Stack from '@mui/material/Stack';
+import { Link } from 'react-router-dom';
+
+import uuid from "react-uuid"
 
 const DrawerHeader = styled('div')(({ theme }) => ({
     display: 'flex',
@@ -45,21 +53,22 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 }));
 
 function createData(
+    id: string,
     title: string,
     type: string,
     note: string,
     isHead: boolean,
     isTail: boolean
 ) {
-    return { title, type, note, isHead };
+    return { id, title, type, note, isHead };
 }
 
 let rows = [
-    createData('Họ và tên', 'Điền ngắn', 'K', true, false),
-    createData('Giới tính', 'Trắc nghiệm', 'Nam | Nữ', false, false),
-    createData('Ngày sinh', 'Lựa chọn', 'Ngày | Tháng | Năm', false, false),
-    createData('Nơi sinh', 'Lựa chọn', 'Xã | Huyện | Tỉnh', false, false),
-    createData('Ảnh', 'Ảnh', '4x6 cm', false, true),
+    createData(uuid(), 'Họ và tên', 'Điền ngắn', 'K', true, false),
+    createData(uuid(), 'Giới tính', 'Trắc nghiệm', 'Nam | Nữ', false, false),
+    createData(uuid(), 'Ngày sinh', 'Lựa chọn', 'Ngày | Tháng | Năm', false, false),
+    createData(uuid(), 'Nơi sinh', 'Lựa chọn', 'Xã | Huyện | Tỉnh', false, false),
+    createData(uuid(), 'Ảnh', 'Ảnh', '4x6 cm', false, true),
 ];
 
 const style = {
@@ -75,6 +84,12 @@ const style = {
     p: 4,
 };
 
+const getId = () => {
+    const id_ = uuid();
+    console.log(id_);
+    return id_;
+}
+
 function DetailForm() {
     const [open, setOpen] = React.useState(false);
     const handleOpen = () => setOpen(true);
@@ -86,13 +101,63 @@ function DetailForm() {
         setType(event.target.value as string);
     };
 
-    const [deleted,setDelete] = React.useState('');
+    const [deleted, setDelete] = React.useState('');
 
-    const handleDelete = (title: string) => (event: any) => {
-        rows = rows.filter(row => row.title !== title);
+    const handleDelete = (id: string) => (event: any) => {
+        console.log(id);
+        rows = rows.filter(row => row.id !== id);
         console.log(rows);
-        setDelete(title);
+        setDelete(id);
     }
+
+    const [duplicated, setDuplicate] = React.useState('');
+
+    const handleDuplicate = (id_: string, index: number) => (event: any) => {
+        // console.log(rows, id_, index);
+        let temp = rows.filter(row => row.id === id_);
+        let result = temp[0];
+        temp = [];
+        // console.log(result);
+        rows.splice(index + 1, 0, createData(uuid(), result.title, result.type, result.note, result.isHead, false));
+        setDuplicate(rows[index].id);
+    }
+
+    const [swaped, setSwap] = React.useState('');
+
+    function swapElements<T>(arr: T[], index: number): T[] {
+        // Kiểm tra xem index có hợp lệ không
+        if (index < 0 || index >= arr.length - 1) {
+            console.error("Invalid index for swapping elements.");
+            return arr; // Trả về mảng ban đầu nếu index không hợp lệ
+        }
+
+        // Hoán đổi vị trí của hai phần tử liên tiếp
+        const temp = arr[index];
+        arr[index] = arr[index + 1];
+        arr[index + 1] = temp;
+
+        return arr;
+    }
+
+    const handleSwap = (id_: string, index: number) => (event: any) => {
+        rows = swapElements(rows, index);
+        console.log(rows[index].title)
+        setSwap(rows[index].id);
+    }
+
+
+    const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
+
+    const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleCloseSetting = () => {
+        setAnchorEl(null);
+    };
+
+    const open_avatar = Boolean(anchorEl);
+    const id = open_avatar ? 'simple-popover' : undefined;
 
     return (
         <div>
@@ -133,14 +198,34 @@ function DetailForm() {
                         Lưu
                     </Button>
 
-                    <IconButton sx={{
-                        color: '#364F6B',
-                        backgroundColor: 'white',
-                        margin: '5px',
-                        marginY: '15px',
-                    }}>
+                    <IconButton
+                        aria-describedby={id} onClick={handleClick}
+                        sx={{
+                            color: '#364F6B',
+                            backgroundColor: 'white',
+                            margin: '5px',
+                            marginY: '15px',
+                        }}>
                         <SettingsIcon />
                     </IconButton>
+                    <Popover
+                        id={id}
+                        open={open_avatar}
+                        anchorEl={anchorEl}
+                        onClose={handleCloseSetting}
+                        anchorOrigin={{
+                            vertical: 'bottom',
+                            horizontal: 'right',
+                        }}
+                    >
+                        <Link to='/form/view'>
+                            <Button sx={{ p: 2, fontWeight: 500, color: 'black', textTransform: 'initial', fontSize: '15px' }}>Xem trước</Button>
+                        </Link>
+                        <Divider />
+                        <Button sx={{ p: 2, fontWeight: 500, color: 'black', textTransform: 'initial', fontSize: '15px' }}>Sửa chủ đề</Button>
+                        <Divider />
+                        <Button sx={{ p: 2, fontWeight: 500, color: 'black', textTransform: 'initial', fontSize: '15px' }}>Đóng Form</Button>
+                    </Popover>
                 </Box>
 
                 <Divider />
@@ -302,7 +387,7 @@ function DetailForm() {
                             <TableBody>
                                 {rows.map((row, index) => (
                                     <TableRow
-                                        key={row.title}
+                                        key={row.id}
                                         sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                     >
                                         <TableCell sx={{ padding: 1, fontWeight: 500, fontSize: '1.05rem' }} component="th" scope="row" align="left">
@@ -312,36 +397,40 @@ function DetailForm() {
                                         <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="left">{row.type}</TableCell>
                                         <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="left">{row.note}</TableCell>
                                         <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="center">
-                                            <IconButton 
-                                            onClick={handleOpen}
-                                            sx={{
-                                                backgroundColor: '#364F6B',
-                                                color: 'white',
-                                                margin: '5px',
-                                                '&:hover': {
-                                                    backgroundColor: '#176B87', // Màu nền thay đổi khi hover
-                                                },
-                                            }}>
+                                            <IconButton
+                                                onClick={handleOpen}
+                                                sx={{
+                                                    backgroundColor: '#364F6B',
+                                                    color: 'white',
+                                                    margin: '5px',
+                                                    '&:hover': {
+                                                        backgroundColor: '#176B87', // Màu nền thay đổi khi hover
+                                                    },
+                                                }}>
                                                 <EditIcon />
                                             </IconButton>
-                                            <IconButton sx={{
-                                                backgroundColor: '#364F6B',
-                                                color: 'white',
-                                                margin: '5px',
-                                                '&:hover': {
-                                                    backgroundColor: '#176B87', // Màu nền thay đổi khi hover
-                                                },
-                                            }}>
+                                            <IconButton
+                                                onClick={handleDuplicate(row.id, index)}
+                                                sx={{
+                                                    backgroundColor: '#364F6B',
+                                                    color: 'white',
+                                                    margin: '5px',
+                                                    '&:hover': {
+                                                        backgroundColor: '#176B87', // Màu nền thay đổi khi hover
+                                                    },
+                                                }}>
                                                 <ContentCopyIcon />
                                             </IconButton>
-                                            <IconButton sx={{
-                                                backgroundColor: '#364F6B',
-                                                color: 'white',
-                                                margin: '5px',
-                                                '&:hover': {
-                                                    backgroundColor: '#176B87', // Màu nền thay đổi khi hover
-                                                },
-                                            }}>
+                                            <IconButton
+                                                onClick={handleSwap(row.id, index)}
+                                                sx={{
+                                                    backgroundColor: '#364F6B',
+                                                    color: 'white',
+                                                    margin: '5px',
+                                                    '&:hover': {
+                                                        backgroundColor: '#176B87', // Màu nền thay đổi khi hover
+                                                    },
+                                                }}>
                                                 <ArrowCircleDownIcon />
                                             </IconButton>
                                             <IconButton sx={{
@@ -354,16 +443,16 @@ function DetailForm() {
                                             }}>
                                                 <ArrowCircleUpIcon />
                                             </IconButton>
-                                            <IconButton 
-                                            onClick={handleDelete(row.title)}
-                                            sx={{
-                                                backgroundColor: '#364F6B',
-                                                color: 'white',
-                                                margin: '5px',
-                                                '&:hover': {
-                                                    backgroundColor: '#176B87', // Màu nền thay đổi khi hover
-                                                },
-                                            }}>
+                                            <IconButton
+                                                onClick={handleDelete(row.id)}
+                                                sx={{
+                                                    backgroundColor: '#364F6B',
+                                                    color: 'white',
+                                                    margin: '5px',
+                                                    '&:hover': {
+                                                        backgroundColor: '#176B87', // Màu nền thay đổi khi hover
+                                                    },
+                                                }}>
                                                 <DeleteIcon />
                                             </IconButton>
                                         </TableCell>

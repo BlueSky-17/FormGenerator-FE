@@ -8,6 +8,7 @@ import Button from '@mui/material/Button';
 import Badge from '@mui/material/Badge';
 import InputBase from '@mui/material/InputBase';
 import { Link } from 'react-router-dom';
+import Popover from '@mui/material/Popover';
 
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
@@ -100,6 +101,19 @@ function HomePage({ pageComponent: PageComponent }: ParentComponentProps): JSX.E
         setOpen(false);
     };
 
+    const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
+
+    const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
+    const open_avatar = Boolean(anchorEl);
+    const id = open_avatar ? 'simple-popover' : undefined;
+
     return (
         <Box sx={{ display: 'flex' }}>
             <CssBaseline />
@@ -131,9 +145,23 @@ function HomePage({ pageComponent: PageComponent }: ParentComponentProps): JSX.E
                         </Badge>
                     </IconButton>
 
-                    <IconButton>
+                    <IconButton aria-describedby={id} onClick={handleClick}>
                         <Avatar src={avatarimage} />
                     </IconButton>
+                    <Popover
+                        id={id}
+                        open={open_avatar}
+                        anchorEl={anchorEl}
+                        onClose={handleClose}
+                        anchorOrigin={{
+                            vertical: 'bottom',
+                            horizontal: 'right',
+                        }}
+                    >
+                        <Typography sx={{ p: 2, fontWeight: 500 }}>Thông tin cá nhân</Typography>
+                        <Divider />
+                        <Typography sx={{ p: 2, fontWeight: 500  }}>Đăng xuất</Typography>
+                    </Popover>
                 </Toolbar>
             </AppBar>
 
@@ -152,7 +180,7 @@ function HomePage({ pageComponent: PageComponent }: ParentComponentProps): JSX.E
             >
                 <Box sx={{ display: 'flex', flexDirection: 'column', backgroundColor: "#364F6B", height: '100%' }}>
                     <DrawerHeader sx={{ backgroundColor: '#364F6B' }}>
-                        <Box sx={{ backgroundColor: '#364F6B', width: "100%", display: "grid", justifyItems: 'center', paddingTop:'4px' }}>
+                        <Box sx={{ backgroundColor: '#364F6B', width: "100%", display: "grid", justifyItems: 'center', paddingTop: '4px' }}>
                             <Link to="/">
                                 <img src={logodrawer} alt="no_img" height={55} />
                             </Link>
@@ -166,9 +194,9 @@ function HomePage({ pageComponent: PageComponent }: ParentComponentProps): JSX.E
                     </DrawerHeader>
                     <Divider />
                     <List>
-                        {[{id: 1, text: 'Trang chủ', path: '/' }, { id: 2, text: 'Thông tin cá nhân', path: '/' }, { id: 3, text: 'Forms của tôi', path: '/' }].map((item) => (
-                            <Link to={item.path}>
-                                <ListItem key={item.text} sx={{ paddingY: '5px' }} disablePadding>
+                        {[{ id: 1, text: 'Trang chủ', path: '/' }, { id: 2, text: 'Thông tin cá nhân', path: '/' }, { id: 3, text: 'Forms của tôi', path: '/' }].map((item) => (
+                            <Link key={item.text} to={item.path}>
+                                <ListItem sx={{ paddingY: '5px' }} disablePadding>
                                     <ListItemButton>
                                         <ListItemIcon sx={{ marginLeft: '25px' }}>
                                             {item.id === 1 ? <HomeIcon sx={{ color: 'white' }} /> : ''}

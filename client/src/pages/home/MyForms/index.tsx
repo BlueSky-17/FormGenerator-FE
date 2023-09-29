@@ -4,6 +4,8 @@ import { styled, useTheme, alpha } from '@mui/material/styles';
 import Button from '@mui/material/Button';
 
 import SearchIcon from '@mui/icons-material/Search';
+import EditIcon from '@mui/icons-material/Edit';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
@@ -19,6 +21,10 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import { Link } from 'react-router-dom';
+
+import Pagination from '@mui/material/Pagination';
+import Stack from '@mui/material/Stack';
+import Tooltip from '@mui/material/Tooltip';
 
 const DrawerHeader = styled('div')(({ theme }) => ({
     display: 'flex',
@@ -136,12 +142,12 @@ function MyForms() {
                         <Table sx={{ minWidth: 650 }} aria-label="simple table">
                             <TableHead>
                                 <TableRow >
-                                    <TableCell sx={{padding: 2, fontWeight: 800, fontSize: '1rem' }} align="left">STT</TableCell>
-                                    <TableCell sx={{padding: 1, fontWeight: 800, fontSize: '1rem' }} align="left">Tên Form</TableCell>
-                                    <TableCell sx={{padding: 1, fontWeight: 800, fontSize: '1rem' }} align="center">Quyền truy cập</TableCell>
-                                    <TableCell sx={{padding: 1, fontWeight: 800, fontSize: '1rem' }} align="center">Phản hồi</TableCell>
-                                    <TableCell sx={{padding: 1, fontWeight: 800, fontSize: '1rem' }} align="center">Tình trạng</TableCell>
-                                    <TableCell sx={{padding: 1, fontWeight: 800, fontSize: '1rem' }} align="center">Thao tác</TableCell>
+                                    <TableCell sx={{ padding: 2, fontWeight: 800, fontSize: '1rem' }} align="left">STT</TableCell>
+                                    <TableCell sx={{ padding: 1, fontWeight: 800, fontSize: '1rem' }} align="left">Tên Form</TableCell>
+                                    <TableCell sx={{ padding: 1, fontWeight: 800, fontSize: '1rem' }} align="center">Quyền truy cập</TableCell>
+                                    <TableCell sx={{ padding: 1, fontWeight: 800, fontSize: '1rem' }} align="center">Phản hồi</TableCell>
+                                    <TableCell sx={{ padding: 1, fontWeight: 800, fontSize: '1rem' }} align="center">Tình trạng</TableCell>
+                                    <TableCell sx={{ padding: 1, fontWeight: 800, fontSize: '1rem' }} align="center">Thao tác</TableCell>
                                 </TableRow >
                             </TableHead>
                             <TableBody>
@@ -184,7 +190,7 @@ function MyForms() {
                                         </TableCell>
                                         <TableCell sx={{ padding: 1 }} align="center">
                                             <Link to="/detail">
-                                                <Button sx={{
+                                                {/* <Button sx={{
                                                     backgroundColor: '#364F6B',
                                                     margin: '10px',
                                                     '&:hover': {
@@ -194,10 +200,23 @@ function MyForms() {
                                                     <Typography sx={{ color: 'white', paddingX: '5px', paddingY: '2px' }} variant="body2" noWrap component="div">
                                                         Chỉnh sửa
                                                     </Typography>
-                                                </Button>
+                                                </Button> */}
+                                                <Tooltip title="Chỉnh sửa" placement="left">
+                                                    <IconButton
+                                                        sx={{
+                                                            backgroundColor: '#364F6B',
+                                                            color: 'white',
+                                                            margin: '5px',
+                                                            '&:hover': {
+                                                                backgroundColor: '#176B87', // Màu nền thay đổi khi hover
+                                                            },
+                                                        }}>
+                                                        <EditIcon />
+                                                    </IconButton>
+                                                </Tooltip>
                                             </Link>
                                             <Link to="/detail">
-                                                <Button sx={{
+                                                {/* <Button sx={{
                                                     backgroundColor: '#364F6B',
                                                     margin: '10px',
                                                     '&:hover': {
@@ -207,7 +226,20 @@ function MyForms() {
                                                     <Typography sx={{ color: 'white', paddingX: '5px', paddingY: '2px' }} variant="body2" noWrap component="div">
                                                         Xem phản hồi
                                                     </Typography>
-                                                </Button>
+                                                </Button> */}
+                                                <Tooltip title="Xem phản hồi" placement="right">
+                                                    <IconButton
+                                                        sx={{
+                                                            backgroundColor: '#364F6B',
+                                                            color: 'white',
+                                                            margin: '5px',
+                                                            '&:hover': {
+                                                                backgroundColor: '#176B87', // Màu nền thay đổi khi hover
+                                                            },
+                                                        }}>
+                                                        <VisibilityIcon />
+                                                    </IconButton>
+                                                </Tooltip>
                                             </Link>
                                         </TableCell>
                                     </TableRow>
@@ -217,31 +249,34 @@ function MyForms() {
                     </TableContainer>
                 </Box>
 
-                <Divider/>
-                    <Box sx={{display:'flex', alignItems:'center', justifyContent:'end'}}>
-                        <Typography>
-                            Số lượng/Trang:
-                        </Typography>
-                        <FormControl sx={{ m: 2, minWidth: 120 }} size="small">
-                            <InputLabel id="demo-select-small-label">Số lượng</InputLabel>
-                            <Select
-                                labelId="demo-select-small-label"
-                                id="demo-select-small"
-                                value={itemsPerPage}
-                                label="ItemsPerPage"
-                                onChange={handleChange}
-                            >
-                                <MenuItem value="">
-                                    <em>None</em>
-                                </MenuItem>
-                                <MenuItem value={5}>5</MenuItem>
-                                <MenuItem value={10}>10</MenuItem>
-                                <MenuItem value={15}>15</MenuItem>
-                            </Select>
-                        </FormControl>
-                    </Box>
+                <Divider />
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'end' }}>
+                    <Typography>
+                        Số lượng/Trang:
+                    </Typography>
+                    <FormControl sx={{ m: 2, minWidth: 120 }} size="small">
+                        <InputLabel id="demo-select-small-label">Số lượng</InputLabel>
+                        <Select
+                            labelId="demo-select-small-label"
+                            id="demo-select-small"
+                            value={itemsPerPage}
+                            label="ItemsPerPage"
+                            onChange={handleChange}
+                        >
+                            <MenuItem value="">
+                                <em>None</em>
+                            </MenuItem>
+                            <MenuItem value={5}>5</MenuItem>
+                            <MenuItem value={10}>10</MenuItem>
+                            <MenuItem value={15}>15</MenuItem>
+                        </Select>
+                    </FormControl>
+                    <Stack spacing={2}>
+                        <Pagination count={10} color="primary" />
+                    </Stack>
+                </Box>
             </Box>
-        </div>
+        </div >
     )
 }
 
