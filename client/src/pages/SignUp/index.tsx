@@ -68,7 +68,7 @@ export default function SignInSide() {
           borderRadius: '20px',
           boxShadow: '0px 4px 4px 0px rgba(0, 0, 0, 0.25)',
           width: '85%',
-          height: '70%',
+          height: '84%',
           flexShrink: 0,
           position: 'absolute',
           left: '-15%'
@@ -90,7 +90,7 @@ export default function SignInSide() {
           }} />
           <Box
             sx={{
-              my: 8,
+              my: 4,
               mx: 4,
               display: 'flex',
               flexDirection: 'column',
@@ -130,6 +130,17 @@ export default function SignInSide() {
                   <TextField
                     required
                     fullWidth
+                    name="username"
+                    label="Username"
+                    type="username"
+                    id="username"
+                    autoComplete="username"
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    required
+                    fullWidth
                     id="email"
                     label="Email Address"
                     name="email"
@@ -144,6 +155,17 @@ export default function SignInSide() {
                     label="Password"
                     type="password"
                     id="password"
+                    autoComplete="new-password"
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    required
+                    fullWidth
+                    name="repeat-password"
+                    label="Repeat Password"
+                    type="password"
+                    id="repeat-password"
                     autoComplete="new-password"
                   />
                 </Grid>
