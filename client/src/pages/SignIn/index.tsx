@@ -5,7 +5,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
-// import Link from '@mui/material/Link';
+//import Link from '@mui/material/Link';
 import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
@@ -22,6 +22,9 @@ import { CardActionArea } from '@mui/material';
 import CircleIcon from '@mui/icons-material/Circle';
 import Icon from '@mui/material/Icon';
 import { Link } from 'react-router-dom';
+import PropTypes from 'prop-types';
+import { error } from 'console';
+
 
 function Copyright(props: any) {
   return (
@@ -35,15 +38,44 @@ function Copyright(props: any) {
     </Typography>
   );
 }
+//@ts-ignore
+async function loginUser(credentials) {
+  return fetch('http://localhost:8080/login', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(credentials)
+  })
+    .then(data => data.json())
+ }
 
-export default function SignInSide() {
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+ //@ts-ignore
+export default function SignInSide({setToken}) {
+  const [username, setUsername] = React.useState<FormDataEntryValue | null>();
+  const [password, setPassword] = React.useState<FormDataEntryValue | null>();
+  
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     console.log({
       email: data.get('email'),
       password: data.get('password'),
     });
+    setUsername(data.get('username'))
+    setPassword(data.get('password'))
+    try{
+      const token = await loginUser({
+        username,
+        password
+      });
+      setToken(token);      
+    }
+    catch(error){
+      console.log(error)
+    }
+
   };
 
   return (
@@ -121,10 +153,10 @@ export default function SignInSide() {
                 margin="normal"
                 required
                 fullWidth
-                id="email"
+                id="username"
                 label="Email Address"
-                name="email"
-                autoComplete="email"
+                name="username"
+                autoComplete="username"
                 autoFocus
               />
               <TextField
@@ -173,4 +205,8 @@ export default function SignInSide() {
       </Grid>
     </Grid >
   );
+}
+
+SignInSide.propTypes = {
+  setToken: PropTypes.func.isRequired
 }

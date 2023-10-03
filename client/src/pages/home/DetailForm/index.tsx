@@ -40,6 +40,8 @@ import { isConstructorDeclaration } from 'typescript';
 import Pagination from '@mui/material/Pagination';
 import Stack from '@mui/material/Stack';
 import { Link } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+
 
 import uuid from "react-uuid"
 
@@ -63,6 +65,8 @@ function createData(
     return { id, title, type, note, isHead };
 }
 
+
+
 let rows = [
     createData(uuid(), 'Họ và tên', 'Điền ngắn', 'K', true, false),
     createData(uuid(), 'Giới tính', 'Trắc nghiệm', 'Nam | Nữ', false, false),
@@ -84,14 +88,23 @@ const style = {
     p: 4,
 };
 
-const getId = () => {
-    const id_ = uuid();
-    console.log(id_);
-    return id_;
+
+async function GetFormDeTails(){
+    return fetch(`http://localhost:8080/form/${useParams()?.formID}`, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + JSON.parse(sessionStorage.getItem('token') as string)?.accessToken
+            }
+          })
+          .then(data => data.json())
 }
 
 function DetailForm() {
     const [open, setOpen] = React.useState(false);
+    
+    console.log(GetFormDeTails())
+
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
 

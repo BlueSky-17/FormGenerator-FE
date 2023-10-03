@@ -93,10 +93,25 @@ const rows = [
     createData('ĐÁNH GIÁ HỆ THỐNG QUẢN LÝ NHÂN VIÊN', 'Tôi', 14, false),
 ];
 
+//get Form
+async function getUserForms(){
+    return fetch(`http://localhost:8080/forms/${JSON.parse(sessionStorage.getItem('token') as string)?.id}`, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + JSON.parse(sessionStorage.getItem('token') as string)?.accessToken
+            }
+          })
+          .then(data => data.json())
+}
+
+
 function MyForms() {
 
     //Page Pagination
     const [itemsPerPage, setItemsPerPage] = useState('');
+    console.log(getUserForms())
+
 
     const handleChange = (event: SelectChangeEvent) => {
         setItemsPerPage(event.target.value);
