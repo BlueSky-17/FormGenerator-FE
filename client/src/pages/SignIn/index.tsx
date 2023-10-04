@@ -21,9 +21,11 @@ import { CardActionArea } from '@mui/material';
 
 import CircleIcon from '@mui/icons-material/Circle';
 import Icon from '@mui/material/Icon';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { error } from 'console';
+import { Navigate } from 'react-router-dom';
+import { useEffect } from 'react';
 
 
 function Copyright(props: any) {
@@ -39,7 +41,7 @@ function Copyright(props: any) {
   );
 }
 //@ts-ignore
-async function loginUser(credentials) {
+async function loginUser(credentials, setLoginState) {
   return fetch('http://localhost:8080/login', {
     method: 'POST',
     headers: {
@@ -47,16 +49,33 @@ async function loginUser(credentials) {
     },
     body: JSON.stringify(credentials)
   })
-    .then(data => data.json())
+    .then((response) => {
+      if(response.status === 200){
+        setLoginState(1)
+        return response.json();     
+    }else if(response.status === 404 || response.status === 401){
+        setLoginState(0)
+    }
+    })
  }
 
  //@ts-ignore
 export default function SignInSide({setToken}) {
+<<<<<<< Updated upstream
   
+=======
+>>>>>>> Stashed changes
 
+  const [loginState, setLoginState] = React.useState<Boolean>();
+
+  const nav: any = useNavigate()
+  // if(loginState && window.location.href == ){
+
+  // }
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
+<<<<<<< Updated upstream
     
     try{
       const token = await loginUser({
@@ -64,12 +83,21 @@ export default function SignInSide({setToken}) {
         password: data.get('password'),
       });
       setToken(token);      
+=======
+      const token = await loginUser({
+        username: data.get('username'),
+        password: data.get('password')
+      }, setLoginState);
+    setToken(token);
+    
+    if(loginState){
+      nav('/home')
+>>>>>>> Stashed changes
     }
-    catch(error){
-      console.log(error)
-    }
-
   };
+
+
+
 
   return (
     <Grid container component="main" sx={{ height: '100vh' }}>
@@ -166,6 +194,10 @@ export default function SignInSide({setToken}) {
                 control={<Checkbox value="remember" color="primary" />}
                 label="Duy trì đăng nhập"
               />
+              {loginState !== undefined &&
+              <Typography component="p" sx={{color: "red"}}>
+              Đăng nhập thất bại: sai tên tài khoản hoặc mật khẩu
+            </Typography>}
               <Button
                 type="submit"
                 fullWidth

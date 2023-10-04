@@ -80,6 +80,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 //get Form
+<<<<<<< Updated upstream
 // async function getUserForms() {
 //     return fetch(`http://localhost:8080/forms/${JSON.parse(sessionStorage.getItem('token') as string)?.id}`, {
 //         method: 'GET',
@@ -90,6 +91,18 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 //     })
 //         .then(data => data.json())
 // }
+=======
+async function getUserForms(){
+    return fetch(`http://localhost:8080/forms/${JSON.parse(sessionStorage.getItem('token') as string)?.user.ID}`, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + JSON.parse(sessionStorage.getItem('token') as string)?.accessToken
+            }
+          })
+          .then(data => data.json())
+}
+>>>>>>> Stashed changes
 
 //   async function getData() {
 //     try {

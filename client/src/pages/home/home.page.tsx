@@ -7,9 +7,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import Button from '@mui/material/Button';
 import Badge from '@mui/material/Badge';
 import InputBase from '@mui/material/InputBase';
-import { Link } from 'react-router-dom';
 import Popover from '@mui/material/Popover';
-
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ListItem from '@mui/material/ListItem';
@@ -21,7 +19,7 @@ import InfoIcon from '@mui/icons-material/Info';
 import ArticleIcon from '@mui/icons-material/Article';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import LogoutIcon from '@mui/icons-material/Logout';
-
+import { Link, useNavigate} from 'react-router-dom';
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
@@ -112,6 +110,17 @@ function HomePage({ pageComponent: PageComponent }: ParentComponentProps): JSX.E
         setAnchorEl(null);
     };
 
+    //add history
+    const navigate: any = useNavigate();
+
+    function logoutHandler() {
+        // Clear the token from sessionStorage or perform any other logout actions
+        sessionStorage.removeItem('token');
+        
+        // Redirect the user to the login page (you can change the path)
+        navigate('/signin');
+      }
+
     const open_avatar = Boolean(anchorEl);
     const id = open_avatar ? 'simple-popover' : undefined;
 
@@ -161,7 +170,9 @@ function HomePage({ pageComponent: PageComponent }: ParentComponentProps): JSX.E
                     >
                         <Typography sx={{ p: 2, fontWeight: 500 }}>Thông tin cá nhân</Typography>
                         <Divider />
-                        <Typography sx={{ p: 2, fontWeight: 500  }}>Đăng xuất</Typography>
+                        <div onClick={logoutHandler}>
+                            <Typography sx={{ p: 2, fontWeight: 500  } }>Đăng xuất</Typography>
+                        </div>
                     </Popover>
                 </Toolbar>
             </AppBar>
@@ -230,7 +241,8 @@ function HomePage({ pageComponent: PageComponent }: ParentComponentProps): JSX.E
                                 backgroundColor: 'white', // Màu nền thay đổi khi hover
                                 color: '#364F6B'
                             },
-                        }}>
+                        }
+                        }>
                             <LogoutIcon sx={{ paddingRight: '5px' }} />
                             Đăng xuất
                         </Button>
