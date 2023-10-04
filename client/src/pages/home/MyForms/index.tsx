@@ -113,7 +113,7 @@ function MyForms() {
 
     //getForms by UserId
     useEffect(() => {
-        fetch(`http://localhost:8080/forms/${JSON.parse(sessionStorage.getItem('token') as string)?.id}`, {
+        fetch(`http://localhost:8080/forms/${JSON.parse(sessionStorage.getItem('token') as string)?.User.id}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -136,7 +136,7 @@ function MyForms() {
     const navigate = useNavigate();
 
     const editForm = (id: string) => (event: any) => {
-        navigate('/detail/' + id);
+        navigate('/form/' + id);
     };
 
     return (

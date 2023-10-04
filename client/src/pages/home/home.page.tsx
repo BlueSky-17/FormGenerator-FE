@@ -88,6 +88,7 @@ type ParentComponentProps = {
     pageComponent: React.ComponentType;
 };
 
+
 function HomePage({ pageComponent: PageComponent }: ParentComponentProps): JSX.Element {
 
     const theme = useTheme();

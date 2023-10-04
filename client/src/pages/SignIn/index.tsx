@@ -52,23 +52,16 @@ async function loginUser(credentials) {
 
  //@ts-ignore
 export default function SignInSide({setToken}) {
-  const [username, setUsername] = React.useState<FormDataEntryValue | null>();
-  const [password, setPassword] = React.useState<FormDataEntryValue | null>();
   
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    console.log({
-      username: data.get('username'),
-      password: data.get('password'),
-    });
-    setUsername(data.get('username'))
-    setPassword(data.get('password'))
+    
     try{
       const token = await loginUser({
-        username,
-        password
+        username: data.get('username'),
+        password: data.get('password'),
       });
       setToken(token);      
     }
