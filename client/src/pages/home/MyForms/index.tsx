@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Box, Typography, Drawer, Avatar, IconButton, Toolbar, List, Divider, Icon } from '@mui/material'
 import { styled, useTheme, alpha } from '@mui/material/styles';
 import Button from '@mui/material/Button';
@@ -35,7 +36,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
     justifyContent: 'flex-end',
 }));
 
-//Setting for Search Input
+//CSS for Search Input
 const Search = styled('div')(({ theme }) => ({
     position: 'relative',
     borderRadius: theme.shape.borderRadius,
@@ -52,6 +53,7 @@ const Search = styled('div')(({ theme }) => ({
     },
 }));
 
+//CSS for Search Input
 const SearchIconWrapper = styled('div')(({ theme }) => ({
     padding: theme.spacing(0, 2),
     height: '100%',
@@ -62,6 +64,7 @@ const SearchIconWrapper = styled('div')(({ theme }) => ({
     justifyContent: 'center',
 }));
 
+//CSS for Search Input
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
     color: 'inherit',
     '& .MuiInputBase-input': {
@@ -76,51 +79,70 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     },
 }));
 
-function createData(
-    name: string,
-    owner: string,
-    response: number,
-    isOpen: boolean
-) {
-    return { name, owner, response, isOpen };
-}
-
-const rows = [
-    createData('KHẢO SÁT CHẤT LƯỢNG SINH VIÊN K22', 'Tôi', 124, true),
-    createData('KHẢO SÁT ỨNG DỤNG ĐẶT MÓN ĂN', 'Tôi', 15, false),
-    createData('KHẢO SÁT ĐĂNG KÝ VỀ QUÊ NGHỈ LỄ 2/9', 'Tôi', 10, false),
-    createData('KHẢO SÁT TỶ LỆ SINH VIÊN ĐI XE GẮN MÁY', 'Tôi', 5, false),
-    createData('ĐÁNH GIÁ HỆ THỐNG QUẢN LÝ NHÂN VIÊN', 'Tôi', 14, false),
-];
-
 //get Form
-async function getUserForms(){
-    return fetch(`http://localhost:8080/forms/${JSON.parse(sessionStorage.getItem('token') as string)?.id}`, {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer ' + JSON.parse(sessionStorage.getItem('token') as string)?.accessToken
-            }
-          })
-          .then(data => data.json())
-}
+// async function getUserForms() {
+//     return fetch(`http://localhost:8080/forms/${JSON.parse(sessionStorage.getItem('token') as string)?.id}`, {
+//         method: 'GET',
+//         headers: {
+//             'Content-Type': 'application/json',
+//             'Authorization': 'Bearer ' + JSON.parse(sessionStorage.getItem('token') as string)?.accessToken
+//         }
+//     })
+//         .then(data => data.json())
+// }
 
+//   async function getData() {
+//     try {
+//       const result = await getUserForms();
+
+//       const newObj = createData(result[0].name, 'Tôi', result[0].answersCounter, false);
+//       rows.push(newObj);
+
+//       console.log(rows);
+
+//     } catch (error) {
+//       // Handle errors here
+//     }
+//   }
 
 function MyForms() {
 
     //Page Pagination
     const [itemsPerPage, setItemsPerPage] = useState('');
-    console.log(getUserForms())
+    const [forms, setForms] = useState<any[]>([])
 
+    //getForms by UserId
+    useEffect(() => {
+        fetch(`http://localhost:8080/forms/${JSON.parse(sessionStorage.getItem('token') as string)?.id}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + JSON.parse(sessionStorage.getItem('token') as string)?.accessToken
+            }
+        })
+            .then(data => data.json())
+            .then(forms => {
+                setForms(forms);
+            })
+    }, [])
+
+    console.log(forms);
 
     const handleChange = (event: SelectChangeEvent) => {
         setItemsPerPage(event.target.value);
     };
 
+    // Navigate when click edit form
+    const navigate = useNavigate();
+
+    const editForm = (id: string) => (event: any) => {
+        navigate('/detail/' + id);
+    };
+
     return (
-        <div>
+        <Box>
             <DrawerHeader />
-            <Box sx={{ backgroundColor: 'white', border: "2px solid #DEDEDE" }}>
+            <Box sx={{ backgroundColor: 'white', border: "2px solid #DEDEDE", height: '100%' }}>
                 <Typography sx={{ color: '#364F6B', padding: '15px', fontWeight: 600 }} variant="h6" noWrap component="div">
                     FORMS CỦA TÔI
                 </Typography>
@@ -152,7 +174,7 @@ function MyForms() {
                 </Box>
 
                 <Divider />
-                <Box sx={{ margin: '15px' }}>
+                <Box sx={{ margin: '15px', minHeight: 480 }}>
                     <TableContainer component={Paper}>
                         <Table sx={{ minWidth: 650 }} aria-label="simple table">
                             <TableHead>
@@ -166,19 +188,19 @@ function MyForms() {
                                 </TableRow >
                             </TableHead>
                             <TableBody>
-                                {rows.map((row, index) => (
+                                {forms.map((form, index) => (
                                     <TableRow
-                                        key={row.name}
+                                        key={form.name}
                                         sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                     >
                                         <TableCell sx={{ padding: 2, fontWeight: 500, fontSize: '1.05rem' }} component="th" scope="row" align="left">
                                             {index + 1}
                                         </TableCell>
-                                        <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="left">{row.name}</TableCell>
-                                        <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="center">{row.owner}</TableCell>
-                                        <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="center">{row.response}</TableCell>
+                                        <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="left">{form.name}</TableCell>
+                                        <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="center">{form.Editors[0]}</TableCell>
+                                        <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="center">{form.AnswersCounter}</TableCell>
                                         <TableCell sx={{ padding: 1 }} align="center">
-                                            {row.isOpen ?
+                                            {form.formState ?
                                                 <Button sx={{
                                                     backgroundColor: '#176B87',
                                                     margin: '10px',
@@ -204,8 +226,7 @@ function MyForms() {
                                                 </Button>}
                                         </TableCell>
                                         <TableCell sx={{ padding: 1 }} align="center">
-                                            <Link to="/detail">
-                                                {/* <Button sx={{
+                                            {/* <Button sx={{
                                                     backgroundColor: '#364F6B',
                                                     margin: '10px',
                                                     '&:hover': {
@@ -216,20 +237,21 @@ function MyForms() {
                                                         Chỉnh sửa
                                                     </Typography>
                                                 </Button> */}
-                                                <Tooltip title="Chỉnh sửa" placement="left">
-                                                    <IconButton
-                                                        sx={{
-                                                            backgroundColor: '#364F6B',
-                                                            color: 'white',
-                                                            margin: '5px',
-                                                            '&:hover': {
-                                                                backgroundColor: '#176B87', // Màu nền thay đổi khi hover
-                                                            },
-                                                        }}>
-                                                        <EditIcon />
-                                                    </IconButton>
-                                                </Tooltip>
-                                            </Link>
+                                            <Tooltip title="Chỉnh sửa" placement="left">
+                                                <IconButton
+                                                    onClick={editForm(form.ID)}
+                                                    sx={{
+                                                        backgroundColor: '#364F6B',
+                                                        color: 'white',
+                                                        margin: '5px',
+                                                        '&:hover': {
+                                                            backgroundColor: '#176B87', // Màu nền thay đổi khi hover
+                                                        },
+                                                    }}
+                                                >
+                                                    <EditIcon />
+                                                </IconButton>
+                                            </Tooltip>
                                             <Link to="/detail">
                                                 {/* <Button sx={{
                                                     backgroundColor: '#364F6B',
@@ -291,7 +313,7 @@ function MyForms() {
                     </Stack>
                 </Box>
             </Box>
-        </div >
+        </Box>
     )
 }
 
