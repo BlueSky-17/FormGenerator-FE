@@ -1,4 +1,5 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Box, Typography, Drawer, Avatar, IconButton, Toolbar, List, Divider, Icon, Modal } from '@mui/material'
 import { styled, useTheme, alpha } from '@mui/material/styles';
 import Button from '@mui/material/Button';
@@ -42,9 +43,6 @@ import Stack from '@mui/material/Stack';
 import { Link } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 
-
-import uuid from "react-uuid"
-
 const DrawerHeader = styled('div')(({ theme }) => ({
     display: 'flex',
     alignItems: 'center',
@@ -53,27 +51,6 @@ const DrawerHeader = styled('div')(({ theme }) => ({
     ...theme.mixins.toolbar,
     justifyContent: 'flex-end',
 }));
-
-function createData(
-    id: string,
-    title: string,
-    type: string,
-    note: string,
-    isHead: boolean,
-    isTail: boolean
-) {
-    return { id, title, type, note, isHead };
-}
-
-
-
-let rows = [
-    createData(uuid(), 'Họ và tên', 'Điền ngắn', 'K', true, false),
-    createData(uuid(), 'Giới tính', 'Trắc nghiệm', 'Nam | Nữ', false, false),
-    createData(uuid(), 'Ngày sinh', 'Lựa chọn', 'Ngày | Tháng | Năm', false, false),
-    createData(uuid(), 'Nơi sinh', 'Lựa chọn', 'Xã | Huyện | Tỉnh', false, false),
-    createData(uuid(), 'Ảnh', 'Ảnh', '4x6 cm', false, true),
-];
 
 const style = {
     position: 'absolute' as 'absolute',
@@ -89,21 +66,47 @@ const style = {
 };
 
 
-async function GetFormDeTails(){
-    return fetch(`http://localhost:8080/form/${useParams()?.formID}`, {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer ' + JSON.parse(sessionStorage.getItem('token') as string)?.accessToken
-            }
-          })
-          .then(data => data.json())
-}
+// async function GetFormDeTails() {
+//     return fetch(`http://localhost:8080/form/${useParams()?.formID}`, {
+//         method: 'GET',
+//         headers: {
+//             'Content-Type': 'application/json',
+//             'Authorization': 'Bearer ' + JSON.parse(sessionStorage.getItem('token') as string)?.accessToken
+//         }
+//     })
+//         .then(data => data.json())
+// }
 
 function DetailForm() {
+    const [formDetail, setFormDetail] = useState<any>({})
+
+    const FormDetailAPI_URL = `http://localhost:8080/form/${useParams()?.formID}`;
+
+    //get detail of form
+    useEffect(() => {
+        fetch(FormDetailAPI_URL, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + JSON.parse(sessionStorage.getItem('token') as string)?.accessToken
+            }
+        })
+            .then(data => data.json())
+            .then(formDetail => {
+                setFormDetail(formDetail);
+            })
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
+
+    console.log(formDetail);
+    console.log(formDetail.Questions === undefined);
+    if (formDetail.Questions !== undefined) {
+        console.log(formDetail.Questions[0]);
+    }
+
+    // if (formDetail.length === 0) forceUpdate();
+
     const [open, setOpen] = React.useState(false);
-    
-    console.log(GetFormDeTails())
 
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
@@ -116,24 +119,24 @@ function DetailForm() {
 
     const [deleted, setDelete] = React.useState('');
 
-    const handleDelete = (id: string) => (event: any) => {
-        console.log(id);
-        rows = rows.filter(row => row.id !== id);
-        console.log(rows);
-        setDelete(id);
-    }
+    // const handleDelete = (id: string) => (event: any) => {
+    //     console.log(id);
+    //     rows = rows.filter(row => row.id !== id);
+    //     console.log(rows);
+    //     setDelete(id);
+    // }
 
     const [duplicated, setDuplicate] = React.useState('');
 
-    const handleDuplicate = (id_: string, index: number) => (event: any) => {
-        // console.log(rows, id_, index);
-        let temp = rows.filter(row => row.id === id_);
-        let result = temp[0];
-        temp = [];
-        // console.log(result);
-        rows.splice(index + 1, 0, createData(uuid(), result.title, result.type, result.note, result.isHead, false));
-        setDuplicate(rows[index].id);
-    }
+    // const handleDuplicate = (id_: string, index: number) => (event: any) => {
+    //     // console.log(rows, id_, index);
+    //     let temp = rows.filter(row => row.id === id_);
+    //     let result = temp[0];
+    //     temp = [];
+    //     // console.log(result);
+    //     rows.splice(index + 1, 0, createData(uuid(), result.title, result.type, result.note, result.isHead, false));
+    //     setDuplicate(rows[index].id);
+    // }
 
     const [swaped, setSwap] = React.useState('');
 
@@ -152,12 +155,11 @@ function DetailForm() {
         return arr;
     }
 
-    const handleSwap = (id_: string, index: number) => (event: any) => {
-        rows = swapElements(rows, index);
-        console.log(rows[index].title)
-        setSwap(rows[index].id);
-    }
-
+    // const handleSwap = (id_: string, index: number) => (event: any) => {
+    //     rows = swapElements(rows, index);
+    //     console.log(rows[index].title)
+    //     setSwap(rows[index].id);
+    // }
 
     const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
 
@@ -178,7 +180,7 @@ function DetailForm() {
             <Box sx={{ backgroundColor: 'white' }}>
                 <Box sx={{ display: 'flex' }}>
                     <Typography sx={{ color: '#364F6B', padding: '12px', fontWeight: 600 }} variant="h4" noWrap component="div">
-                        KHẢO SÁT CHẤT LƯỢNG SINH VIÊN K22
+                        {Object.keys(formDetail).length !== 0 ? formDetail.header.Title : null}
                     </Typography>
                     <Box sx={{ flexGrow: 1 }} />
                     {/* <Button sx={{
@@ -274,7 +276,9 @@ function DetailForm() {
                 </Box>
 
                 <Box sx={{ display: 'flex', alignContent: 'center', margin: '15px' }}>
-                    <Typography sx={{}} variant='body1' component="div">Mô tả biểu mẫu</Typography>
+                    <Typography sx={{}} variant='body1' component="div">
+                        {Object.keys(formDetail).length !== 0 ? formDetail.header.Description : null}
+                    </Typography>
 
                     <Modal
                         open={open}
@@ -390,25 +394,25 @@ function DetailForm() {
                         <Table sx={{ minWidth: 650 }} aria-label="simple table">
                             <TableHead>
                                 <TableRow>
-                                    <TableCell sx={{ padding: 1, fontWeight: 800, fontSize: '1rem' }} align="left">Tiêu đề</TableCell>
                                     <TableCell sx={{ padding: 1, fontWeight: 800, fontSize: '1rem' }} align="left">STT</TableCell>
+                                    <TableCell sx={{ padding: 1, fontWeight: 800, fontSize: '1rem' }} align="left">Tiêu đề</TableCell>
                                     <TableCell sx={{ padding: 1, fontWeight: 800, fontSize: '1rem' }} align="left">Dạng</TableCell>
                                     <TableCell sx={{ padding: 1, fontWeight: 800, fontSize: '1rem' }} align="left">Ghi chú</TableCell>
                                     <TableCell sx={{ padding: 1, fontWeight: 800, fontSize: '1rem' }} align="center">Chỉnh sửa</TableCell>
                                 </TableRow >
                             </TableHead>
                             <TableBody>
-                                {rows.map((row, index) => (
+                                {formDetail.Questions !== undefined ? formDetail.QuestionOrder.map((ques, index) => (
                                     <TableRow
-                                        key={row.id}
+                                        key={index}
                                         sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                     >
                                         <TableCell sx={{ padding: 1, fontWeight: 500, fontSize: '1.05rem' }} component="th" scope="row" align="left">
                                             {index + 1}
                                         </TableCell>
-                                        <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="left">{row.title}</TableCell>
-                                        <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="left">{row.type}</TableCell>
-                                        <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="left">{row.note}</TableCell>
+                                        <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="left">{formDetail.Questions[ques-1].Question}</TableCell>
+                                        <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="left">{formDetail.Questions[ques-1].Type}</TableCell>
+                                        <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="left">{formDetail.Questions[ques-1].Description}</TableCell>
                                         <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="center">
                                             <IconButton
                                                 onClick={handleOpen}
@@ -423,7 +427,7 @@ function DetailForm() {
                                                 <EditIcon />
                                             </IconButton>
                                             <IconButton
-                                                onClick={handleDuplicate(row.id, index)}
+                                                // onClick={handleDuplicate(row.id, index)}
                                                 sx={{
                                                     backgroundColor: '#364F6B',
                                                     color: 'white',
@@ -435,7 +439,7 @@ function DetailForm() {
                                                 <ContentCopyIcon />
                                             </IconButton>
                                             <IconButton
-                                                onClick={handleSwap(row.id, index)}
+                                                // onClick={handleSwap(row.id, index)}
                                                 sx={{
                                                     backgroundColor: '#364F6B',
                                                     color: 'white',
@@ -457,7 +461,7 @@ function DetailForm() {
                                                 <ArrowCircleUpIcon />
                                             </IconButton>
                                             <IconButton
-                                                onClick={handleDelete(row.id)}
+                                                // onClick={handleDelete(row.id)}
                                                 sx={{
                                                     backgroundColor: '#364F6B',
                                                     color: 'white',
@@ -470,7 +474,8 @@ function DetailForm() {
                                             </IconButton>
                                         </TableCell>
                                     </TableRow>
-                                ))}
+                                )): null
+                                }
                             </TableBody>
                         </Table>
                     </TableContainer>
