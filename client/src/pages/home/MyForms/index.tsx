@@ -113,7 +113,7 @@ function MyForms() {
 
     //getForms by UserId
     useEffect(() => {
-        fetch(`http://localhost:8080/forms/${JSON.parse(sessionStorage.getItem('token') as string)?.id}`, {
+        fetch(`http://localhost:8080/forms/${JSON.parse(sessionStorage.getItem('token') as string)?.user.ID}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -136,7 +136,7 @@ function MyForms() {
     const navigate = useNavigate();
 
     const editForm = (id: string) => (event: any) => {
-        navigate('/detail/' + id);
+        navigate('/form/' + id);
     };
 
     return (
@@ -239,7 +239,7 @@ function MyForms() {
                                                 </Button> */}
                                             <Tooltip title="Chỉnh sửa" placement="left">
                                                 <IconButton
-                                                    onClick={editForm(form.ID)}
+                                                    onClick={editForm(form.id)}
                                                     sx={{
                                                         backgroundColor: '#364F6B',
                                                         color: 'white',

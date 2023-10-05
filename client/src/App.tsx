@@ -15,10 +15,18 @@ function setToken(userToken: any) {
 
 function getToken() {
   const tokenString = sessionStorage.getItem('token');
-  if (tokenString) {
-    const userToken = JSON.parse(tokenString);
+  // if (tokenString) {
+  //   const userToken = JSON.parse(tokenString);
+  //   return userToken?.accessToken;
+  // }
+  try{
+    const userToken = JSON.parse(tokenString as string);
     return userToken?.accessToken;
   }
+  catch(error){
+    console.log(error);
+  }
+  return null;
 }
 
 
@@ -44,20 +52,29 @@ function App() {
   if (!token) {
     return (
       <BrowserRouter>
-        <SignInSide setToken={setToken} />
-      </BrowserRouter>)
+        <Routes>
+          <Route path="/" element={<SignInSide setToken={setToken} />} />
+          <Route path="/signin" element={<SignInSide setToken={setToken} />} />
+          <Route path="/home" element={<HomePage pageComponent={MyForms} />} />
+        </Routes>
+      </BrowserRouter>
+    );
   }
 
   return (
-    <div className='wrapper'>
+    <div className="wrapper">
       <BrowserRouter>
         <Routes>
           {/* <Route path="/" element={<LoginPage />} /> */}
           <Route path="/" element={<HomePage pageComponent={MyForms} />} />
           <Route path="/home" element={<HomePage pageComponent={MyForms} />} />
-          <Route path="/detail/:formID" element={<HomePage pageComponent={DetailForm} />} />
+          <Route
+            path="/form/:formID"
+            element={<HomePage pageComponent={DetailForm} />}
+          />
           <Route path="/form/:formId/view" element={<Form />} />
           <Route path="/signup" element={<SignUp />} />
+          <Route path="/signin" element={<SignInSide setToken={setToken} />} />
         </Routes>
       </BrowserRouter>
     </div>

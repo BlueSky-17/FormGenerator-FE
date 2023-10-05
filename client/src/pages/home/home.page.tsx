@@ -7,7 +7,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import Button from '@mui/material/Button';
 import Badge from '@mui/material/Badge';
 import InputBase from '@mui/material/InputBase';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Popover from '@mui/material/Popover';
 
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
@@ -114,6 +114,16 @@ function HomePage({ pageComponent: PageComponent }: ParentComponentProps): JSX.E
     const open_avatar = Boolean(anchorEl);
     const id = open_avatar ? 'simple-popover' : undefined;
 
+    const navigate: any = useNavigate();
+
+    function handleLogout() {
+        // Clear the token from sessionStorage or perform any other logout actions
+        sessionStorage.removeItem('token');
+
+        // Redirect the user to the login page (you can change the path)
+        navigate('/signin');
+    }
+
     return (
         <Box sx={{ display: 'flex' }}>
             <CssBaseline />
@@ -158,9 +168,18 @@ function HomePage({ pageComponent: PageComponent }: ParentComponentProps): JSX.E
                             horizontal: 'right',
                         }}
                     >
-                        <Typography sx={{ p: 2, fontWeight: 500 }}>Thông tin cá nhân</Typography>
+                        <Button
+                        sx={{ p: 2, fontWeight: 500, color: 'black' }}
+                        >
+                            Thông tin cá nhân
+                        </Button>
                         <Divider />
-                        <Typography sx={{ p: 2, fontWeight: 500  }}>Đăng xuất</Typography>
+                        <Button
+                            onClick={handleLogout}
+                            sx={{ p: 2, fontWeight: 500, color: 'black' }}
+                        >
+                            Đăng xuất
+                        </Button>
                     </Popover>
                 </Toolbar>
             </AppBar>

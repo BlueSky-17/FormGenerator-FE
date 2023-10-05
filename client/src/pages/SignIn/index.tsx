@@ -21,10 +21,11 @@ import { CardActionArea } from '@mui/material';
 
 import CircleIcon from '@mui/icons-material/Circle';
 import Icon from '@mui/material/Icon';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { error } from 'console';
-
+import { Navigate } from 'react-router-dom';
+import { useEffect } from 'react';
 
 function Copyright(props: any) {
   return (
@@ -39,7 +40,7 @@ function Copyright(props: any) {
   );
 }
 //@ts-ignore
-async function loginUser(credentials) {
+async function loginUser(credentials, setLoginState) {
   return fetch('http://localhost:8080/login', {
     method: 'POST',
     headers: {
@@ -47,36 +48,41 @@ async function loginUser(credentials) {
     },
     body: JSON.stringify(credentials)
   })
-    .then(data => data.json())
- }
+    .then((response) => {
+      if (response.status === 200) {
+        setLoginState(1)
+        return response.json();
+      } else if (response.status === 404 || response.status === 401) {
+        setLoginState(0)
+      }
+    })
+}
 
- //@ts-ignore
-export default function SignInSide({setToken}) {
-  const [username, setUsername] = React.useState<FormDataEntryValue | null>();
-  const [password, setPassword] = React.useState<FormDataEntryValue | null>();
-  
+//@ts-ignore
+export default function SignInSide({ setToken }) {
+
+  const [loginState, setLoginState] = React.useState<Boolean>();
+
+  const nav: any = useNavigate()
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    console.log({
-      username: data.get('username'),
-      password: data.get('password'),
-    });
-    setUsername(data.get('username'))
-    setPassword(data.get('password'))
-    try{
+
+    try {
       const token = await loginUser({
-        username,
-        password
-      });
-      setToken(token);      
+        username: data.get('username'),
+        password: data.get('password'),
+      }, setLoginState);
+      setToken(token);
     }
-    catch(error){
+    catch (error) {
       console.log(error)
     }
-
-  };
+    if (loginState) {
+      nav('/home')
+    };
+  }
 
   return (
     <Grid container component="main" sx={{ height: '100vh' }}>
@@ -154,7 +160,7 @@ export default function SignInSide({setToken}) {
                 required
                 fullWidth
                 id="username"
-                label="Email Address"
+                label="Username"
                 name="username"
                 autoComplete="username"
                 autoFocus
@@ -169,6 +175,10 @@ export default function SignInSide({setToken}) {
                 id="password"
                 autoComplete="current-password"
               />
+              {loginState !== undefined &&
+                <Typography component="p" sx={{ color: "red" }}>
+                  Đăng nhập thất bại: Sai tên tài khoản hoặc mật khẩu
+                </Typography>}
               <FormControlLabel
                 control={<Checkbox value="remember" color="primary" />}
                 label="Duy trì đăng nhập"
@@ -210,3 +220,4 @@ export default function SignInSide({setToken}) {
 SignInSide.propTypes = {
   setToken: PropTypes.func.isRequired
 }
+
