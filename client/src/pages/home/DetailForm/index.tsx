@@ -36,7 +36,6 @@ import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormLabel from '@mui/material/FormLabel';
 import Checkbox from '@mui/material/Checkbox';
-import { isConstructorDeclaration } from 'typescript';
 
 import Pagination from '@mui/material/Pagination';
 import Stack from '@mui/material/Stack';
@@ -65,24 +64,25 @@ const style = {
     p: 4,
 };
 
-
-// async function GetFormDeTails() {
-//     return fetch(`http://localhost:8080/form/${useParams()?.formID}`, {
-//         method: 'GET',
-//         headers: {
-//             'Content-Type': 'application/json',
-//             'Authorization': 'Bearer ' + JSON.parse(sessionStorage.getItem('token') as string)?.accessToken
-//         }
-//     })
-//         .then(data => data.json())
-// }
+function addShortTextType(
+    Question: string,
+    Description: string,
+    Required: boolean,
+    ImagePath: string,
+    Type: string,
+    Content: {}
+) {
+    return { Question, Description, Required, ImagePath, Type, Content };
+}
 
 function DetailForm() {
     const [formDetail, setFormDetail] = useState<any>({})
 
     const FormDetailAPI_URL = `http://localhost:8080/form/${useParams()?.formID}`;
 
-    //get detail of form
+    const UpdateFormAPI_URL = `http://localhost:8080/update-form/${useParams()?.formID}`;
+
+    //get detail of form (from API)
     useEffect(() => {
         fetch(FormDetailAPI_URL, {
             method: 'GET',
@@ -98,23 +98,65 @@ function DetailForm() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
-    console.log(formDetail);
-    console.log(formDetail.Questions === undefined);
-    if (formDetail.Questions !== undefined) {
-        console.log(formDetail.Questions[0]);
-    }
-
-    // if (formDetail.length === 0) forceUpdate();
-
+    // open + close Modal edit form
     const [open, setOpen] = React.useState(false);
 
-    const handleOpen = () => setOpen(true);
+    const handleOpen = () => {
+        // return default value when open modal
+        setType('');
+        setTextFieldValue('');
+
+        setOpen(true);
+    }
+
     const handleClose = () => setOpen(false);
 
-    const [type, setType] = React.useState('');
+    //add question into form (front-end)
+    const addQuestion = () => {
 
+        formDetail.Questions.push(addShortTextType(textFieldValue, "", true, "", type, {}));
+        formDetail.QuestionOrder.push(formDetail.Questions.length);
+
+        setOpen(false);
+        updateObjectInDatabase(formDetail.id, formDetail)
+    };
+
+    //add question to database
+    const updateObjectInDatabase = async (formID, updateData) => {
+        try {
+            const response = await fetch(UpdateFormAPI_URL, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + JSON.parse(sessionStorage.getItem('token') as string)?.accessToken
+                },
+                body: JSON.stringify(updateData),
+            });
+
+            console.log(response);
+
+            if (!response.ok) {
+                throw new Error(`HTTP Error! Status: ${response.status}`);
+            }
+
+            const dataFromServer = await response.json();
+            // Xử lý dữ liệu từ máy chủ (nếu cần)
+            console.log(dataFromServer);
+        } catch (error) {
+            console.error('Lỗi khi gửi yêu cầu:', error);
+        }
+    };
+
+    // set type of question
+    const [type, setType] = React.useState('');
     const handleChange = (event: SelectChangeEvent) => {
         setType(event.target.value as string);
+    };
+
+    // set title of question
+    const [textFieldValue, setTextFieldValue] = useState('');
+    const handleTextFieldChange = (e) => {
+        setTextFieldValue(e.target.value);
     };
 
     const [deleted, setDelete] = React.useState('');
@@ -161,6 +203,7 @@ function DetailForm() {
     //     setSwap(rows[index].id);
     // }
 
+    // Tùy chỉnh nút Settings
     const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
 
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -178,6 +221,8 @@ function DetailForm() {
         <div>
             <DrawerHeader />
             <Box sx={{ backgroundColor: 'white' }}>
+
+                {/*Header of Form: Title, Save Form and Settings*/}
                 <Box sx={{ display: 'flex' }}>
                     <Typography sx={{ color: '#364F6B', padding: '12px', fontWeight: 600 }} variant="h4" noWrap component="div">
                         {Object.keys(formDetail).length !== 0 ? formDetail.header.Title : null}
@@ -245,6 +290,7 @@ function DetailForm() {
 
                 <Divider />
 
+                {/*Header of Form: Chỉnh sửa & Xem phản hồi*/}
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '5px', borderBottom: "10px solid #364F6B" }}>
                     <Button sx={{
                         color: 'white',
@@ -275,11 +321,14 @@ function DetailForm() {
                     </Button>
                 </Box>
 
+                {/*Header of Form: Description and Modal Edit */}
                 <Box sx={{ display: 'flex', alignContent: 'center', margin: '15px' }}>
+                    {/* Form Description */}
                     <Typography sx={{}} variant='body1' component="div">
                         {Object.keys(formDetail).length !== 0 ? formDetail.header.Description : null}
                     </Typography>
 
+                    {/* Modal: Thêm mới Question */}
                     <Modal
                         open={open}
                         onClose={handleClose}
@@ -299,7 +348,14 @@ function DetailForm() {
                                     </Typography>
 
                                     <Box sx={{ marginY: '10px', display: 'flex', alignItems: 'center' }}>
-                                        <TextField sx={{ marginRight: '10px', width: '100%' }} id="outlined-basic" variant="outlined" placeholder='Nhập nội dung câu hỏi...' />
+                                        <TextField
+                                            value={textFieldValue}
+                                            onChange={handleTextFieldChange}
+                                            sx={{ marginRight: '10px', width: '100%' }}
+                                            id="outlined-basic"
+                                            variant="outlined"
+                                            placeholder='Nhập nội dung câu hỏi...'
+                                        />
                                         <FormControl fullWidth>
                                             <InputLabel id="demo-simple-select-label">Dạng</InputLabel>
                                             <Select
@@ -309,22 +365,22 @@ function DetailForm() {
                                                 label="Dạng"
                                                 onChange={handleChange}
                                             >
-                                                <MenuItem value={'Trắc nghiệm'}>
+                                                <MenuItem value={'multi-choice'}>
                                                     <RadioButtonCheckedIcon sx={{ paddingRight: '5px' }} />
                                                     Trắc nghiệm
                                                 </MenuItem>
-                                                <MenuItem value={'Ô đánh dấu'}>
+                                                <MenuItem value={'checkbox'}>
                                                     <CheckBoxIcon sx={{ paddingRight: '5px' }} />
                                                     Ô đánh dấu
                                                 </MenuItem>
-                                                <MenuItem value={'Điền ngắn'}>
+                                                <MenuItem value={'shortText'}>
                                                     <NotesIcon sx={{ paddingRight: '5px' }} />
                                                     Điền ngắn
                                                 </MenuItem>
                                             </Select>
                                         </FormControl>
                                     </Box>
-                                    {type === 'Trắc nghiệm' ?
+                                    {type === 'multi-choice' ?
                                         <FormControl>
                                             {/* <FormLabel id="demo-radio-buttons-group-label">Gender</FormLabel> */}
                                             <RadioGroup
@@ -339,7 +395,7 @@ function DetailForm() {
                                         </FormControl>
                                         : null
                                     }
-                                    {type === 'Ô đánh dấu' ?
+                                    {type === 'checkbox' ?
                                         <FormControl>
                                             {/* <FormLabel id="demo-radio-buttons-group-label">Gender</FormLabel> */}
                                             <FormControlLabel control={<Checkbox defaultChecked />} label="Label" />
@@ -348,13 +404,13 @@ function DetailForm() {
                                         </FormControl>
                                         : null
                                     }
-                                    {type === 'Điền ngắn' ?
+                                    {type === 'shortText' ?
                                         <TextField sx={{ width: '100%' }} id="standard-basic" label="Điền ngắn" variant="standard" />
                                         : null
                                     }
                                     <Box sx={{ display: 'flex', flexDirection: 'row-reverse' }} >
                                         <Button
-                                            onClick={handleClose}
+                                            onClick={addQuestion}
                                             sx={{
                                                 color: 'white',
                                                 backgroundColor: '#364F6B',
@@ -389,6 +445,8 @@ function DetailForm() {
                 </Box>
 
                 <Divider />
+        
+                {/* Body of Form */}
                 <Box sx={{ margin: '15px' }}>
                     <TableContainer component={Paper}>
                         <Table sx={{ minWidth: 650 }} aria-label="simple table">
@@ -410,9 +468,9 @@ function DetailForm() {
                                         <TableCell sx={{ padding: 1, fontWeight: 500, fontSize: '1.05rem' }} component="th" scope="row" align="left">
                                             {index + 1}
                                         </TableCell>
-                                        <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="left">{formDetail.Questions[ques-1].Question}</TableCell>
-                                        <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="left">{formDetail.Questions[ques-1].Type}</TableCell>
-                                        <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="left">{formDetail.Questions[ques-1].Description}</TableCell>
+                                        <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="left">{formDetail.Questions[ques - 1].Question}</TableCell>
+                                        <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="left">{formDetail.Questions[ques - 1].Type}</TableCell>
+                                        <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="left">{formDetail.Questions[ques - 1].Description}</TableCell>
                                         <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="center">
                                             <IconButton
                                                 onClick={handleOpen}
@@ -474,7 +532,7 @@ function DetailForm() {
                                             </IconButton>
                                         </TableCell>
                                     </TableRow>
-                                )): null
+                                )) : null
                                 }
                             </TableBody>
                         </Table>
