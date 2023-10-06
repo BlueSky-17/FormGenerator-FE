@@ -75,6 +75,8 @@ export default function SignInSide({ setToken }) {
         password: data.get('password'),
       }, setLoginState);
       setToken(token);
+
+      console.log(setLoginState);
     }
     catch (error) {
       console.log(error)

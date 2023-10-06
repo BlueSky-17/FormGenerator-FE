@@ -34,18 +34,18 @@ function App() {
   //const [token, setToken] = React.useState();
   // const token = getToken();
 
-  try {
-    const token = getToken();
-    if (!token) {
-      return (
-        <BrowserRouter>
-          <SignInSide setToken={setToken} />
-        </BrowserRouter>)
-    }
-  }
-  catch (error) {
-    sessionStorage.removeItem('token');
-  }
+  // try {
+  //   const token = getToken();
+  //   if (!token) {
+  //     return (
+  //       <BrowserRouter>
+  //         <SignInSide setToken={setToken} />
+  //       </BrowserRouter>)
+  //   }
+  // }
+  // catch (error) {
+  //   sessionStorage.removeItem('token');
+  // }
 
   const token = getToken();
 

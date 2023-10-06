@@ -115,13 +115,32 @@ function DetailForm() {
     const addQuestion = () => {
 
         formDetail.Questions.push(addShortTextType(textFieldValue, "", true, "", type, {}));
-        formDetail.QuestionOrder.push(formDetail.Questions.length);
+        formDetail.QuestionOrder.push(formDetail.Questions.length-1);
 
         setOpen(false);
         updateObjectInDatabase(formDetail.id, formDetail)
     };
 
-    //add question to database
+    const [deleted, setDelete] = React.useState(false);
+
+    //delete question in form (front-end)
+    const deleteQuestion = (index: string) => (event: any) => {
+        formDetail.Questions.splice(index,1)
+
+        formDetail.QuestionOrder = formDetail.QuestionOrder.filter(num => num !== index);
+        formDetail.QuestionOrder = formDetail.QuestionOrder.map((num) => {
+            if (num > index) 
+                return --num;
+            else 
+                return num;
+        })
+
+        if (deleted === true) setDelete(false);
+        else setDelete(true);
+        updateObjectInDatabase(formDetail.id, formDetail)
+    };
+
+    //update question in database
     const updateObjectInDatabase = async (formID, updateData) => {
         try {
             const response = await fetch(UpdateFormAPI_URL, {
@@ -158,15 +177,6 @@ function DetailForm() {
     const handleTextFieldChange = (e) => {
         setTextFieldValue(e.target.value);
     };
-
-    const [deleted, setDelete] = React.useState('');
-
-    // const handleDelete = (id: string) => (event: any) => {
-    //     console.log(id);
-    //     rows = rows.filter(row => row.id !== id);
-    //     console.log(rows);
-    //     setDelete(id);
-    // }
 
     const [duplicated, setDuplicate] = React.useState('');
 
@@ -445,7 +455,7 @@ function DetailForm() {
                 </Box>
 
                 <Divider />
-        
+
                 {/* Body of Form */}
                 <Box sx={{ margin: '15px' }}>
                     <TableContainer component={Paper}>
@@ -468,9 +478,9 @@ function DetailForm() {
                                         <TableCell sx={{ padding: 1, fontWeight: 500, fontSize: '1.05rem' }} component="th" scope="row" align="left">
                                             {index + 1}
                                         </TableCell>
-                                        <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="left">{formDetail.Questions[ques - 1].Question}</TableCell>
-                                        <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="left">{formDetail.Questions[ques - 1].Type}</TableCell>
-                                        <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="left">{formDetail.Questions[ques - 1].Description}</TableCell>
+                                        <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="left">{formDetail.Questions[ques].Question}</TableCell>
+                                        <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="left">{formDetail.Questions[ques].Type}</TableCell>
+                                        <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="left">{formDetail.Questions[ques].Description}</TableCell>
                                         <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="center">
                                             <IconButton
                                                 onClick={handleOpen}
@@ -519,7 +529,7 @@ function DetailForm() {
                                                 <ArrowCircleUpIcon />
                                             </IconButton>
                                             <IconButton
-                                                // onClick={handleDelete(row.id)}
+                                                onClick={deleteQuestion(ques)}
                                                 sx={{
                                                     backgroundColor: '#364F6B',
                                                     color: 'white',
