@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Box, Typography, Drawer, Avatar, IconButton, Toolbar, List, Divider, Icon } from '@mui/material'
 import { styled, useTheme, alpha } from '@mui/material/styles';
 import Button from '@mui/material/Button';
@@ -32,7 +32,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
-
+import { useParams } from 'react-router-dom';
 
 const ariaLabel = { 'aria-label': 'description' };
 
@@ -62,38 +62,70 @@ const rows = [
 ];
 
 function Form() {
+    const [formDetail, setFormDetail] = useState<any>({})
+
+    const FormDetailAPI_URL = `http://localhost:8080/form/${useParams()?.formID}`;
+
+    //get detail of form (from API)
+    useEffect(() => {
+        fetch(FormDetailAPI_URL, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + JSON.parse(sessionStorage.getItem('token') as string)?.accessToken
+            }
+        })
+            .then(data => data.json())
+            .then(formDetail => {
+                setFormDetail(formDetail);
+            })
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
+
     return (
         <div>
             <Box sx={{ border: "2px solid #DEDEDE", height: '100%', width: '100%' }}>
                 <Box sx={{ backgroundColor: 'white', border: "2px solid #DEDEDE", marginX: '300px', marginTop: '70px' }}>
+                    {/* Header of Form */}
                     <Box sx={{ textAlign: 'center' }}>
                         <Typography sx={{ color: '#364F6B', padding: '15px', fontWeight: 600 }} variant="h4" noWrap component="div">
-                            FORM KHẢO SÁT CHẤT LƯỢNG K22
+                            {Object.keys(formDetail).length !== 0 ? formDetail.header.Title : null}
                         </Typography>
                         <Typography sx={{ color: '#364F6B', padding: '5px', fontWeight: 400 }} variant='body1' noWrap component="div">
-                            Mô tả biểu mẫu
+                            {Object.keys(formDetail).length !== 0 ? formDetail.header.Description : null}
                         </Typography>
                     </Box>
 
                     <Divider />
 
+                    {/* Body of Form */}
                     <Box sx={{ border: "2px solid #364F6B", borderTop: '6px solid #364F6B', margin: '35px' }}>
-                        <Typography sx={{ color: '#364F6B', justifySelft: 'left', padding: '5px', fontWeight: 500 }} variant='h5' noWrap component="div">
-                            1. Họ và tên:
-                        </Typography>
-                        <Box
-                            component="form"
-                            sx={{
-                                '& > :not(style)': { m: 1 },
-                                marginBottom: '10px'
-                            }}
-                            noValidate
-                            autoComplete="off"
-                        >
-                            <Input sx={{ width: '50%' }} placeholder="Nguyen Van A" inputProps={ariaLabel} />
-                        </Box>
+                        {formDetail.Questions !== undefined ? formDetail.QuestionOrder.map((ques, index) => (
+                            <Box
+                                key={index}
+                            >
+                                {/* Câu hỏi */}
+                                <Typography
+                                    sx={{ color: '#364F6B', justifySelft: 'left', padding: '5px', fontWeight: 500 }} variant='h5' noWrap component="div">
+                                    {index + 1}.{formDetail.Questions[ques].Question}
+                                </Typography>
+                                {/* Nội dung | Dạng câu hỏi */}
+                                <Box
+                                    component="form"
+                                    sx={{
+                                        '& > :not(style)': { m: 1 },
+                                        marginBottom: '10px'
+                                    }}
+                                    noValidate
+                                    autoComplete="off"
+                                >
+                                    <Input sx={{ width: '50%' }} placeholder="Nguyen Van A" inputProps={ariaLabel} />
+                                </Box>
+                            </Box>
+                        ))
+                            : null}
                     </Box>
-                    <Box sx={{ border: "2px solid #364F6B", borderTop: '6px solid #364F6B', margin: '35px' }}>
+                    {/* <Box sx={{ border: "2px solid #364F6B", borderTop: '6px solid #364F6B', margin: '35px' }}>
                         <Typography sx={{ color: '#364F6B', justifySelft: 'left', padding: '5px', fontWeight: 500 }} variant='h5' noWrap component="div">
                             2. Giới tính
                         </Typography>
@@ -146,7 +178,7 @@ function Form() {
                                 renderInput={(params) => <TextField {...params} label="Chọn xã" />}
                             />
                         </Box>
-                    </Box>
+                    </Box>*/}
                 </Box>
                 <Box sx={{ display: 'grid', justifyItems: 'right', width: '100%' }}>
                     <Button sx={{

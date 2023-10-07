@@ -72,7 +72,7 @@ function App() {
             path="/form/:formID"
             element={<HomePage pageComponent={DetailForm} />}
           />
-          <Route path="/form/:formId/view" element={<Form />} />
+          <Route path="/form/:formID/view" element={<Form />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/signin" element={<SignInSide setToken={setToken} />} />
         </Routes>

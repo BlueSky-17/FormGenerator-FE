@@ -24,6 +24,8 @@ import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import NotesIcon from '@mui/icons-material/Notes';
+import ClearIcon from '@mui/icons-material/Clear';
+import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 
 import TextField from '@mui/material/TextField';
 import InputLabel from '@mui/material/InputLabel';
@@ -75,6 +77,12 @@ function addShortTextType(
     return { Question, Description, Required, ImagePath, Type, Content };
 }
 
+function addOption(
+    MultiChoice: { Options: string[], ImportedData: string }
+) {
+    return { MultiChoice };
+}
+
 function DetailForm() {
     const [formDetail, setFormDetail] = useState<any>({})
 
@@ -102,9 +110,14 @@ function DetailForm() {
     const [open, setOpen] = React.useState(false);
 
     const handleOpen = () => {
-        // return default value when open modal
+        // return default value when open modal: type and title
         setType('');
         setTextFieldValue('');
+
+        // return default value when open modal: options
+        setOptionFieldValueArray([]);
+        setOptionLength(0);
+        setActive(-1);
 
         setOpen(true);
     }
@@ -113,9 +126,17 @@ function DetailForm() {
 
     //add question into form (front-end)
     const addQuestion = () => {
-
+        // Tạo một Question có 5 trường: Question, Description, Required, ImagePath, Type, Content
         formDetail.Questions.push(addShortTextType(textFieldValue, "", true, "", type, {}));
-        formDetail.QuestionOrder.push(formDetail.Questions.length-1);
+
+        // Push index vào QuestionOrder
+        const newIndex = formDetail.Questions.length - 1;
+        formDetail.QuestionOrder.push(newIndex);
+
+        // Lấy Object: Options có chứa Option[] và ImportedData
+        const updatedMultiChoice = handleOptionArrayChange();
+
+        Object.assign(formDetail.Questions[newIndex].Content, updatedMultiChoice);
 
         setOpen(false);
         updateObjectInDatabase(formDetail.id, formDetail)
@@ -125,13 +146,15 @@ function DetailForm() {
 
     //delete question in form (front-end)
     const deleteQuestion = (index: string) => (event: any) => {
-        formDetail.Questions.splice(index,1)
+        // Xóa 1 phần tử ở vị trí index
+        formDetail.Questions.splice(index, 1)
 
+        // lọc mảng các num mà khác index, chỉnh lại cho các num
         formDetail.QuestionOrder = formDetail.QuestionOrder.filter(num => num !== index);
         formDetail.QuestionOrder = formDetail.QuestionOrder.map((num) => {
-            if (num > index) 
+            if (num > index)
                 return --num;
-            else 
+            else
                 return num;
         })
 
@@ -176,6 +199,78 @@ function DetailForm() {
     const [textFieldValue, setTextFieldValue] = useState('');
     const handleTextFieldChange = (e) => {
         setTextFieldValue(e.target.value);
+    };
+
+    // Biến tạm: optionFieldValue
+    const [optionFieldValue, setOptionFieldValue] = useState('');
+
+    const handleOptionFieldChange = (e) => {
+        setOptionFieldValue(e.target.value);
+    };
+
+    // Lưu giá trị các options[]
+    const [optionFieldValueArray, setOptionFieldValueArray] = useState<string[]>(['']);
+
+    // Lưu chiều dài của options, sử dụng để re-render khi bấm nút "Thêm" option
+    const [optionLength, setOptionLength] = useState<number>(1);
+
+    // active === index thì value của TextField sẽ thay đổi
+    const [active, setActive] = useState<number>(-1);
+
+    // active === index thì value của TextField sẽ thay đổi
+    const handleActive = (index: number) => (e) =>
+    {
+        setActive(index);
+        setOptionFieldValue(optionFieldValueArray[index]);
+    }
+
+    // Khi onBlur thì sẽ lưu value vào mảng options[]
+    const saveOption = (index: number) => (e) => {
+        optionFieldValueArray[index] = optionFieldValue;
+
+        console.log(optionFieldValueArray);
+    };
+
+    //Lưu array tạm optionFieldValueArray vào một Object
+    const handleOptionArrayChange = () => {
+        const updatedMultiChoice = addOption({
+            Options: optionFieldValueArray,
+            ImportedData: '',
+        });
+        // console.log(updatedMultiChoice);
+        // console.log(formDetail.Questions);
+        // formDetail.Questions.Content.MultiChoice.push(...updatedMultiChoice.MultiChoice.Options);
+        return updatedMultiChoice;
+    };
+
+    // Thêm option trống 
+    const handleOption = () => {
+        // const newIndex = optionFieldArray.length - 1;
+        const newIndex = optionLength + 1;
+
+        optionFieldValueArray.push('')
+
+        console.log(optionFieldValueArray);
+
+        setOptionLength(newIndex);
+    }
+
+    // console.log(optionFieldValue);
+
+    console.log(optionFieldValueArray);
+
+    // console.log(formDetail.Questions.Content.option)
+
+    // const addOption = () => {
+    //     options: string[];
+
+    // }
+
+    // Navigate to view form page
+    const navigate = useNavigate();
+
+    const viewForm = () => {
+        navigate('/form/' + formDetail.id + '/view');
     };
 
     const [duplicated, setDuplicate] = React.useState('');
@@ -288,9 +383,12 @@ function DetailForm() {
                             horizontal: 'right',
                         }}
                     >
-                        <Link to='/form/view'>
-                            <Button sx={{ p: 2, fontWeight: 500, color: 'black', textTransform: 'initial', fontSize: '15px' }}>Xem trước</Button>
-                        </Link>
+                        <Button
+                            onClick={viewForm}
+                            sx={{ p: 2, fontWeight: 500, color: 'black', textTransform: 'initial', fontSize: '15px' }}
+                        >
+                            Xem trước
+                        </Button>
                         <Divider />
                         <Button sx={{ p: 2, fontWeight: 500, color: 'black', textTransform: 'initial', fontSize: '15px' }}>Sửa chủ đề</Button>
                         <Divider />
@@ -357,8 +455,9 @@ function DetailForm() {
                                         Chỉnh sửa câu hỏi
                                     </Typography>
 
-                                    <Box sx={{ marginY: '10px', display: 'flex', alignItems: 'center' }}>
+                                    <Box component="form" sx={{ marginY: '10px', display: 'flex', alignItems: 'center' }}>
                                         <TextField
+                                            required
                                             value={textFieldValue}
                                             onChange={handleTextFieldChange}
                                             sx={{ marginRight: '10px', width: '100%' }}
@@ -391,18 +490,46 @@ function DetailForm() {
                                         </FormControl>
                                     </Box>
                                     {type === 'multi-choice' ?
-                                        <FormControl>
-                                            {/* <FormLabel id="demo-radio-buttons-group-label">Gender</FormLabel> */}
-                                            <RadioGroup
-                                                aria-labelledby="demo-radio-buttons-group-label"
-                                                defaultValue="female"
-                                                name="radio-buttons-group"
+                                        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                                            {
+                                                optionFieldValueArray.map((item, index) => (
+                                                    <Box key={index} sx={{ display: 'flex', alignItems: 'center' }}>
+                                                        <RadioButtonUncheckedIcon
+                                                            sx={{ color: 'gray', marginRight: '10px' }}
+                                                        />
+                                                        <TextField
+                                                            value={index === active ? optionFieldValue : optionFieldValueArray[index]}
+                                                            onChange={handleOptionFieldChange}
+                                                            onBlur={saveOption(index)}
+                                                            onClick={handleActive(index)}
+                                                            sx={{ marginRight: '10px', width: '100%' }}
+                                                            // id={index.toString()}
+                                                            variant="standard"
+                                                        // defaultValue='Tùy chọn 1'
+                                                        >
+                                                            {/* {optionFieldValue} */}
+                                                        </TextField>
+                                                        <IconButton
+                                                            // onClick={deleteQuestion(ques)}
+                                                            sx={{
+                                                                backgroundColor: '#white',
+                                                                color: '#7B7B7B',
+                                                                margin: '5px',
+                                                                '&:hover': {
+                                                                    backgroundColor: '#EBEBEB', // Màu nền thay đổi khi hover
+                                                                },
+                                                            }}>
+                                                            <ClearIcon />
+                                                        </IconButton>
+                                                    </Box>
+                                                ))
+                                            }
+                                            <Button
+                                                onClick={handleOption}
                                             >
-                                                <FormControlLabel value="female" control={<Radio />} label="Nam" />
-                                                <FormControlLabel value="male" control={<Radio />} label="Nữ" />
-                                                <FormControlLabel value="other" control={<Radio />} label="Khác" />
-                                            </RadioGroup>
-                                        </FormControl>
+                                                Thêm tùy chọn
+                                            </Button>
+                                        </Box >
                                         : null
                                     }
                                     {type === 'checkbox' ?
@@ -421,6 +548,7 @@ function DetailForm() {
                                     <Box sx={{ display: 'flex', flexDirection: 'row-reverse' }} >
                                         <Button
                                             onClick={addQuestion}
+                                            // onClick={handleOptionArrayChange}
                                             sx={{
                                                 color: 'white',
                                                 backgroundColor: '#364F6B',
