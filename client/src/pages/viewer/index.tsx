@@ -25,6 +25,8 @@ import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormLabel from '@mui/material/FormLabel';
+import Checkbox from '@mui/material/Checkbox';
+
 
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -82,16 +84,61 @@ function Form() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
+    const [selectedValue, setSelectedValue] = React.useState('');
+
+    const handleChange = (e) => {
+        setSelectedValue(e.target.value);
+    };
+
+    console.log(selectedValue);
+    console.log(formDetail);
+
+    const ResponseAPI_URL = `http://localhost:8080/form-response/${useParams()?.formID}`;
+
+    //update question in database
+    const addResponsetoDatabase = async (formID, data) => {
+        try {
+            const response = await fetch(ResponseAPI_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + JSON.parse(sessionStorage.getItem('token') as string)?.accessToken
+                },
+                body: JSON.stringify(data),
+            });
+
+            console.log(response);
+
+            if (!response.ok) {
+                throw new Error(`HTTP Error! Status: ${response.status}`);
+            }
+
+            const dataFromServer = await response.json();
+            // Xử lý dữ liệu từ máy chủ (nếu cần)
+            console.log(dataFromServer);
+        } catch (error) {
+            console.error('Lỗi khi gửi yêu cầu:', error);
+        }
+    };
+
+    const [submitForm, setSubmitForm] = React.useState(false);
+
+    const handleSubmitForm = () => {
+
+        console.log(formDetail.id);
+        addResponsetoDatabase(formDetail.id,"Hello");
+    }
+
     return (
         <div>
-            <Box sx={{ border: "2px solid #DEDEDE", height: '100%', width: '100%' }}>
+            <Box sx={{ backgroundColor: '#E9F2F4', border: "2px solid #DEDEDE", height: '100%', width: '100%' }}>
                 <Box sx={{ backgroundColor: 'white', border: "2px solid #DEDEDE", marginX: '300px', marginTop: '70px' }}>
                     {/* Header of Form */}
-                    <Box sx={{ textAlign: 'center' }}>
-                        <Typography sx={{ color: '#364F6B', padding: '15px', fontWeight: 600 }} variant="h4" noWrap component="div">
+                    <Box sx={{ textAlign: 'center', backgroundColor: '#008272', paddingY: '30px' }}>
+                        <Typography sx={{ color: 'white', padding: '15px', fontWeight: 600 }} variant="h4" noWrap component="div">
                             {Object.keys(formDetail).length !== 0 ? formDetail.header.Title : null}
                         </Typography>
-                        <Typography sx={{ color: '#364F6B', padding: '5px', fontWeight: 400 }} variant='body1' noWrap component="div">
+                        <Typography sx={{ color: 'white', padding: '5px', fontWeight: 400 }} variant='body1' noWrap component="div">
                             {Object.keys(formDetail).length !== 0 ? formDetail.header.Description : null}
                         </Typography>
                     </Box>
@@ -99,28 +146,54 @@ function Form() {
                     <Divider />
 
                     {/* Body of Form */}
-                    <Box sx={{ border: "2px solid #364F6B", borderTop: '6px solid #364F6B', margin: '35px' }}>
+                    <Box sx={{ margin: '50px' }}>
                         {formDetail.Questions !== undefined ? formDetail.QuestionOrder.map((ques, index) => (
                             <Box
                                 key={index}
                             >
                                 {/* Câu hỏi */}
                                 <Typography
-                                    sx={{ color: '#364F6B', justifySelft: 'left', padding: '5px', fontWeight: 500 }} variant='h5' noWrap component="div">
-                                    {index + 1}.{formDetail.Questions[ques].Question}
+                                    sx={{ color: '#008272', justifySelft: 'left', padding: '5px', fontWeight: 500 }} variant='h5' noWrap component="div">
+                                    {index + 1}. {formDetail.Questions[ques].Question}
                                 </Typography>
                                 {/* Nội dung | Dạng câu hỏi */}
-                                <Box
-                                    component="form"
-                                    sx={{
-                                        '& > :not(style)': { m: 1 },
-                                        marginBottom: '10px'
-                                    }}
-                                    noValidate
-                                    autoComplete="off"
-                                >
-                                    <Input sx={{ width: '50%' }} placeholder="Nguyen Van A" inputProps={ariaLabel} />
-                                </Box>
+                                {formDetail.Questions[ques].Type === 'multi-choice' ?
+                                    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                                        <FormControl sx={{ marginLeft: '15px' }}>
+                                            <RadioGroup
+                                                key={index}
+                                                aria-labelledby="demo-radio-buttons-group-label"
+                                                defaultValue="female"
+                                                name="radio-buttons-group"
+                                            >
+                                                {formDetail.Questions[ques].Content.MultiChoice.Options.map((item, index) => (
+                                                    <FormControlLabel
+                                                        key={index}
+                                                        checked={selectedValue === item}
+                                                        onChange={handleChange}
+                                                        value={item}
+                                                        control={<Radio />}
+                                                        label={item}
+                                                    />
+                                                ))}
+                                            </RadioGroup>
+                                        </FormControl>
+                                    </Box >
+                                    : null
+                                }
+                                {formDetail.Questions[ques].Type === 'checkbox' ?
+                                    <FormControl sx={{ marginLeft: '15px' }}>
+                                        {/* <FormLabel id="demo-radio-buttons-group-label">Gender</FormLabel> */}
+                                        <FormControlLabel control={<Checkbox defaultChecked />} label="Label" />
+                                        <FormControlLabel required control={<Checkbox />} label="Required" />
+                                        <FormControlLabel disabled control={<Checkbox />} label="Disabled" />
+                                    </FormControl>
+                                    : null
+                                }
+                                {formDetail.Questions[ques].Type === 'shortText' ?
+                                    <TextField sx={{ width: '100%' }} id="standard-basic" label="Điền ngắn" variant="standard" />
+                                    : null
+                                }
                             </Box>
                         ))
                             : null}
@@ -181,12 +254,14 @@ function Form() {
                     </Box>*/}
                 </Box>
                 <Box sx={{ display: 'grid', justifyItems: 'right', width: '100%' }}>
-                    <Button sx={{
-                        background: 'white', color: '#364F6B', marginRight: '300px', marginBottom: '30px', marginTop: '30px', width: '100px', height: '50px', '&:hover': {
-                            backgroundColor: 'white', // Màu nền thay đổi khi hover
-                            color: '#364F6B'
-                        },
-                    }}>
+                    <Button
+                        onClick={handleSubmitForm}
+                        sx={{
+                            background: '#008272', color: 'white', marginRight: '300px', marginBottom: '30px', marginTop: '30px', width: '100px', height: '50px', '&:hover': {
+                                backgroundColor: '#008272', // Màu nền thay đổi khi hover
+                                color: 'white'
+                            },
+                        }}>
                         Gửi
                     </Button>
                 </Box>

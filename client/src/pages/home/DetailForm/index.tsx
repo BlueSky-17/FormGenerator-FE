@@ -78,9 +78,9 @@ function addShortTextType(
 }
 
 function addOption(
-    MultiChoice: { Options: string[], ImportedData: string }
+    multiChoice: { Options: string[], ImportedData: string }
 ) {
-    return { MultiChoice };
+    return { multiChoice };
 }
 
 function DetailForm() {
@@ -321,6 +321,8 @@ function DetailForm() {
 
     const open_avatar = Boolean(anchorEl);
     const id = open_avatar ? 'simple-popover' : undefined;
+
+    console.log(formDetail.Questions);
 
     return (
         <div>
