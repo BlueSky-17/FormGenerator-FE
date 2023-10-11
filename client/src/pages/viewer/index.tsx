@@ -35,36 +35,36 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import { useParams } from 'react-router-dom';
+import { stringify } from 'querystring';
 
 const ariaLabel = { 'aria-label': 'description' };
 
-function createData(
-    name: string,
-    owner: string,
-    response: number,
-    isOpen: boolean
+function Responses(
+    questionName: string,
+    type: string,
+    content: {}
 ) {
-    return { name, owner, response, isOpen };
+    return { questionName, type, content };
 }
 
-const countrys = [
-    { label: 'Nghệ An', year: 1994 },
-    { label: 'Tây Ninh', year: 1972 },
-    { label: 'Quảng Trị', year: 1974 },
-    { label: 'Cà Mau', year: 2008 },
-    { label: 'TP.HCM', year: 1957 }
-]
+function addResultMultiChoice(
+    multiChoice: string
+){
+    return {multiChoice}
+}
 
-const rows = [
-    createData('KHẢO SÁT CHẤT LƯỢNG SINH VIÊN K22', 'Tôi', 124, true),
-    createData('KHẢO SÁT ỨNG DỤNG ĐẶT MÓN ĂN', 'Tôi', 15, false),
-    createData('KHẢO SÁT ĐĂNG KÝ VỀ QUÊ NGHỈ LỄ 2/9', 'Tôi', 10, false),
-    createData('KHẢO SÁT TỶ LỆ SINH VIÊN ĐI XE GẮN MÁY', 'Tôi', 5, false),
-    createData('ĐÁNH GIÁ HỆ THỐNG QUẢN LÝ NHÂN VIÊN', 'Tôi', 14, false),
-];
+// const countrys = [
+//     { label: 'Nghệ An', year: 1994 },
+//     { label: 'Tây Ninh', year: 1972 },
+//     { label: 'Quảng Trị', year: 1974 },
+//     { label: 'Cà Mau', year: 2008 },
+//     { label: 'TP.HCM', year: 1957 }
+// ]
 
 function Form() {
     const [formDetail, setFormDetail] = useState<any>({})
+
+    const [formResponses, setFormResponse] = useState<any[]>([])
 
     const FormDetailAPI_URL = `http://localhost:8080/form/${useParams()?.formID}`;
 
@@ -86,10 +86,63 @@ function Form() {
 
     const [selectedValue, setSelectedValue] = React.useState('');
 
-    const handleChange = (e) => {
+    // const myMap = new Map();
+
+    const handleChange = (ques: number, index: number) => (e) => {
         setSelectedValue(e.target.value);
+        console.log(index);
+
+
+        // console.log(typeof(formDetail.Questions[ques].Content.MultiChoice.Options[index]));
+
+        // console.log(formResponses[ques].Content.multiChoice)
+        // let i = 0;
+        // console.log(formDetail.Questions[ques].Content.MultiChoice.Options[index])
+
+        // if (i === index) { }
+        // myMap.set(formDetail.Questions[ques].Content.MultiChoice.Options[index], 1); 
+
+        // console.log(myMap);
+        formResponses[ques].content.multiChoice = formDetail.Questions[ques].Content.MultiChoice.Options[index];
+        console.log(formResponses[ques].content.multiChoice)
     };
 
+    // let len: number = Object.keys(formDetail.QuestionOrder).length;
+
+    console.log(formDetail.QuestionOrder);
+
+    // const handleKey = (index: number) => {
+    //     const myMap = new Map();
+    //     const len = formDetail.Questions[index].Content.multiChoice.Options.length;
+    //     let i = 0;
+    //     while (i < len) {
+    //         myMap.set(formDetail.Questions[index].Content.multiChoice.Options[i], false);
+    //     }
+    // }
+
+    // Vì render lần đâu lấy length bị lỗi -> nên dùng try catch 
+    try {
+        let i = 0;
+        // Tránh push thêm khi re-render component 
+        if (formDetail.QuestionOrder.length !== formResponses.length) {
+            while (i < formDetail.QuestionOrder.length) {
+                formResponses.push(
+                    Responses(
+                        formDetail.Questions[i].Question,
+                        formDetail.Questions[i].Type,
+                        addResultMultiChoice("")
+                    )
+                )
+                // setFormResponse(formResponses);
+                i++;
+            }
+        }
+    }
+    catch (error) {
+        console.log("Error");
+    }
+
+    console.log(formResponses);
     console.log(selectedValue);
     console.log(formDetail);
 
@@ -104,7 +157,7 @@ function Form() {
                     'Content-Type': 'application/json',
                     'Authorization': 'Bearer ' + JSON.parse(sessionStorage.getItem('token') as string)?.accessToken
                 },
-                body: JSON.stringify(data),
+                body: JSON.stringify(data)
             });
 
             console.log(response);
@@ -121,12 +174,17 @@ function Form() {
         }
     };
 
-    const [submitForm, setSubmitForm] = React.useState(false);
-
     const handleSubmitForm = () => {
-
-        console.log(formDetail.id);
-        addResponsetoDatabase(formDetail.id,"Hello");
+        // console.log(formDetail.id);
+        // console.log(data);
+        addResponsetoDatabase(formDetail.id, {
+            "ID": "6526518a6b149bcb2510172f",
+            "FormID": "651dbc9d49502243191371e3",
+            "Username": formDetail.owner,
+            "UserID": formDetail.owner,
+            "SubmitTime": "2023-10-11T07:40:58.1078101Z",
+            "Responses": formResponses
+        });
     }
 
     return (
@@ -169,8 +227,8 @@ function Form() {
                                                 {formDetail.Questions[ques].Content.MultiChoice.Options.map((item, index) => (
                                                     <FormControlLabel
                                                         key={index}
-                                                        checked={selectedValue === item}
-                                                        onChange={handleChange}
+                                                        // checked={selectedValue === item}
+                                                        onChange={handleChange(ques, index)}
                                                         value={item}
                                                         control={<Radio />}
                                                         label={item}
