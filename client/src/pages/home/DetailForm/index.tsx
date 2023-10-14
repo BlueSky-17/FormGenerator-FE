@@ -26,10 +26,13 @@ import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import NotesIcon from '@mui/icons-material/Notes';
 import ClearIcon from '@mui/icons-material/Clear';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
+import EventIcon from '@mui/icons-material/Event';
 
 import TextField from '@mui/material/TextField';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
 import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 
@@ -53,6 +56,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
     justifyContent: 'flex-end',
 }));
 
+// style cho modal edit
 const style = {
     position: 'absolute' as 'absolute',
     top: '35%',
@@ -218,8 +222,7 @@ function DetailForm() {
     const [active, setActive] = useState<number>(-1);
 
     // active === index thì value của TextField sẽ thay đổi
-    const handleActive = (index: number) => (e) =>
-    {
+    const handleActive = (index: number) => (e) => {
         setActive(index);
         setOptionFieldValue(optionFieldValueArray[index]);
     }
@@ -237,9 +240,7 @@ function DetailForm() {
             Options: optionFieldValueArray,
             ImportedData: '',
         });
-        // console.log(updatedMultiChoice);
-        // console.log(formDetail.Questions);
-        // formDetail.Questions.Content.MultiChoice.push(...updatedMultiChoice.MultiChoice.Options);
+
         return updatedMultiChoice;
     };
 
@@ -254,17 +255,6 @@ function DetailForm() {
 
         setOptionLength(newIndex);
     }
-
-    // console.log(optionFieldValue);
-
-    console.log(optionFieldValueArray);
-
-    // console.log(formDetail.Questions.Content.option)
-
-    // const addOption = () => {
-    //     options: string[];
-
-    // }
 
     // Navigate to view form page
     const navigate = useNavigate();
@@ -335,35 +325,6 @@ function DetailForm() {
                         {Object.keys(formDetail).length !== 0 ? formDetail.header.Title : null}
                     </Typography>
                     <Box sx={{ flexGrow: 1 }} />
-                    {/* <Button sx={{
-                        color: '#364F6B',
-                        backgroundColor: 'white',
-                        border: '2px solid #364F6B',
-                        borderRadius: '10px',
-                        fontSize: '0.8rem',
-                        marginY: '18px',
-                        textTransform: 'initial',
-                        '&:hover': {
-                            backgroundColor: '#364F6B', // Màu nền thay đổi khi hover
-                            color: 'white'
-                        },
-                    }}>
-                        <VisibilityIcon sx={{ marginRight: '5px', height: '90%' }} />
-                        Xem trước
-                    </Button> */}
-
-                    <Button
-                        sx={{
-                            color: 'white',
-                            backgroundColor: '#364F6B',
-                            borderRadius: '10px',
-                            marginY: '12px',
-                            '&:hover': {
-                                backgroundColor: '#2E4155', // Màu nền thay đổi khi hover
-                            },
-                        }}>
-                        Lưu
-                    </Button>
 
                     <IconButton
                         aria-describedby={id} onClick={handleClick}
@@ -477,16 +438,36 @@ function DetailForm() {
                                                 onChange={handleChange}
                                             >
                                                 <MenuItem value={'multi-choice'}>
-                                                    <RadioButtonCheckedIcon sx={{ paddingRight: '5px' }} />
-                                                    Trắc nghiệm
+                                                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                                                        <RadioButtonCheckedIcon sx={{ marginRight: '10px', color: '#6D7073' }} />
+                                                        <ListItemText>
+                                                            Trắc nghiệm
+                                                        </ListItemText>
+                                                    </div>
                                                 </MenuItem>
                                                 <MenuItem value={'checkbox'}>
-                                                    <CheckBoxIcon sx={{ paddingRight: '5px' }} />
-                                                    Ô đánh dấu
+                                                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                                                        <CheckBoxIcon sx={{ marginRight: '10px', color: '#6D7073' }} />
+                                                        <ListItemText>
+                                                            Ô đánh dấu
+                                                        </ListItemText>
+                                                    </div>
                                                 </MenuItem>
                                                 <MenuItem value={'shortText'}>
-                                                    <NotesIcon sx={{ paddingRight: '5px' }} />
-                                                    Điền ngắn
+                                                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                                                        <NotesIcon sx={{ marginRight: '10px', color: '#6D7073' }} />
+                                                        <ListItemText>
+                                                            Điền ngắn
+                                                        </ListItemText>
+                                                    </div>
+                                                </MenuItem>
+                                                <MenuItem value={'datePicker'}>
+                                                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                                                        <EventIcon sx={{ marginRight: '10px', color: '#6D7073' }} />
+                                                        <ListItemText>
+                                                            Lịch
+                                                        </ListItemText>
+                                                    </div>
                                                 </MenuItem>
                                             </Select>
                                         </FormControl>
@@ -536,7 +517,6 @@ function DetailForm() {
                                     }
                                     {type === 'checkbox' ?
                                         <FormControl>
-                                            {/* <FormLabel id="demo-radio-buttons-group-label">Gender</FormLabel> */}
                                             <FormControlLabel control={<Checkbox defaultChecked />} label="Label" />
                                             <FormControlLabel required control={<Checkbox />} label="Required" />
                                             <FormControlLabel disabled control={<Checkbox />} label="Disabled" />
@@ -550,7 +530,6 @@ function DetailForm() {
                                     <Box sx={{ display: 'flex', flexDirection: 'row-reverse' }} >
                                         <Button
                                             onClick={addQuestion}
-                                            // onClick={handleOptionArrayChange}
                                             sx={{
                                                 color: 'white',
                                                 backgroundColor: '#364F6B',
@@ -695,8 +674,8 @@ function DetailForm() {
                         </Button>
                     </Box>
                 </Box>
-            </Box>
-        </div>
+            </Box >
+        </div >
     )
 }
 
