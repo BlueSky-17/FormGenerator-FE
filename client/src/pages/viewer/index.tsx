@@ -90,35 +90,10 @@ function Form() {
 
     const handleChange = (ques: number, index: number) => (e) => {
         setSelectedValue(e.target.value);
-        console.log(index);
 
-
-        // console.log(typeof(formDetail.Questions[ques].Content.MultiChoice.Options[index]));
-
-        // console.log(formResponses[ques].Content.multiChoice)
-        // let i = 0;
-        // console.log(formDetail.Questions[ques].Content.MultiChoice.Options[index])
-
-        // if (i === index) { }
-        // myMap.set(formDetail.Questions[ques].Content.MultiChoice.Options[index], 1); 
-
-        // console.log(myMap);
         formResponses[ques].content.multiChoice = formDetail.Questions[ques].Content.MultiChoice.Options[index];
         console.log(formResponses[ques].content.multiChoice)
     };
-
-    // let len: number = Object.keys(formDetail.QuestionOrder).length;
-
-    console.log(formDetail.QuestionOrder);
-
-    // const handleKey = (index: number) => {
-    //     const myMap = new Map();
-    //     const len = formDetail.Questions[index].Content.multiChoice.Options.length;
-    //     let i = 0;
-    //     while (i < len) {
-    //         myMap.set(formDetail.Questions[index].Content.multiChoice.Options[i], false);
-    //     }
-    // }
 
     // Vì render lần đâu lấy length bị lỗi -> nên dùng try catch 
     try {
@@ -141,10 +116,6 @@ function Form() {
     catch (error) {
         console.log("Error");
     }
-
-    console.log(formResponses);
-    console.log(selectedValue);
-    console.log(formDetail);
 
     const ResponseAPI_URL = `http://localhost:8080/form-response/${useParams()?.formID}`;
 
@@ -211,7 +182,7 @@ function Form() {
                             >
                                 {/* Câu hỏi */}
                                 <Typography
-                                    sx={{ color: '#008272', justifySelft: 'left', padding: '5px', fontWeight: 500 }} variant='h5' noWrap component="div">
+                                    sx={{ color: '#008272', justifySelft: 'left', padding: '10px', fontWeight: 500 }} variant='h5' noWrap component="div">
                                     {index + 1}. {formDetail.Questions[ques].Question}
                                 </Typography>
                                 {/* Nội dung | Dạng câu hỏi */}
@@ -249,7 +220,13 @@ function Form() {
                                     : null
                                 }
                                 {formDetail.Questions[ques].Type === 'shortText' ?
-                                    <TextField sx={{ width: '100%' }} id="standard-basic" label="Điền ngắn" variant="standard" />
+                                    <TextField sx={{ width: '100%' }} id="filled-basic" label="Điền ngắn" variant="filled" />
+                                    : null
+                                }
+                                {formDetail.Questions[ques].Type === 'datePicker' ?
+                                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                        <DatePicker />
+                                    </LocalizationProvider>
                                     : null
                                 }
                             </Box>

@@ -56,7 +56,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
     justifyContent: 'flex-end',
 }));
 
-// style cho modal edit
+// Style cho modal edit
 const style = {
     position: 'absolute' as 'absolute',
     top: '35%',
@@ -70,7 +70,7 @@ const style = {
     p: 4,
 };
 
-function addShortTextType(
+function addEmptyQuestion(
     Question: string,
     Description: string,
     Required: boolean,
@@ -81,11 +81,27 @@ function addShortTextType(
     return { Question, Description, Required, ImagePath, Type, Content };
 }
 
+// Content for multi-choice TYPE
 function addOption(
     multiChoice: { Options: string[], ImportedData: string }
 ) {
     return { multiChoice };
 }
+
+// Content for multi-choice TYPE
+function addShortText(
+    ShortText: string
+) {
+    return { ShortText };
+}
+
+// Content for date TYPE
+function addDate(
+    Date: string
+) {
+    return { Date };
+}
+
 
 function DetailForm() {
     const [formDetail, setFormDetail] = useState<any>({})
@@ -94,7 +110,7 @@ function DetailForm() {
 
     const UpdateFormAPI_URL = `http://localhost:8080/update-form/${useParams()?.formID}`;
 
-    //get detail of form (from API)
+    //API GET: Get detail of form
     useEffect(() => {
         fetch(FormDetailAPI_URL, {
             method: 'GET',
@@ -110,64 +126,7 @@ function DetailForm() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
-    // open + close Modal edit form
-    const [open, setOpen] = React.useState(false);
-
-    const handleOpen = () => {
-        // return default value when open modal: type and title
-        setType('');
-        setTextFieldValue('');
-
-        // return default value when open modal: options
-        setOptionFieldValueArray([]);
-        setOptionLength(0);
-        setActive(-1);
-
-        setOpen(true);
-    }
-
-    const handleClose = () => setOpen(false);
-
-    //add question into form (front-end)
-    const addQuestion = () => {
-        // Tạo một Question có 5 trường: Question, Description, Required, ImagePath, Type, Content
-        formDetail.Questions.push(addShortTextType(textFieldValue, "", true, "", type, {}));
-
-        // Push index vào QuestionOrder
-        const newIndex = formDetail.Questions.length - 1;
-        formDetail.QuestionOrder.push(newIndex);
-
-        // Lấy Object: Options có chứa Option[] và ImportedData
-        const updatedMultiChoice = handleOptionArrayChange();
-
-        Object.assign(formDetail.Questions[newIndex].Content, updatedMultiChoice);
-
-        setOpen(false);
-        updateObjectInDatabase(formDetail.id, formDetail)
-    };
-
-    const [deleted, setDelete] = React.useState(false);
-
-    //delete question in form (front-end)
-    const deleteQuestion = (index: string) => (event: any) => {
-        // Xóa 1 phần tử ở vị trí index
-        formDetail.Questions.splice(index, 1)
-
-        // lọc mảng các num mà khác index, chỉnh lại cho các num
-        formDetail.QuestionOrder = formDetail.QuestionOrder.filter(num => num !== index);
-        formDetail.QuestionOrder = formDetail.QuestionOrder.map((num) => {
-            if (num > index)
-                return --num;
-            else
-                return num;
-        })
-
-        if (deleted === true) setDelete(false);
-        else setDelete(true);
-        updateObjectInDatabase(formDetail.id, formDetail)
-    };
-
-    //update question in database
+    //API PUT: Update form 
     const updateObjectInDatabase = async (formID, updateData) => {
         try {
             const response = await fetch(UpdateFormAPI_URL, {
@@ -193,16 +152,90 @@ function DetailForm() {
         }
     };
 
-    // set type of question
+    // Đóng/Mở Modal edit form
+    const [open, setOpen] = React.useState(false);
+
+    const handleOpen = () => {
+        // return default value when open modal: type and title
+        setType('');
+        setTextFieldValue('');
+
+        // return default value when open modal: multi-choice TYPE
+        if (type === "multi-choice") {
+            setOptionFieldValueArray([]);
+            setOptionLength(0);
+            setActive(-1);
+        }
+
+        setOpen(true);
+    }
+
+    const handleClose = () => setOpen(false);
+
+    // Set type of question
     const [type, setType] = React.useState('');
     const handleChange = (event: SelectChangeEvent) => {
         setType(event.target.value as string);
     };
 
-    // set title of question
+    // Set title of question
     const [textFieldValue, setTextFieldValue] = useState('');
     const handleTextFieldChange = (e) => {
         setTextFieldValue(e.target.value);
+    };
+
+    // Add question to a form 
+    const addQuestion = () => {
+        // Tạo một Question có 5 trường: Question, Description, Required, ImagePath, Type, Content
+        formDetail.Questions.push(addEmptyQuestion(textFieldValue, "", true, "", type, {}));
+
+        // Push index vào QuestionOrder
+        const newIndex = formDetail.Questions.length - 1;
+        formDetail.QuestionOrder.push(newIndex);
+
+        // Lấy Object: Options có chứa Option[] và ImportedData
+        if (type === "multi-choice") {
+            const updateMultiChoice = addOption({
+                Options: optionFieldValueArray,
+                ImportedData: '',
+            });
+
+            Object.assign(formDetail.Questions[newIndex].Content, updateMultiChoice);
+        }
+        else if (type === "shortText") {
+            const updateShortText = addShortText('');
+
+            Object.assign(formDetail.Questions[newIndex].Content, updateShortText);
+        }
+        else if (type === "datePicker") {
+            const updateDate = addDate('');
+
+            Object.assign(formDetail.Questions[newIndex].Content, updateDate);
+        }
+
+        setOpen(false);
+        updateObjectInDatabase(formDetail.id, formDetail)
+    };
+
+    const [deleted, setDelete] = React.useState(false);
+
+    // Delete question in a form 
+    const deleteQuestion = (index: string) => (event: any) => {
+        // Xóa 1 phần tử ở vị trí index
+        formDetail.Questions.splice(index, 1)
+
+        // Lọc mảng các num mà khác index, chỉnh lại cho các num
+        formDetail.QuestionOrder = formDetail.QuestionOrder.filter(num => num !== index);
+        formDetail.QuestionOrder = formDetail.QuestionOrder.map((num) => {
+            if (num > index)
+                return --num;
+            else
+                return num;
+        })
+
+        if (deleted === true) setDelete(false);
+        else setDelete(true);
+        updateObjectInDatabase(formDetail.id, formDetail)
     };
 
     // Biến tạm: optionFieldValue
@@ -232,16 +265,6 @@ function DetailForm() {
         optionFieldValueArray[index] = optionFieldValue;
 
         console.log(optionFieldValueArray);
-    };
-
-    //Lưu array tạm optionFieldValueArray vào một Object
-    const handleOptionArrayChange = () => {
-        const updatedMultiChoice = addOption({
-            Options: optionFieldValueArray,
-            ImportedData: '',
-        });
-
-        return updatedMultiChoice;
     };
 
     // Thêm option trống 
