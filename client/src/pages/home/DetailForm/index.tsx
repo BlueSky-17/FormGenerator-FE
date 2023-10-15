@@ -156,7 +156,6 @@ function DetailForm() {
 
     // Đóng/Mở Modal edit form
     const [open, setOpen] = React.useState(false);
-
     const handleOpen = () => {
         // return default value when open modal: type and title
         setType('');
@@ -171,16 +170,13 @@ function DetailForm() {
 
         setOpen(true);
     }
-
     const handleClose = () => setOpen(false);
 
-    // Đóng/Mở Submodal edit form
+    // Đóng/Mở Submodal edit form (using with linked-data type)
     const [subopen, setSubOpen] = React.useState(false);
-
     const handleSubOpen = () => {
         setSubOpen(true);
     }
-
     const handleSubClose = () => setSubOpen(false);
 
     // Set type of question
@@ -228,9 +224,8 @@ function DetailForm() {
         updateObjectInDatabase(formDetail.id, formDetail)
     };
 
-    const [deleted, setDelete] = React.useState(false);
-
     // Delete question in a form 
+    const [deleted, setDelete] = React.useState(false);
     const deleteQuestion = (index: string) => (event: any) => {
         // Xóa 1 phần tử ở vị trí index
         formDetail.Questions.splice(index, 1)
@@ -334,20 +329,16 @@ function DetailForm() {
 
     // Tùy chỉnh nút Settings
     const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
-
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
         setAnchorEl(event.currentTarget);
     };
-
     const handleCloseSetting = () => {
         setAnchorEl(null);
     };
+    const open_settings = Boolean(anchorEl);
 
-    const open_avatar = Boolean(anchorEl);
-    const id = open_avatar ? 'simple-popover' : undefined;
-
+    //Tùy chỉnh file
     const [file, setFile] = useState<File>();
-
     const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
             setFile(e.target.files[0]);
@@ -369,7 +360,7 @@ function DetailForm() {
                     <Box sx={{ flexGrow: 1 }} />
 
                     <IconButton
-                        aria-describedby={id} onClick={handleClick}
+                        onClick={handleClick}
                         sx={{
                             color: '#364F6B',
                             backgroundColor: 'white',
@@ -379,8 +370,7 @@ function DetailForm() {
                         <SettingsIcon />
                     </IconButton>
                     <Popover
-                        id={id}
-                        open={open_avatar}
+                        open={open_settings}
                         anchorEl={anchorEl}
                         onClose={handleCloseSetting}
                         anchorOrigin={{

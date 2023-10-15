@@ -37,8 +37,6 @@ import Autocomplete from '@mui/material/Autocomplete';
 import { useParams } from 'react-router-dom';
 import { stringify } from 'querystring';
 
-const ariaLabel = { 'aria-label': 'description' };
-
 function Responses(
     questionName: string,
     type: string,
@@ -49,8 +47,20 @@ function Responses(
 
 function addResultMultiChoice(
     multiChoice: string
-){
-    return {multiChoice}
+) {
+    return { multiChoice }
+}
+
+function addResultShortText(
+    shortText: string
+) {
+    return { shortText }
+}
+
+function addResultDate(
+    date: string
+) {
+    return { date }
 }
 
 // const countrys = [
@@ -63,12 +73,12 @@ function addResultMultiChoice(
 
 function Form() {
     const [formDetail, setFormDetail] = useState<any>({})
-
     const [formResponses, setFormResponse] = useState<any[]>([])
 
     const FormDetailAPI_URL = `http://localhost:8080/form/${useParams()?.formID}`;
+    const ResponseAPI_URL = `http://localhost:8080/form-response/${useParams()?.formID}`;
 
-    //get detail of form (from API)
+    //API GET: get detail of form 
     useEffect(() => {
         fetch(FormDetailAPI_URL, {
             method: 'GET',
@@ -84,42 +94,7 @@ function Form() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
-    const [selectedValue, setSelectedValue] = React.useState('');
-
-    // const myMap = new Map();
-
-    const handleChange = (ques: number, index: number) => (e) => {
-        setSelectedValue(e.target.value);
-
-        formResponses[ques].content.multiChoice = formDetail.Questions[ques].Content.MultiChoice.Options[index];
-        console.log(formResponses[ques].content.multiChoice)
-    };
-
-    // Vì render lần đâu lấy length bị lỗi -> nên dùng try catch 
-    try {
-        let i = 0;
-        // Tránh push thêm khi re-render component 
-        if (formDetail.QuestionOrder.length !== formResponses.length) {
-            while (i < formDetail.QuestionOrder.length) {
-                formResponses.push(
-                    Responses(
-                        formDetail.Questions[i].Question,
-                        formDetail.Questions[i].Type,
-                        addResultMultiChoice("")
-                    )
-                )
-                // setFormResponse(formResponses);
-                i++;
-            }
-        }
-    }
-    catch (error) {
-        console.log("Error");
-    }
-
-    const ResponseAPI_URL = `http://localhost:8080/form-response/${useParams()?.formID}`;
-
-    //update question in database
+    //API POST: update question in database
     const addResponsetoDatabase = async (formID, data) => {
         try {
             const response = await fetch(ResponseAPI_URL, {
@@ -145,9 +120,72 @@ function Form() {
         }
     };
 
+    // Initial mảng FormResponses tương ứng với các Question trong Form
+    // Vì render lần đâu lấy length bị lỗi -> nên dùng try catch 
+    try {
+        let i = 0;
+        // Tránh push thêm khi re-render component 
+        if (formDetail.QuestionOrder.length !== formResponses.length) {
+            while (i < formDetail.QuestionOrder.length) {
+                if (formDetail.Questions[i].Type === "multi-choice") {
+                    formResponses.push(
+                        Responses(
+                            formDetail.Questions[i].Question,
+                            formDetail.Questions[i].Type,
+                            addResultMultiChoice("")
+                        )
+                    )
+                }
+                else if (formDetail.Questions[i].Type === "shortText") {
+                    formResponses.push(
+                        Responses(
+                            formDetail.Questions[i].Question,
+                            formDetail.Questions[i].Type,
+                            addResultShortText("")
+                        )
+                    )
+                }
+                else if (formDetail.Questions[i].Type === "datePicker") {
+                    formResponses.push(
+                        Responses(
+                            formDetail.Questions[i].Question,
+                            formDetail.Questions[i].Type,
+                            addResultDate("")
+                        )
+                    )
+                }
+                // setFormResponse(formResponses);
+                i++;
+            }
+        }
+    }
+    catch (error) {
+        console.log("Error");
+    }
+    
+    // Lưu giá trị cho các field dạng multi-choice
+    const handleChange = (ques: number, index: number) => (e) => {
+        formResponses[ques].content.multiChoice = formDetail.Questions[ques].Content.MultiChoice.Options[index];
+        console.log(formResponses[ques].content.multiChoice)
+    };
+
+    //Lưu giá trị cho các field dạng shortText
+    const [inputValue, setInputValue] = React.useState('');
+    const handleChangeInputValue = (ques: number) => (e) => {
+        setInputValue(e.target.value);
+    };
+    const saveInputValue = (ques:number) => (e) =>{
+        formResponses[ques].content.shortText = inputValue;
+    };
+
+    //Lưu giá trị cho các field dạng Date
+    const handleChangeDate = (ques: number) => (e) => {
+        formResponses[ques].content.date = e.$d;
+    };
+
+
+    const [submit, setSubmit] = useState(false);
     const handleSubmitForm = () => {
-        // console.log(formDetail.id);
-        // console.log(data);
         addResponsetoDatabase(formDetail.id, {
             "ID": "6526518a6b149bcb2510172f",
             "FormID": "651dbc9d49502243191371e3",
@@ -156,11 +194,15 @@ function Form() {
             "SubmitTime": "2023-10-11T07:40:58.1078101Z",
             "Responses": formResponses
         });
+
+        setSubmit(true);
     }
+
+    console.log(formResponses);
 
     return (
         <div>
-            <Box sx={{ backgroundColor: '#E9F2F4', border: "2px solid #DEDEDE", height: '100%', width: '100%' }}>
+            <Box sx={{ backgroundColor: '#E9F2F4', border: "2px solid #DEDEDE", height: '100vh', width: '100vw' }}>
                 <Box sx={{ backgroundColor: 'white', border: "2px solid #DEDEDE", marginX: '300px', marginTop: '70px' }}>
                     {/* Header of Form */}
                     <Box sx={{ textAlign: 'center', backgroundColor: '#008272', paddingY: '30px' }}>
@@ -174,8 +216,8 @@ function Form() {
 
                     <Divider />
 
-                    {/* Body of Form */}
-                    <Box sx={{ margin: '50px' }}>
+                    {/* Body of Form | In case: Unsubmit form */}
+                    {!submit && <Box sx={{ margin: '50px' }}>
                         {formDetail.Questions !== undefined ? formDetail.QuestionOrder.map((ques, index) => (
                             <Box
                                 key={index}
@@ -220,75 +262,34 @@ function Form() {
                                     : null
                                 }
                                 {formDetail.Questions[ques].Type === 'shortText' ?
-                                    <TextField sx={{ width: '100%' }} id="filled-basic" label="Điền ngắn" variant="filled" />
+                                    <TextField
+                                        value={inputValue}
+                                        onChange={handleChangeInputValue(ques)}
+                                        onBlur={saveInputValue(ques)}
+                                        sx={{ width: '100%' }}
+                                        id="filled-basic"
+                                        label="Điền ngắn"
+                                        variant="filled" />
                                     : null
                                 }
                                 {formDetail.Questions[ques].Type === 'datePicker' ?
                                     <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                        <DatePicker />
+                                        <DatePicker onChange={handleChangeDate(ques)}/>
                                     </LocalizationProvider>
                                     : null
                                 }
                             </Box>
                         ))
                             : null}
-                    </Box>
-                    {/* <Box sx={{ border: "2px solid #364F6B", borderTop: '6px solid #364F6B', margin: '35px' }}>
-                        <Typography sx={{ color: '#364F6B', justifySelft: 'left', padding: '5px', fontWeight: 500 }} variant='h5' noWrap component="div">
-                            2. Giới tính
-                        </Typography>
-                        <FormControl sx={{ marginLeft: '15px' }}>
-                            <RadioGroup
-                                aria-labelledby="demo-radio-buttons-group-label"
-                                defaultValue="female"
-                                name="radio-buttons-group"
-                            >
-                                <FormControlLabel value="female" control={<Radio />} label="Nam" />
-                                <FormControlLabel value="male" control={<Radio />} label="Nữ" />
-                                <FormControlLabel value="other" control={<Radio />} label="Khác" />
-                            </RadioGroup>
-                        </FormControl>
-                    </Box>
-                    <Box sx={{ border: "2px solid #364F6B", borderTop: '6px solid #364F6B', margin: '35px' }}>
-                        <Typography sx={{ color: '#364F6B', justifySelft: 'left', padding: '5px', fontWeight: 500 }} variant='h5' noWrap component="div">
-                            3. Ngày sinh
-                        </Typography>
-                        <Box sx={{ marginLeft: '15px', marginBottom: '15px' }}>
-                            <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                <DatePicker />
-                            </LocalizationProvider>
+                    </Box>}
+
+                    {/* Body of Form | In case: Form submitted */}
+                    {submit && <Box sx={{ margin: '50px' }}>
+                                Phản hồi đã được gửi thành công.
                         </Box>
-                    </Box>
-                    <Box sx={{ border: "2px solid #364F6B", borderTop: '6px solid #364F6B', margin: '35px' }}>
-                        <Typography sx={{ color: '#364F6B', justifySelft: 'left', padding: '5px', fontWeight: 500 }} variant='h5' noWrap component="div">
-                            4. Nơi sinh
-                        </Typography>
-                        <Box sx={{ marginLeft: '15px', marginY: '15px', display: 'flex' }}>
-                            <Autocomplete
-                                disablePortal
-                                id="combo-box-demo"
-                                options={countrys}
-                                sx={{ width: 200, marginRight: '10px' }}
-                                renderInput={(params) => <TextField {...params} label="Chọn tỉnh" />}
-                            />
-                            <Autocomplete
-                                disablePortal
-                                id="combo-box-demo"
-                                options={countrys}
-                                sx={{ width: 200, marginRight: '10px' }}
-                                renderInput={(params) => <TextField {...params} label="Chọn huyện" />}
-                            />
-                            <Autocomplete
-                                disablePortal
-                                id="combo-box-demo"
-                                options={countrys}
-                                sx={{ width: 200, marginRight: '10px' }}
-                                renderInput={(params) => <TextField {...params} label="Chọn xã" />}
-                            />
-                        </Box>
-                    </Box>*/}
+                    }
                 </Box>
-                <Box sx={{ display: 'grid', justifyItems: 'right', width: '100%' }}>
+                {!submit && <Box sx={{ display: 'grid', justifyItems: 'right', width: '100%' }}>
                     <Button
                         onClick={handleSubmitForm}
                         sx={{
@@ -299,7 +300,7 @@ function Form() {
                         }}>
                         Gửi
                     </Button>
-                </Box>
+                </Box>}
             </Box>
         </div>
     )
