@@ -27,6 +27,7 @@ import NotesIcon from '@mui/icons-material/Notes';
 import ClearIcon from '@mui/icons-material/Clear';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import EventIcon from '@mui/icons-material/Event';
+import DatasetLinkedIcon from '@mui/icons-material/DatasetLinked';
 
 import TextField from '@mui/material/TextField';
 import InputLabel from '@mui/material/InputLabel';
@@ -46,6 +47,7 @@ import Pagination from '@mui/material/Pagination';
 import Stack from '@mui/material/Stack';
 import { Link } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
+import { ChangeEvent } from 'react';
 
 const DrawerHeader = styled('div')(({ theme }) => ({
     display: 'flex',
@@ -64,7 +66,7 @@ const style = {
     transform: 'translate(-50%, -50%)',
     width: 700,
     bgcolor: 'background.paper',
-    border: '2px solid #000',
+    border: '1px solid #000',
     borderRadius: '15px',
     boxShadow: 24,
     p: 4,
@@ -171,6 +173,15 @@ function DetailForm() {
     }
 
     const handleClose = () => setOpen(false);
+
+    // Đóng/Mở Submodal edit form
+    const [subopen, setSubOpen] = React.useState(false);
+
+    const handleSubOpen = () => {
+        setSubOpen(true);
+    }
+
+    const handleSubClose = () => setSubOpen(false);
 
     // Set type of question
     const [type, setType] = React.useState('');
@@ -335,6 +346,14 @@ function DetailForm() {
     const open_avatar = Boolean(anchorEl);
     const id = open_avatar ? 'simple-popover' : undefined;
 
+    const [file, setFile] = useState<File>();
+
+    const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files) {
+            setFile(e.target.files[0]);
+        }
+    };
+
     console.log(formDetail.Questions);
 
     return (
@@ -415,175 +434,12 @@ function DetailForm() {
                     </Button>
                 </Box>
 
-                {/*Header of Form: Description and Modal Edit */}
+                {/*Header of Form: Description*/}
                 <Box sx={{ display: 'flex', alignContent: 'center', margin: '15px' }}>
                     {/* Form Description */}
                     <Typography sx={{}} variant='body1' component="div">
                         {Object.keys(formDetail).length !== 0 ? formDetail.header.Description : null}
                     </Typography>
-
-                    {/* Modal: Thêm mới Question */}
-                    <Modal
-                        open={open}
-                        onClose={handleClose}
-                        aria-labelledby="parent-modal-title"
-                        aria-describedby="parent-modal-description"
-                    >
-                        <Box sx={{ ...style, width: 400 }}>
-                            <Modal
-                                open={open}
-                                onClose={handleClose}
-                                aria-labelledby="modal-modal-title"
-                                aria-describedby="modal-modal-description"
-                            >
-                                <Box sx={style}>
-                                    <Typography variant='h6' component="div">
-                                        Chỉnh sửa câu hỏi
-                                    </Typography>
-
-                                    <Box component="form" sx={{ marginY: '10px', display: 'flex', alignItems: 'center' }}>
-                                        <TextField
-                                            required
-                                            value={textFieldValue}
-                                            onChange={handleTextFieldChange}
-                                            sx={{ marginRight: '10px', width: '100%' }}
-                                            id="outlined-basic"
-                                            variant="outlined"
-                                            placeholder='Nhập nội dung câu hỏi...'
-                                        />
-                                        <FormControl fullWidth>
-                                            <InputLabel id="demo-simple-select-label">Dạng</InputLabel>
-                                            <Select
-                                                labelId="demo-simple-select-label"
-                                                id="demo-simple-select"
-                                                value={type}
-                                                label="Dạng"
-                                                onChange={handleChange}
-                                            >
-                                                <MenuItem value={'multi-choice'}>
-                                                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                                                        <RadioButtonCheckedIcon sx={{ marginRight: '10px', color: '#6D7073' }} />
-                                                        <ListItemText>
-                                                            Trắc nghiệm
-                                                        </ListItemText>
-                                                    </div>
-                                                </MenuItem>
-                                                <MenuItem value={'checkbox'}>
-                                                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                                                        <CheckBoxIcon sx={{ marginRight: '10px', color: '#6D7073' }} />
-                                                        <ListItemText>
-                                                            Ô đánh dấu
-                                                        </ListItemText>
-                                                    </div>
-                                                </MenuItem>
-                                                <MenuItem value={'shortText'}>
-                                                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                                                        <NotesIcon sx={{ marginRight: '10px', color: '#6D7073' }} />
-                                                        <ListItemText>
-                                                            Điền ngắn
-                                                        </ListItemText>
-                                                    </div>
-                                                </MenuItem>
-                                                <MenuItem value={'datePicker'}>
-                                                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                                                        <EventIcon sx={{ marginRight: '10px', color: '#6D7073' }} />
-                                                        <ListItemText>
-                                                            Lịch
-                                                        </ListItemText>
-                                                    </div>
-                                                </MenuItem>
-                                            </Select>
-                                        </FormControl>
-                                    </Box>
-                                    {type === 'multi-choice' ?
-                                        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                                            {
-                                                optionFieldValueArray.map((item, index) => (
-                                                    <Box key={index} sx={{ display: 'flex', alignItems: 'center' }}>
-                                                        <RadioButtonUncheckedIcon
-                                                            sx={{ color: 'gray', marginRight: '10px' }}
-                                                        />
-                                                        <TextField
-                                                            value={index === active ? optionFieldValue : optionFieldValueArray[index]}
-                                                            onChange={handleOptionFieldChange}
-                                                            onBlur={saveOption(index)}
-                                                            onClick={handleActive(index)}
-                                                            sx={{ marginRight: '10px', width: '100%' }}
-                                                            // id={index.toString()}
-                                                            variant="standard"
-                                                        // defaultValue='Tùy chọn 1'
-                                                        >
-                                                            {/* {optionFieldValue} */}
-                                                        </TextField>
-                                                        <IconButton
-                                                            // onClick={deleteQuestion(ques)}
-                                                            sx={{
-                                                                backgroundColor: '#white',
-                                                                color: '#7B7B7B',
-                                                                margin: '5px',
-                                                                '&:hover': {
-                                                                    backgroundColor: '#EBEBEB', // Màu nền thay đổi khi hover
-                                                                },
-                                                            }}>
-                                                            <ClearIcon />
-                                                        </IconButton>
-                                                    </Box>
-                                                ))
-                                            }
-                                            <Button
-                                                onClick={handleOption}
-                                            >
-                                                Thêm tùy chọn
-                                            </Button>
-                                        </Box >
-                                        : null
-                                    }
-                                    {type === 'checkbox' ?
-                                        <FormControl>
-                                            <FormControlLabel control={<Checkbox defaultChecked />} label="Label" />
-                                            <FormControlLabel required control={<Checkbox />} label="Required" />
-                                            <FormControlLabel disabled control={<Checkbox />} label="Disabled" />
-                                        </FormControl>
-                                        : null
-                                    }
-                                    {type === 'shortText' ?
-                                        <TextField sx={{ width: '100%' }} id="standard-basic" label="Điền ngắn" variant="standard" />
-                                        : null
-                                    }
-                                    <Box sx={{ display: 'flex', flexDirection: 'row-reverse' }} >
-                                        <Button
-                                            onClick={addQuestion}
-                                            sx={{
-                                                color: 'white',
-                                                backgroundColor: '#364F6B',
-                                                borderRadius: '10px',
-                                                marginY: '10px',
-                                                marginX: '5px',
-                                                '&:hover': {
-                                                    backgroundColor: '#2E4155', // Màu nền thay đổi khi hover
-                                                },
-                                            }}>
-                                            Lưu
-                                        </Button>
-                                        <Button
-                                            onClick={handleClose}
-                                            sx={{
-                                                color: '#000000',
-                                                backgroundColor: '#E7E7E8',
-                                                borderRadius: '10px',
-                                                marginY: '10px',
-                                                marginX: '5px',
-                                                '&:hover': {
-                                                    backgroundColor: '#E7E7E7', // Màu nền thay đổi khi hover
-                                                },
-                                            }}>
-                                            Hủy
-                                        </Button>
-                                    </Box>
-                                </Box>
-                            </Modal>
-                        </Box>
-                    </Modal>
                 </Box>
 
                 <Divider />
@@ -698,6 +554,255 @@ function DetailForm() {
                     </Box>
                 </Box>
             </Box >
+
+            {/* Modal: Thêm mới Question */}
+            <Modal
+                open={open}
+                onClose={handleClose}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <Box sx={style}>
+                    <Typography variant='h6' component="div">
+                        Chỉnh sửa câu hỏi
+                    </Typography>
+
+                    <Box component="form" sx={{ marginY: '10px', display: 'flex', alignItems: 'center' }}>
+                        <TextField
+                            required
+                            value={textFieldValue}
+                            onChange={handleTextFieldChange}
+                            sx={{ marginRight: '10px', width: '100%' }}
+                            id="outlined-basic"
+                            variant="outlined"
+                            placeholder='Nhập nội dung câu hỏi...'
+                        />
+                        <FormControl fullWidth>
+                            <InputLabel id="demo-simple-select-label">Dạng</InputLabel>
+                            <Select
+                                labelId="demo-simple-select-label"
+                                id="demo-simple-select"
+                                value={type}
+                                label="Dạng"
+                                onChange={handleChange}
+                            >
+                                <MenuItem value={'multi-choice'}>
+                                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                                        <RadioButtonCheckedIcon sx={{ marginRight: '10px', color: '#6D7073' }} />
+                                        <ListItemText>
+                                            Trắc nghiệm
+                                        </ListItemText>
+                                    </div>
+                                </MenuItem>
+                                <MenuItem value={'checkbox'}>
+                                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                                        <CheckBoxIcon sx={{ marginRight: '10px', color: '#6D7073' }} />
+                                        <ListItemText>
+                                            Ô đánh dấu
+                                        </ListItemText>
+                                    </div>
+                                </MenuItem>
+                                <MenuItem value={'shortText'}>
+                                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                                        <NotesIcon sx={{ marginRight: '10px', color: '#6D7073' }} />
+                                        <ListItemText>
+                                            Điền ngắn
+                                        </ListItemText>
+                                    </div>
+                                </MenuItem>
+                                <MenuItem value={'datePicker'}>
+                                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                                        <EventIcon sx={{ marginRight: '10px', color: '#6D7073' }} />
+                                        <ListItemText>
+                                            Lịch
+                                        </ListItemText>
+                                    </div>
+                                </MenuItem>
+                                <MenuItem value={'linkedData'}>
+                                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                                        <DatasetLinkedIcon sx={{ marginRight: '10px', color: '#6D7073' }} />
+                                        <ListItemText>
+                                            Dữ liệu liên kết
+                                        </ListItemText>
+                                    </div>
+                                </MenuItem>
+                            </Select>
+                        </FormControl>
+                    </Box>
+                    {type === 'multi-choice' ?
+                        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                            {
+                                optionFieldValueArray.map((item, index) => (
+                                    <Box key={index} sx={{ display: 'flex', alignItems: 'center' }}>
+                                        <RadioButtonUncheckedIcon
+                                            sx={{ color: 'gray', marginRight: '10px' }}
+                                        />
+                                        <TextField
+                                            value={index === active ? optionFieldValue : optionFieldValueArray[index]}
+                                            onChange={handleOptionFieldChange}
+                                            onBlur={saveOption(index)}
+                                            onClick={handleActive(index)}
+                                            sx={{ marginRight: '10px', width: '100%' }}
+                                            // id={index.toString()}
+                                            variant="standard"
+                                        // defaultValue='Tùy chọn 1'
+                                        >
+                                            {/* {optionFieldValue} */}
+                                        </TextField>
+                                        <IconButton
+                                            // onClick={deleteQuestion(ques)}
+                                            sx={{
+                                                backgroundColor: '#white',
+                                                color: '#7B7B7B',
+                                                margin: '5px',
+                                                '&:hover': {
+                                                    backgroundColor: '#EBEBEB', // Màu nền thay đổi khi hover
+                                                },
+                                            }}>
+                                            <ClearIcon />
+                                        </IconButton>
+                                    </Box>
+                                ))
+                            }
+                            <Button
+                                onClick={handleOption}
+                            >
+                                Thêm tùy chọn
+                            </Button>
+                        </Box >
+                        : null
+                    }
+                    {type === 'checkbox' ?
+                        <FormControl>
+                            <FormControlLabel control={<Checkbox defaultChecked />} label="Label" />
+                            <FormControlLabel required control={<Checkbox />} label="Required" />
+                            <FormControlLabel disabled control={<Checkbox />} label="Disabled" />
+                        </FormControl>
+                        : null
+                    }
+                    {type === 'shortText' ?
+                        <TextField disabled sx={{ width: '100%' }} id="standard-basic" label="Điền ngắn" variant="standard" />
+                        : null
+                    }
+                    {type === 'linkedData' ?
+                        <Box>
+                            <Typography sx={{ color: '#6D7073' }}>Nhập <b>1 file excel</b> để thêm trường dữ liệu liên kết</Typography>
+                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingY: '7px' }}>
+                                <Button
+                                    sx={{ color: "#364F6B" }}
+                                    component="label"
+                                >
+                                    Nhập tại đây
+                                    <input
+                                        onChange={handleFileChange}
+                                        type="file"
+                                        hidden
+                                    />
+                                </Button>
+                                <Typography sx={{ color: '#364F6B' }}>{file && `${file.name}`}</Typography>
+                            </Box>
+                            {file && <Button
+                                onClick={handleSubOpen}
+                                sx={{
+                                    color: 'white',
+                                    backgroundColor: '#364F6B',
+                                    borderRadius: '10px',
+                                    paddingY: '10px',
+                                    paddingX: '5px',
+                                    width: '100%',
+                                    '&:hover': {
+                                        backgroundColor: '#2E4155', // Màu nền thay đổi khi hover
+                                    }
+                                }}>
+                                Xử lý file
+                            </Button>}
+                        </Box>
+                        : null
+                    }
+                    <Box sx={{ display: 'flex', flexDirection: 'row-reverse' }} >
+                        <Button
+                            onClick={addQuestion}
+                            sx={{
+                                color: 'white',
+                                backgroundColor: '#364F6B',
+                                borderRadius: '10px',
+                                marginY: '10px',
+                                marginX: '5px',
+                                '&:hover': {
+                                    backgroundColor: '#2E4155', // Màu nền thay đổi khi hover
+                                },
+                            }}>
+                            Lưu
+                        </Button>
+                        <Button
+                            onClick={handleClose}
+                            sx={{
+                                color: '#000000',
+                                backgroundColor: '#E7E7E8',
+                                borderRadius: '10px',
+                                marginY: '10px',
+                                marginX: '5px',
+                                '&:hover': {
+                                    backgroundColor: '#E7E7E7', // Màu nền thay đổi khi hover
+                                },
+                            }}>
+                            Hủy
+                        </Button>
+                    </Box>
+                </Box>
+            </Modal>
+
+            <Modal
+                open={subopen}
+                onClose={handleSubClose}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <Box sx={{ ...style, width: 800 }}>
+                    <Typography variant='h6' component="div">
+                        Chọn các trường thêm vào
+                    </Typography>
+                    <Typography variant='body1' component="div">
+                        Content Here
+                    </Typography>
+                    <Typography variant='body1' component="div">
+                        Content Here
+                    </Typography>
+                    <Typography variant='body1' component="div">
+                        Content Here
+                    </Typography>
+                    <Box sx={{ display: 'flex', flexDirection: 'row-reverse' }} >
+                        <Button
+                            onClick={handleSubClose}
+                            sx={{
+                                color: 'white',
+                                backgroundColor: '#364F6B',
+                                borderRadius: '10px',
+                                marginY: '10px',
+                                marginX: '5px',
+                                '&:hover': {
+                                    backgroundColor: '#2E4155', // Màu nền thay đổi khi hover
+                                },
+                            }}>
+                            Xác nhận
+                        </Button>
+                        <Button
+                            onClick={handleSubClose}
+                            sx={{
+                                color: '#000000',
+                                backgroundColor: '#E7E7E8',
+                                borderRadius: '10px',
+                                marginY: '10px',
+                                marginX: '5px',
+                                '&:hover': {
+                                    backgroundColor: '#E7E7E7', // Màu nền thay đổi khi hover
+                                },
+                            }}>
+                            Hủy
+                        </Button>
+                    </Box>
+                </Box>
+            </Modal>
         </div >
     )
 }
