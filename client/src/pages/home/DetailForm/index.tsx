@@ -28,6 +28,7 @@ import ClearIcon from '@mui/icons-material/Clear';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import EventIcon from '@mui/icons-material/Event';
 import DatasetLinkedIcon from '@mui/icons-material/DatasetLinked';
+import ArrowDropDownCircleIcon from '@mui/icons-material/ArrowDropDownCircle';
 
 import TextField from '@mui/material/TextField';
 import InputLabel from '@mui/material/InputLabel';
@@ -173,11 +174,15 @@ function DetailForm() {
     const handleClose = () => setOpen(false);
 
     // Đóng/Mở Submodal edit form (using with linked-data type)
-    const [subopen, setSubOpen] = React.useState(false);
+    const [subopen, setSubOpen] = React.useState('');
     const handleSubOpen = () => {
-        setSubOpen(true);
+        if (type === 'linkedData') setSubOpen('linkedData');
+        else if (type === 'dropDown') {
+            setSubOpen('dropDown')
+            solveTextInDropDown(textInDropdown);
+        }
     }
-    const handleSubClose = () => setSubOpen(false);
+    const handleSubClose = () => setSubOpen('');
 
     // Set type of question
     const [type, setType] = React.useState('');
@@ -344,6 +349,17 @@ function DetailForm() {
             setFile(e.target.files[0]);
         }
     };
+
+    const [textInDropdown, setTextInDropdown] = useState('');
+    const handleTextInDropdown = (e) => {
+        setTextInDropdown(e.target.value)
+    }
+
+    const [optionInDropDown, setOptionInDropdown] = useState<string[]>([]);
+    const solveTextInDropDown = (textInDropDown: string) => {
+        const myDropdown = textInDropDown.split('\n');
+        setOptionInDropdown(myDropdown);
+    }
 
     console.log(formDetail.Questions);
 
@@ -576,6 +592,14 @@ function DetailForm() {
                                 label="Dạng"
                                 onChange={handleChange}
                             >
+                                <MenuItem value={'shortText'}>
+                                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                                        <NotesIcon sx={{ marginRight: '10px', color: '#6D7073' }} />
+                                        <ListItemText>
+                                            Điền ngắn
+                                        </ListItemText>
+                                    </div>
+                                </MenuItem>
                                 <MenuItem value={'multi-choice'}>
                                     <div style={{ display: 'flex', alignItems: 'center' }}>
                                         <RadioButtonCheckedIcon sx={{ marginRight: '10px', color: '#6D7073' }} />
@@ -592,11 +616,11 @@ function DetailForm() {
                                         </ListItemText>
                                     </div>
                                 </MenuItem>
-                                <MenuItem value={'shortText'}>
+                                <MenuItem value={'dropDown'}>
                                     <div style={{ display: 'flex', alignItems: 'center' }}>
-                                        <NotesIcon sx={{ marginRight: '10px', color: '#6D7073' }} />
+                                        <ArrowDropDownCircleIcon sx={{ marginRight: '10px', color: '#6D7073' }} />
                                         <ListItemText>
-                                            Điền ngắn
+                                            Menu thả xuống
                                         </ListItemText>
                                     </div>
                                 </MenuItem>
@@ -635,10 +659,7 @@ function DetailForm() {
                                             sx={{ marginRight: '10px', width: '100%' }}
                                             // id={index.toString()}
                                             variant="standard"
-                                        // defaultValue='Tùy chọn 1'
-                                        >
-                                            {/* {optionFieldValue} */}
-                                        </TextField>
+                                        />
                                         <IconButton
                                             // onClick={deleteQuestion(ques)}
                                             sx={{
@@ -672,6 +693,36 @@ function DetailForm() {
                     }
                     {type === 'shortText' ?
                         <TextField disabled sx={{ width: '100%' }} id="standard-basic" label="Điền ngắn" variant="standard" />
+                        : null
+                    }
+                    {type === 'dropDown' ?
+                        <Box>
+                            <Typography sx={{ color: '#6D7073', marginBottom: '15px' }}>Nhập <b>mỗi lựa chọn</b> là <b> một dòng</b></Typography>
+                            <TextField
+                                value={textInDropdown}
+                                onChange={handleTextInDropdown}
+                                id="outlined-multiline-flexible"
+                                multiline
+                                rows={5}
+                                sx={{ width: '100%' }}
+                            />
+                            <Button
+                                onClick={handleSubOpen}
+                                sx={{
+                                    color: 'white',
+                                    backgroundColor: '#364F6B',
+                                    borderRadius: '10px',
+                                    paddingY: '10px',
+                                    paddingX: '5px',
+                                    marginTop: '10px',
+                                    width: '100%',
+                                    '&:hover': {
+                                        backgroundColor: '#2E4155', // Màu nền thay đổi khi hover
+                                    }
+                                }}>
+                                Xử lý dữ liệu
+                            </Button>
+                        </Box>
                         : null
                     }
                     {type === 'linkedData' ?
@@ -742,55 +793,98 @@ function DetailForm() {
                 </Box>
             </Modal>
 
+            {/* SubModal */}
             <Modal
-                open={subopen}
+                open={subopen !== ''}
                 onClose={handleSubClose}
                 aria-labelledby="modal-modal-title"
                 aria-describedby="modal-modal-description"
             >
                 <Box sx={{ ...style, width: 800 }}>
-                    <Typography variant='h6' component="div">
-                        Chọn các trường thêm vào
-                    </Typography>
-                    <Typography variant='body1' component="div">
-                        Content Here
-                    </Typography>
-                    <Typography variant='body1' component="div">
-                        Content Here
-                    </Typography>
-                    <Typography variant='body1' component="div">
-                        Content Here
-                    </Typography>
-                    <Box sx={{ display: 'flex', flexDirection: 'row-reverse' }} >
-                        <Button
-                            onClick={handleSubClose}
-                            sx={{
-                                color: 'white',
-                                backgroundColor: '#364F6B',
-                                borderRadius: '10px',
-                                marginY: '10px',
-                                marginX: '5px',
-                                '&:hover': {
-                                    backgroundColor: '#2E4155', // Màu nền thay đổi khi hover
-                                },
-                            }}>
-                            Xác nhận
-                        </Button>
-                        <Button
-                            onClick={handleSubClose}
-                            sx={{
-                                color: '#000000',
-                                backgroundColor: '#E7E7E8',
-                                borderRadius: '10px',
-                                marginY: '10px',
-                                marginX: '5px',
-                                '&:hover': {
-                                    backgroundColor: '#E7E7E7', // Màu nền thay đổi khi hover
-                                },
-                            }}>
-                            Hủy
-                        </Button>
-                    </Box>
+                    {subopen === 'linkedData' ?
+                        <Box>
+                            <Typography variant='h6' component="div">
+                                Chọn các trường thêm vào
+                            </Typography>
+                            <Typography variant='body1' component="div">
+                                Content Here
+                            </Typography>
+                            <Typography variant='body1' component="div">
+                                Content Here
+                            </Typography>
+                            <Typography variant='body1' component="div">
+                                Content Here
+                            </Typography>
+                            <Box sx={{ display: 'flex', flexDirection: 'row-reverse' }} >
+                                <Button
+                                    onClick={handleSubClose}
+                                    sx={{
+                                        color: 'white',
+                                        backgroundColor: '#364F6B',
+                                        borderRadius: '10px',
+                                        marginY: '10px',
+                                        marginX: '5px',
+                                        '&:hover': {
+                                            backgroundColor: '#2E4155', // Màu nền thay đổi khi hover
+                                        },
+                                    }}>
+                                    Xác nhận
+                                </Button>
+                                <Button
+                                    onClick={handleSubClose}
+                                    sx={{
+                                        color: '#000000',
+                                        backgroundColor: '#E7E7E8',
+                                        borderRadius: '10px',
+                                        marginY: '10px',
+                                        marginX: '5px',
+                                        '&:hover': {
+                                            backgroundColor: '#E7E7E7', // Màu nền thay đổi khi hover
+                                        },
+                                    }}>
+                                    Hủy
+                                </Button>
+                            </Box>
+                        </Box>
+                        : null}
+                    {subopen === 'dropDown' ?
+                        <Box>
+                            <Typography>Xác nhận các trường dữ liệu trong <b>Menu thả xuống</b> là:</Typography>
+                            {
+                                optionInDropDown.map((char, index) => (
+                                    <Typography sx={{ textAlign: 'center' }} key={index}> {char}</Typography>
+                                ))
+                            }
+                            <Box sx={{ display: 'flex', flexDirection: 'row-reverse' }} >
+                                <Button
+                                    onClick={handleSubClose}
+                                    sx={{
+                                        color: 'white',
+                                        backgroundColor: '#364F6B',
+                                        borderRadius: '10px',
+                                        margin: '5px',
+                                        '&:hover': {
+                                            backgroundColor: '#2E4155', // Màu nền thay đổi khi hover
+                                        },
+                                    }}>
+                                    Xác nhận
+                                </Button>
+                                <Button
+                                    onClick={handleSubClose}
+                                    sx={{
+                                        color: '#000000',
+                                        backgroundColor: '#E7E7E8',
+                                        borderRadius: '10px',
+                                        margin: '5px',
+                                        '&:hover': {
+                                            backgroundColor: '#E7E7E7', // Màu nền thay đổi khi hover
+                                        },
+                                    }}>
+                                    Hủy
+                                </Button>
+                            </Box>
+                        </Box>
+                        : null}
                 </Box>
             </Modal>
         </div >
