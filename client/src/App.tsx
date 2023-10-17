@@ -65,7 +65,6 @@ function App() {
     <div className="wrapper">
       <BrowserRouter>
         <Routes>
-          {/* <Route path="/" element={<LoginPage />} /> */}
           <Route path="/" element={<HomePage pageComponent={MyForms} />} />
           <Route path="/home" element={<HomePage pageComponent={MyForms} />} />
           <Route
@@ -74,7 +73,7 @@ function App() {
           />
           <Route path="/form/:formID/view" element={<Form />} />
           <Route path="/signup" element={<SignUp />} />
-          <Route path="/signin" element={<SignInSide setToken={setToken} />} />
+          {/* <Route path="/signin" element={<SignInSide setToken={setToken} />} /> */}
         </Routes>
       </BrowserRouter>
     </div>

@@ -79,39 +79,21 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     },
 }));
 
-//get Form
-// async function getUserForms() {
-//     return fetch(`http://localhost:8080/forms/${JSON.parse(sessionStorage.getItem('token') as string)?.id}`, {
-//         method: 'GET',
-//         headers: {
-//             'Content-Type': 'application/json',
-//             'Authorization': 'Bearer ' + JSON.parse(sessionStorage.getItem('token') as string)?.accessToken
-//         }
-//     })
-//         .then(data => data.json())
-// }
-
-//   async function getData() {
-//     try {
-//       const result = await getUserForms();
-
-//       const newObj = createData(result[0].name, 'Tôi', result[0].answersCounter, false);
-//       rows.push(newObj);
-
-//       console.log(rows);
-
-//     } catch (error) {
-//       // Handle errors here
-//     }
-//   }
-
 function MyForms() {
+
+    // const nav: any = useNavigate()
+
+    // if (loginState) {
+    //   nav('/home')
+    // };
 
     //Page Pagination
     const [itemsPerPage, setItemsPerPage] = useState('');
     const [forms, setForms] = useState<any[]>([])
 
-    //getForms by UserId
+    const CreateFormAPI_URL = `http://localhost:8080/form/`;
+
+    //API GET: getForms by UserId
     useEffect(() => {
         fetch(`http://localhost:8080/forms/${JSON.parse(sessionStorage.getItem('token') as string)?.user.ID}`, {
             method: 'GET',
@@ -125,6 +107,50 @@ function MyForms() {
                 setForms(forms);
             })
     }, [])
+
+    //API POST: create a new response
+    const createForm = async (data) => {
+        try {
+            const response = await fetch(CreateFormAPI_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + JSON.parse(sessionStorage.getItem('token') as string)?.accessToken,
+                },
+                body: JSON.stringify(data)
+            });
+
+            console.log(response);
+
+            if (!response.ok) {
+                throw new Error(`HTTP Error! Status: ${response.status}`);
+            }
+
+            const dataFromServer = await response.json();
+            // Xử lý dữ liệu từ máy chủ (nếu cần)
+            console.log(dataFromServer);
+        } catch (error) {
+            console.error('Lỗi khi gửi yêu cầu:', error);
+        }
+    };
+
+    const createNewForm = () => {
+        createForm(
+            {
+                "name": "Form Đăng ký Online",
+                "header": {
+                    "Title": "ĐĂNG KÝ THAM GIA ĐƯỜNG CHẠY VÌ CỘNG ĐỒNG UPRACE 2022",
+                    "Description": "[UpRace 2022 - Cột Mốc 5 Năm Vì Cộng Đồng]",
+                    "ImagePath": ""
+                },
+                "owner": "651c23cd42c2093b0ae518ba",
+                "answersCounter": 0,
+                "latestModified": "2023-10-14T12:34:56Z",
+                "createDate": "2023-10-14T12:34:56Z"
+            }
+        )
+    }
 
     console.log(forms);
 
@@ -160,13 +186,15 @@ function MyForms() {
                     </Search>
                     <Box sx={{ flexGrow: 1 }} />
 
-                    <Button sx={{
-                        backgroundColor: '#364F6B',
-                        margin: '10px',
-                        '&:hover': {
-                            backgroundColor: '#176B87', // Màu nền thay đổi khi hover
-                        },
-                    }}>
+                    <Button
+                        onClick={createNewForm}
+                        sx={{
+                            backgroundColor: '#364F6B',
+                            margin: '10px',
+                            '&:hover': {
+                                backgroundColor: '#176B87', // Màu nền thay đổi khi hover
+                            },
+                        }}>
                         <Typography sx={{ fontWeight: 500, color: 'white', paddingX: '10px', paddingY: '4px' }} variant="body2" noWrap component="div">
                             Tạo Form
                         </Typography>
@@ -190,14 +218,16 @@ function MyForms() {
                             <TableBody>
                                 {forms.map((form, index) => (
                                     <TableRow
-                                        key={form.name}
+                                        key={index}
                                         sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                     >
                                         <TableCell sx={{ padding: 2, fontWeight: 500, fontSize: '1.05rem' }} component="th" scope="row" align="left">
                                             {index + 1}
                                         </TableCell>
                                         <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="left">{form.name}</TableCell>
-                                        <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="center">{form.Editors[0]}</TableCell>
+                                        <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="center">
+                                            {/* {form.Editors[0]} */}
+                                        </TableCell>
                                         <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="center">{form.AnswersCounter}</TableCell>
                                         <TableCell sx={{ padding: 1 }} align="center">
                                             {form.formState ?

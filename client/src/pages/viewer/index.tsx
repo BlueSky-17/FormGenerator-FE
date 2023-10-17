@@ -94,8 +94,8 @@ function Form() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
-    //API POST: update question in database
-    const addResponsetoDatabase = async (formID, data) => {
+    //API POST: create a new response
+    const addResponsetoDatabase = async (data) => {
         try {
             const response = await fetch(ResponseAPI_URL, {
                 method: 'POST',
@@ -183,10 +183,9 @@ function Form() {
         formResponses[ques].content.date = e.$d;
     };
 
-
     const [submit, setSubmit] = useState(false);
     const handleSubmitForm = () => {
-        addResponsetoDatabase(formDetail.id, {
+        addResponsetoDatabase({
             "ID": "6526518a6b149bcb2510172f",
             "FormID": "651dbc9d49502243191371e3",
             "Username": formDetail.owner,

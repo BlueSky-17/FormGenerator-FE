@@ -86,25 +86,24 @@ function addEmptyQuestion(
 
 // Content for multi-choice TYPE
 function addOption(
-    multiChoice: { Options: string[], ImportedData: string }
+    MultiChoice: { Options: string[], ImportedData: string }
 ) {
-    return { multiChoice };
+    return { MultiChoice };
 }
 
 // Content for multi-choice TYPE
 function addShortText(
-    ShortText: string
+    shortText: string
 ) {
-    return { ShortText };
+    return { shortText };
 }
 
 // Content for date TYPE
 function addDate(
-    Date: string
+    date: string
 ) {
-    return { Date };
+    return { date };
 }
-
 
 function DetailForm() {
     const [formDetail, setFormDetail] = useState<any>({})
@@ -130,7 +129,7 @@ function DetailForm() {
     }, [])
 
     //API PUT: Update form 
-    const updateObjectInDatabase = async (formID, updateData) => {
+    const updateObjectInDatabase = async (updateData) => {
         try {
             const response = await fetch(UpdateFormAPI_URL, {
                 method: 'PUT',
@@ -197,7 +196,7 @@ function DetailForm() {
     };
 
     // Add question to a form 
-    const addQuestion = () => {
+    const addQuestion = async () => {
         // Tạo một Question có 5 trường: Question, Description, Required, ImagePath, Type, Content
         formDetail.Questions.push(addEmptyQuestion(textFieldValue, "", true, "", type, {}));
 
@@ -224,9 +223,16 @@ function DetailForm() {
 
             Object.assign(formDetail.Questions[newIndex].Content, updateDate);
         }
+        console.log(formDetail);
+
+        console.log(formDetail.Questions)
+
+        updateObjectInDatabase({
+            "QuestionOrder": formDetail.QuestionOrder,
+            "Questions": formDetail.Questions
+        })
 
         setOpen(false);
-        updateObjectInDatabase(formDetail.id, formDetail)
     };
 
     // Delete question in a form 
@@ -246,7 +252,7 @@ function DetailForm() {
 
         if (deleted === true) setDelete(false);
         else setDelete(true);
-        updateObjectInDatabase(formDetail.id, formDetail)
+        updateObjectInDatabase(formDetail)
     };
 
     // Biến tạm: optionFieldValue

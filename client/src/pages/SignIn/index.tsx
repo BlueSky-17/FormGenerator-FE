@@ -1,4 +1,5 @@
 import * as React from 'react';
+import {useState} from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -61,9 +62,13 @@ async function loginUser(credentials, setLoginState) {
 //@ts-ignore
 export default function SignInSide({ setToken }) {
 
-  const [loginState, setLoginState] = React.useState<Boolean>();
+  const [loginState, setLoginState] = useState<Boolean>();
 
   const nav: any = useNavigate()
+
+  if (loginState) {
+    nav('/home')
+  };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -81,9 +86,6 @@ export default function SignInSide({ setToken }) {
     catch (error) {
       console.log(error)
     }
-    if (loginState) {
-      nav('/home')
-    };
   }
 
   return (
@@ -177,7 +179,7 @@ export default function SignInSide({ setToken }) {
                 id="password"
                 autoComplete="current-password"
               />
-              {loginState !== undefined &&
+              { loginState === undefined && loginState === false &&
                 <Typography component="p" sx={{ color: "red" }}>
                   Đăng nhập thất bại: Sai tên tài khoản hoặc mật khẩu
                 </Typography>}
