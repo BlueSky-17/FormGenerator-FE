@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Box, Typography, Drawer, Avatar, IconButton, Toolbar, List, Divider, Icon } from '@mui/material'
+import { Box, Typography, TextField, Drawer, Avatar, IconButton, Toolbar, List, Divider, Icon, Modal } from '@mui/material'
 import { styled, useTheme, alpha } from '@mui/material/styles';
 import Button from '@mui/material/Button';
 
@@ -35,6 +35,20 @@ const DrawerHeader = styled('div')(({ theme }) => ({
     ...theme.mixins.toolbar,
     justifyContent: 'flex-end',
 }));
+
+// Style cho modal edit
+const style = {
+    position: 'absolute' as 'absolute',
+    top: '35%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 700,
+    bgcolor: 'background.paper',
+    border: '1px solid #000',
+    borderRadius: '15px',
+    boxShadow: 24,
+    p: 4,
+};
 
 //CSS for Search Input
 const Search = styled('div')(({ theme }) => ({
@@ -90,8 +104,9 @@ function MyForms() {
     //Page Pagination
     const [itemsPerPage, setItemsPerPage] = useState('');
     const [forms, setForms] = useState<any[]>([])
+    const [created, setCreated] = useState(false);
 
-    const CreateFormAPI_URL = `http://localhost:8080/form/`;
+    const CreateFormAPI_URL: string = `http://localhost:8080/form`;
 
     //API GET: getForms by UserId
     useEffect(() => {
@@ -106,14 +121,14 @@ function MyForms() {
             .then(forms => {
                 setForms(forms);
             })
-    }, [])
+    }, [created])
 
     //API POST: create a new response
     const createForm = async (data) => {
         try {
             const response = await fetch(CreateFormAPI_URL, {
                 method: 'POST',
-                mode: 'no-cors',
+                // mode: 'no-cors',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': 'Bearer ' + JSON.parse(sessionStorage.getItem('token') as string)?.accessToken,
@@ -136,27 +151,51 @@ function MyForms() {
     };
 
     const createNewForm = () => {
+        setOpen(false);
+
         createForm(
             {
-                "name": "Form Đăng ký Online",
+                "name": name,
                 "header": {
-                    "Title": "ĐĂNG KÝ THAM GIA ĐƯỜNG CHẠY VÌ CỘNG ĐỒNG UPRACE 2022",
-                    "Description": "[UpRace 2022 - Cột Mốc 5 Năm Vì Cộng Đồng]",
+                    "Title": name,
+                    "Description": description,
                     "ImagePath": ""
                 },
-                "owner": "651c23cd42c2093b0ae518ba",
+                "owner": JSON.parse(sessionStorage.getItem('token') as string)?.user.ID,
                 "answersCounter": 0,
                 "latestModified": "2023-10-14T12:34:56Z",
-                "createDate": "2023-10-14T12:34:56Z"
+                "createDate": "2023-10-14T12:34:56Z",
+                "questions": [],
+                "questionOrder": []
             }
         )
+
+        setCreated(!created)
     }
 
-    console.log(forms);
+    const [open, setOpen] = React.useState(false);
+    const handleOpen = () => {
+        setOpen(true);
+    }
+    const handleClose = () => setOpen(false);
+
+    // Set name of form
+    const [name, setName] = useState('');
+    const handleName = (e) => {
+        setName(e.target.value);
+    };
+
+    // Set description of form
+    const [description, setDescription] = useState('');
+    const handleDescription = (e) => {
+        setDescription(e.target.value);
+    };
 
     const handleChange = (event: SelectChangeEvent) => {
         setItemsPerPage(event.target.value);
     };
+
+    console.log(forms)
 
     // Navigate when click edit form
     const navigate = useNavigate();
@@ -168,7 +207,7 @@ function MyForms() {
     return (
         <Box>
             <DrawerHeader />
-            <Box sx={{ backgroundColor: 'white', border: "2px solid #DEDEDE", height: '100%' }}>
+            <Box sx={{ backgroundColor: 'white', border: "2px solid #DEDEDE" }}>
                 <Typography sx={{ color: '#364F6B', padding: '15px', fontWeight: 600 }} variant="h6" noWrap component="div">
                     FORMS CỦA TÔI
                 </Typography>
@@ -187,7 +226,7 @@ function MyForms() {
                     <Box sx={{ flexGrow: 1 }} />
 
                     <Button
-                        onClick={createNewForm}
+                        onClick={handleOpen}
                         sx={{
                             backgroundColor: '#364F6B',
                             margin: '10px',
@@ -343,6 +382,78 @@ function MyForms() {
                     </Stack>
                 </Box>
             </Box>
+
+            {/* Modal create form */}
+            <Modal
+                open={open}
+                // onClose={handleClose}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <Box sx={style}>
+                    <Typography variant='h6' component="div">
+                        Vui lòng điền thông tin form
+                    </Typography>
+
+                    <Box component="form" sx={{ marginY: '10px', display: 'flex', flexDirection: 'column' }}>
+                        <Typography variant='subtitle1' component="div">
+                            <b>Tên form</b>
+                        </Typography>
+                        <TextField
+                            required
+                            value={name}
+                            onChange={handleName}
+                            sx={{ marginRight: '10px', width: '100%' }}
+                            variant="outlined"
+                            placeholder='Tên form'
+                            helperText='Hiển thị tại trang quản trị'
+                        />
+                        <Typography variant='subtitle1' component="div">
+                            <b>Mô tả</b>
+                        </Typography>
+                        <TextField
+                            required
+                            value={description}
+                            onChange={handleDescription}
+                            sx={{ marginRight: '10px', width: '100%' }}
+                            variant="outlined"
+                            placeholder='Mô tả'
+                            helperText='Hiển thị tại trang người điền'
+                        />
+                    </Box>
+
+                    <Box sx={{ display: 'flex', flexDirection: 'row-reverse' }} >
+                        <Button
+                            onClick={createNewForm}
+                            sx={{
+                                color: 'white',
+                                backgroundColor: '#364F6B',
+                                borderRadius: '10px',
+                                marginY: '10px',
+                                marginX: '5px',
+                                '&:hover': {
+                                    backgroundColor: '#2E4155', // Màu nền thay đổi khi hover
+                                },
+                            }}>
+                            Xác nhận
+                        </Button>
+                        <Button
+                            onClick={handleClose}
+                            sx={{
+                                color: '#000000',
+                                backgroundColor: '#E7E7E8',
+                                borderRadius: '10px',
+                                marginY: '10px',
+                                marginX: '5px',
+                                '&:hover': {
+                                    backgroundColor: '#E7E7E7', // Màu nền thay đổi khi hover
+                                },
+                            }}>
+                            Hủy
+                        </Button>
+                    </Box>
+                </Box>
+            </Modal>
         </Box>
     )
 }

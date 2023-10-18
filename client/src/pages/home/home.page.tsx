@@ -125,7 +125,7 @@ function HomePage({ pageComponent: PageComponent }: ParentComponentProps): JSX.E
     }
 
     return (
-        <Box sx={{ display: 'flex' }}>
+        <Box sx={{ display: 'flex', height:"100vh", witdh:'100vw' }}>
             <CssBaseline />
             <AppBar position="fixed" open={open}>
                 <Toolbar sx={{ backgroundColor: 'white' }}>

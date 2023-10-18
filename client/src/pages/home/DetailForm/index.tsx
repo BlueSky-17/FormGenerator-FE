@@ -370,7 +370,7 @@ function DetailForm() {
     console.log(formDetail.Questions);
 
     return (
-        <div>
+        <Box>
             <DrawerHeader />
             <Box sx={{ backgroundColor: 'white' }}>
 
@@ -893,7 +893,7 @@ function DetailForm() {
                         : null}
                 </Box>
             </Modal>
-        </div >
+        </Box >
     )
 }
 
