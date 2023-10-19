@@ -7,6 +7,7 @@ import Button from '@mui/material/Button';
 import SearchIcon from '@mui/icons-material/Search';
 import EditIcon from '@mui/icons-material/Edit';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
@@ -26,6 +27,7 @@ import { Link } from 'react-router-dom';
 import Pagination from '@mui/material/Pagination';
 import Stack from '@mui/material/Stack';
 import Tooltip from '@mui/material/Tooltip';
+import { useParams } from 'react-router-dom';
 
 const DrawerHeader = styled('div')(({ theme }) => ({
     display: 'flex',
@@ -94,21 +96,19 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 function MyForms() {
-
-    // const nav: any = useNavigate()
-
-    // if (loginState) {
-    //   nav('/home')
-    // };
-
     //Page Pagination
     const [itemsPerPage, setItemsPerPage] = useState('');
     const [forms, setForms] = useState<any[]>([])
-    const [created, setCreated] = useState(false);
+    const handleChange = (event: SelectChangeEvent) => {
+        setItemsPerPage(event.target.value);
+    };
 
-    const CreateFormAPI_URL: string = `http://localhost:8080/form`;
+    // render: use to re-render after create or delete form
+    const [render, setRender] = useState(false);
 
-    //API GET: getForms by UserId
+    const API_URL: string = `http://localhost:8080/form`;
+
+    //API GET: fetch forms by UserId
     useEffect(() => {
         fetch(`http://localhost:8080/forms/${JSON.parse(sessionStorage.getItem('token') as string)?.user.ID}`, {
             method: 'GET',
@@ -121,12 +121,44 @@ function MyForms() {
             .then(forms => {
                 setForms(forms);
             })
-    }, [created])
+    }, [render])
 
-    //API POST: create a new response
+    // API DELETE: delete form by FormId
+    const deleteForm = async (objectId) => {
+        try {
+            const response = await fetch(API_URL + `/${objectId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + JSON.parse(sessionStorage.getItem('token') as string)?.accessToken
+                }
+            });
+
+            console.log(response);
+
+            if (!response.ok) {
+                throw new Error(`HTTP Error! Status: ${response.status}`);
+            }
+
+            console.log('Object deleted successfully');
+        } catch (error) {
+            console.error('Lỗi khi gửi yêu cầu DELETE:', error);
+        }
+    };
+
+    const handleDeleteForm = () => {
+        // Close modal
+        setOpen(false);
+        // Call API DELETE form by ID
+        deleteForm(formID);
+        // Re-render component
+        setRender(!render);
+    }
+
+    //API POST: create new form
     const createForm = async (data) => {
         try {
-            const response = await fetch(CreateFormAPI_URL, {
+            const response = await fetch(API_URL, {
                 method: 'POST',
                 // mode: 'no-cors',
                 headers: {
@@ -150,9 +182,10 @@ function MyForms() {
         }
     };
 
-    const createNewForm = () => {
+    const handleCreateForm = () => {
+        // Close modal
         setOpen(false);
-
+        // Call API POST to create a new form
         createForm(
             {
                 "name": name,
@@ -170,39 +203,49 @@ function MyForms() {
             }
         )
 
-        setCreated(!created)
+        // Return default value of Create Modal
+        setName('');
+        setDescription('');
+
+        // Re-render component
+        setRender(!render)
     }
 
+    // // Handle MODAL
     const [open, setOpen] = React.useState(false);
-    const handleOpen = () => {
-        setOpen(true);
-    }
-    const handleClose = () => setOpen(false);
-
-    // Set name of form
+    const [modal, setModal] = useState('');
+    const [formID, setFormID] = useState('');
     const [name, setName] = useState('');
+    const [description, setDescription] = useState('');
+    // Open Create Modal 
+    const handleOpenAdd = () => {
+        setOpen(true);
+        setModal('add');
+    }
+    // Open Delete Modal
+    const handleOpenDelete = (formID: string) => (e) => {
+        setOpen(true);
+        setModal('delete');
+        setFormID(formID);
+    }
+    // Close Modal
+    const handleClose = () => setOpen(false);
+    // Set name of form
     const handleName = (e) => {
         setName(e.target.value);
     };
-
     // Set description of form
-    const [description, setDescription] = useState('');
     const handleDescription = (e) => {
         setDescription(e.target.value);
     };
 
-    const handleChange = (event: SelectChangeEvent) => {
-        setItemsPerPage(event.target.value);
-    };
-
-    console.log(forms)
-
     // Navigate when click edit form
     const navigate = useNavigate();
-
     const editForm = (id: string) => (event: any) => {
         navigate('/form/' + id);
     };
+
+    console.log(forms)
 
     return (
         <Box>
@@ -226,7 +269,7 @@ function MyForms() {
                     <Box sx={{ flexGrow: 1 }} />
 
                     <Button
-                        onClick={handleOpen}
+                        onClick={handleOpenAdd}
                         sx={{
                             backgroundColor: '#364F6B',
                             margin: '10px',
@@ -295,17 +338,6 @@ function MyForms() {
                                                 </Button>}
                                         </TableCell>
                                         <TableCell sx={{ padding: 1 }} align="center">
-                                            {/* <Button sx={{
-                                                    backgroundColor: '#364F6B',
-                                                    margin: '10px',
-                                                    '&:hover': {
-                                                        backgroundColor: '#176B87', // Màu nền thay đổi khi hover
-                                                    },
-                                                }}>
-                                                    <Typography sx={{ color: 'white', paddingX: '5px', paddingY: '2px' }} variant="body2" noWrap component="div">
-                                                        Chỉnh sửa
-                                                    </Typography>
-                                                </Button> */}
                                             <Tooltip title="Chỉnh sửa" placement="left">
                                                 <IconButton
                                                     onClick={editForm(form.id)}
@@ -322,17 +354,6 @@ function MyForms() {
                                                 </IconButton>
                                             </Tooltip>
                                             <Link to="/detail">
-                                                {/* <Button sx={{
-                                                    backgroundColor: '#364F6B',
-                                                    margin: '10px',
-                                                    '&:hover': {
-                                                        backgroundColor: '#176B87', // Màu nền thay đổi khi hover
-                                                    },
-                                                }}>
-                                                    <Typography sx={{ color: 'white', paddingX: '5px', paddingY: '2px' }} variant="body2" noWrap component="div">
-                                                        Xem phản hồi
-                                                    </Typography>
-                                                </Button> */}
                                                 <Tooltip title="Xem phản hồi" placement="right">
                                                     <IconButton
                                                         sx={{
@@ -347,6 +368,18 @@ function MyForms() {
                                                     </IconButton>
                                                 </Tooltip>
                                             </Link>
+                                            <IconButton
+                                                onClick={handleOpenDelete(form.id)}
+                                                sx={{
+                                                    backgroundColor: '#364F6B',
+                                                    color: 'white',
+                                                    margin: '5px',
+                                                    '&:hover': {
+                                                        backgroundColor: '#176B87', // Màu nền thay đổi khi hover
+                                                    },
+                                                }}>
+                                                <DeleteIcon />
+                                            </IconButton>
                                         </TableCell>
                                     </TableRow>
                                 ))}
@@ -390,68 +423,107 @@ function MyForms() {
                 aria-labelledby="modal-modal-title"
                 aria-describedby="modal-modal-description"
             >
-                <Box sx={style}>
-                    <Typography variant='h6' component="div">
-                        Vui lòng điền thông tin form
-                    </Typography>
-
-                    <Box component="form" sx={{ marginY: '10px', display: 'flex', flexDirection: 'column' }}>
-                        <Typography variant='subtitle1' component="div">
-                            <b>Tên form</b>
+                <Box>
+                    {modal === 'add' ? <Box sx={style}>
+                        <Typography variant='h6' component="div">
+                            Vui lòng điền thông tin form
                         </Typography>
-                        <TextField
-                            required
-                            value={name}
-                            onChange={handleName}
-                            sx={{ marginRight: '10px', width: '100%' }}
-                            variant="outlined"
-                            placeholder='Tên form'
-                            helperText='Hiển thị tại trang quản trị'
-                        />
-                        <Typography variant='subtitle1' component="div">
-                            <b>Mô tả</b>
-                        </Typography>
-                        <TextField
-                            required
-                            value={description}
-                            onChange={handleDescription}
-                            sx={{ marginRight: '10px', width: '100%' }}
-                            variant="outlined"
-                            placeholder='Mô tả'
-                            helperText='Hiển thị tại trang người điền'
-                        />
-                    </Box>
 
-                    <Box sx={{ display: 'flex', flexDirection: 'row-reverse' }} >
-                        <Button
-                            onClick={createNewForm}
-                            sx={{
-                                color: 'white',
-                                backgroundColor: '#364F6B',
-                                borderRadius: '10px',
-                                marginY: '10px',
-                                marginX: '5px',
-                                '&:hover': {
-                                    backgroundColor: '#2E4155', // Màu nền thay đổi khi hover
-                                },
-                            }}>
-                            Xác nhận
-                        </Button>
-                        <Button
-                            onClick={handleClose}
-                            sx={{
-                                color: '#000000',
-                                backgroundColor: '#E7E7E8',
-                                borderRadius: '10px',
-                                marginY: '10px',
-                                marginX: '5px',
-                                '&:hover': {
-                                    backgroundColor: '#E7E7E7', // Màu nền thay đổi khi hover
-                                },
-                            }}>
-                            Hủy
-                        </Button>
+                        <Box component="form" sx={{ marginY: '10px', display: 'flex', flexDirection: 'column' }}>
+                            <Typography variant='subtitle1' component="div">
+                                <b>Tên form</b>
+                            </Typography>
+                            <TextField
+                                required
+                                value={name}
+                                onChange={handleName}
+                                sx={{ margin: '10px', width: '100%' }}
+                                variant="outlined"
+                                placeholder='Tên form'
+                            />
+                            <Typography variant='subtitle1' component="div">
+                                <b>Mô tả</b>
+                            </Typography>
+                            <TextField
+                                required
+                                value={description}
+                                onChange={handleDescription}
+                                sx={{ margin: '10px', width: '100%' }}
+                                variant="outlined"
+                                placeholder='Mô tả'
+                            />
+                        </Box>
+
+                        <Box sx={{ display: 'flex', flexDirection: 'row-reverse' }} >
+                            <Button
+                                onClick={handleCreateForm}
+                                sx={{
+                                    color: 'white',
+                                    backgroundColor: '#364F6B',
+                                    borderRadius: '10px',
+                                    marginY: '10px',
+                                    marginX: '5px',
+                                    '&:hover': {
+                                        backgroundColor: '#2E4155', // Màu nền thay đổi khi hover
+                                    },
+                                }}>
+                                Xác nhận
+                            </Button>
+                            <Button
+                                onClick={handleClose}
+                                sx={{
+                                    color: '#000000',
+                                    backgroundColor: '#E7E7E8',
+                                    borderRadius: '10px',
+                                    marginY: '10px',
+                                    marginX: '5px',
+                                    '&:hover': {
+                                        backgroundColor: '#E7E7E7', // Màu nền thay đổi khi hover
+                                    },
+                                }}>
+                                Hủy
+                            </Button>
+                        </Box>
                     </Box>
+                        : null}
+                    {
+                        modal === 'delete' ?
+                            <Box sx={{ ...style }}>
+                                <Typography variant='h5'><b>Xác nhận xóa form?</b></Typography>
+
+                                <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'right' }} >
+                                    <Button
+                                        onClick={handleDeleteForm}
+                                        sx={{
+                                            color: 'white',
+                                            backgroundColor: '#364F6B',
+                                            borderRadius: '10px',
+                                            marginY: '10px',
+                                            marginX: '5px',
+                                            '&:hover': {
+                                                backgroundColor: '#2E4155', // Màu nền thay đổi khi hover
+                                            },
+                                        }}>
+                                        Xác nhận
+                                    </Button>
+                                    <Button
+                                        onClick={handleClose}
+                                        sx={{
+                                            color: '#000000',
+                                            backgroundColor: '#E7E7E8',
+                                            borderRadius: '10px',
+                                            marginY: '10px',
+                                            marginX: '5px',
+                                            '&:hover': {
+                                                backgroundColor: '#E7E7E7', // Màu nền thay đổi khi hover
+                                            },
+                                        }}>
+                                        Hủy
+                                    </Button>
+                                </Box>
+                            </Box>
+                            : null
+                    }
                 </Box>
             </Modal>
         </Box>
