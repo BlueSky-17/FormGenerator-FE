@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Box, Typography, Drawer, Avatar, IconButton, Toolbar, List, Divider, Icon, Modal } from '@mui/material'
+import { Box, Typography, Drawer, Avatar, IconButton, Toolbar, List, Divider, Icon, Modal, Grid } from '@mui/material'
 import { styled, useTheme, alpha } from '@mui/material/styles';
 import Button from '@mui/material/Button';
 
@@ -29,6 +29,7 @@ import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import EventIcon from '@mui/icons-material/Event';
 import DatasetLinkedIcon from '@mui/icons-material/DatasetLinked';
 import ArrowDropDownCircleIcon from '@mui/icons-material/ArrowDropDownCircle';
+import CloseIcon from '@mui/icons-material/Close';
 
 import TextField from '@mui/material/TextField';
 import InputLabel from '@mui/material/InputLabel';
@@ -43,12 +44,15 @@ import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormLabel from '@mui/material/FormLabel';
 import Checkbox from '@mui/material/Checkbox';
+import Alert from '@mui/material/Alert';
 
 import Pagination from '@mui/material/Pagination';
 import Stack from '@mui/material/Stack';
 import { Link } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 import { ChangeEvent } from 'react';
+
+import * as XLSX from 'xlsx'
 
 const DrawerHeader = styled('div')(({ theme }) => ({
     display: 'flex',
@@ -103,6 +107,13 @@ function addDate(
     date: string
 ) {
     return { date };
+}
+
+// Content for linked data TYPE
+function addLinkedData(
+    LinkedData: { ImportedLink: string, ListOfOptions: {} }
+) {
+    return {  LinkedData };
 }
 
 function DetailForm() {
@@ -174,8 +185,88 @@ function DetailForm() {
 
     // Đóng/Mở Submodal edit form (using with linked-data type)
     const [subopen, setSubOpen] = React.useState('');
-    const handleSubOpen = () => {
-        if (type === 'linkedData') setSubOpen('linkedData');
+    const [fields, setFields] = useState<string[]>([]);
+    const [myObject, setMyObject] = useState({});
+
+    console.log(fields);
+
+    const handleSubOpen = (e) => {
+        if (type === 'linkedData') {
+            setSubOpen('linkedData');
+
+            // Lấy mảng các field (keys) 
+            setFields(Object.keys(excelData[0])); // fields: ['Tính','Huyện','Xã']
+            // console.log(Object.keys(excelData[0]));
+            // console.log(fields); //['Tính','Huyện','Xã']
+            const arr = Object.keys(excelData[0])[0]; //['Tính']
+
+            //Trả về mảng different value của field đầu tiên ['Nghệ An','Hà Tĩnh', 'TP.HCM']
+            const uniqueValues = excelData.reduce((accumulator: string[], row) => {
+                // Check if the name is not already in the accumulator
+                if (!accumulator.includes(row[arr])) {
+                    accumulator.push(row[arr])
+                }
+                return accumulator;
+            }, []);
+
+            console.log(uniqueValues); //['Nghệ An', 'Hà Tĩnh', 'TP.HCM']
+
+            const tempObject = {};
+
+            uniqueValues.forEach(item => {
+                tempObject[item] = {}
+            });
+
+            const arr2 = Object.keys(excelData[0])[1]; //['Huyện']
+
+            const uniqueValues2 = excelData.reduce((accumulator: string[], row) => {
+                // Check if the name is not already in the accumulator
+                if (!accumulator.includes(row[arr2])) {
+                    accumulator.push(row[arr2])
+                }
+                return accumulator;
+            }, []);
+
+            console.log(uniqueValues2); //['Thanh Chương', 'Nghi Lộc', 'Can Lộc', 'Quận 7']
+
+            uniqueValues2.forEach(item => {
+                excelData.forEach(item2 => {
+                    // console.log(item);
+                    // console.log(item2[arr2]);
+                    // console.log(arr)
+                    if(item2[arr2] === item) tempObject[item2[arr]][item] = {};
+                }
+                )
+            });
+
+            const arr3 = Object.keys(excelData[0])[2]; //['Xã']
+
+            const uniqueValues3 = excelData.reduce((accumulator: string[], row) => {
+                // Check if the name is not already in the accumulator
+                if (!accumulator.includes(row[arr3])) {
+                    accumulator.push(row[arr3])
+                }
+                return accumulator;
+            }, []);
+
+            console.log(uniqueValues3); //['Thị Trấn', 'Thanh Đồng', 'Ngọc Sơn', 'Đông Tây']
+
+            uniqueValues3.forEach(item => {
+                excelData.forEach(item3 => {
+                    // console.log(item);
+                    // console.log(item2[arr2]);
+                    // console.log(arr)
+                    if(item3[arr3] === item) tempObject[item3[arr]][item3[arr2]] = item;
+                }
+                )
+            });
+
+            console.log(tempObject);
+            setMyObject(tempObject);
+
+            // console.log(myObject);
+            // setFirstFieldArray(uniqueValues);
+        }
         else if (type === 'dropDown') {
             setSubOpen('dropDown')
             solveTextInDropDown(textInDropdown);
@@ -183,10 +274,19 @@ function DetailForm() {
     }
     const handleSubClose = () => setSubOpen('');
 
+    console.log(myObject);
+
     // Set type of question
     const [type, setType] = React.useState('');
     const handleChange = (event: SelectChangeEvent) => {
         setType(event.target.value as string);
+    };
+
+    const [firstFieldArray, setFirstFieldArray] = useState<string[]>([]);
+
+    const [firstField, setFirstField] = useState('');
+    const handleFieldChange = (event: SelectChangeEvent) => {
+        setFirstField(event.target.value as string);
     };
 
     // Set title of question
@@ -223,6 +323,16 @@ function DetailForm() {
 
             Object.assign(formDetail.Questions[newIndex].Content, updateDate);
         }
+        else if (type === "linkedData") {
+
+            const updateLinkedData = addLinkedData({
+                ImportedLink: 'hi',
+                ListOfOptions: myObject,
+            });
+
+            Object.assign(formDetail.Questions[newIndex].Content, updateLinkedData);
+        }
+
         console.log(formDetail);
 
         console.log(formDetail.Questions)
@@ -348,13 +458,67 @@ function DetailForm() {
     };
     const open_settings = Boolean(anchorEl);
 
-    //Tùy chỉnh file
-    const [file, setFile] = useState<File>();
-    const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files) {
-            setFile(e.target.files[0]);
+    //Tùy chỉnh file: onchange state
+    const [file, setFile] = useState<string>('');
+    const handleFileChange = (e) => {
+        let fileType = ['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'text/csv'];
+        let selectedFile = e.target.files[0];
+        console.log(e.target.files[0]);
+
+        if (selectedFile) {
+            console.log(selectedFile.type);
+            if (selectedFile && fileType.includes(selectedFile.type)) {
+                setTypeError('');
+                setFile(e.target.files[0]);
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    if (event.target && event.target.result) {
+                        const fileContent = event.target.result as ArrayBuffer;
+
+                        // Convert ArrayBuffer to binary string
+                        const binaryString = String.fromCharCode.apply(null, Array.from(new Uint8Array(fileContent)));
+
+                        // Read Excel data
+                        const workbook = XLSX.read(binaryString, { type: 'binary' });
+                        const worksheetName = workbook.SheetNames[0];
+                        const worksheet = workbook.Sheets[worksheetName];
+                        const data: string[] = XLSX.utils.sheet_to_json(worksheet);
+
+                        setExcelData(data);
+                        console.log(data);
+                    }
+                };
+                reader.readAsArrayBuffer(selectedFile);
+            }
+            else {
+                setTypeError('Vui lòng lựa chọn dạng file excel');
+                setFile('');
+            }
         }
+        else {
+            console.log('Vui lòng chọn file!');
+        }
+
     };
+    const [typeError, setTypeError] = useState<string>();
+    //submit state
+    const [excelData, setExcelData] = useState<string[]>([]);
+
+    //submit event
+    // const handleFileSubmit = (e) => {
+    //     console.log(file);
+    //     console.log(excelData);
+    //     e.preventDefault();
+    //     if (file !== '') {
+    //         const workbook = XLSX.read(file, { type: 'buffer' })
+    //         const worksheetName = workbook.SheetNames[0];
+    //         const worksheet = workbook.Sheets[worksheetName];
+    //         const data: string[] = XLSX.utils.sheet_to_json(worksheet);
+    //         setExcelData(data);
+    //         console.log(data);
+    //         console.log(excelData);
+    //     }
+    // }
 
     const [textInDropdown, setTextInDropdown] = useState('');
     const handleTextInDropdown = (e) => {
@@ -746,9 +910,10 @@ function DetailForm() {
                                         hidden
                                     />
                                 </Button>
-                                <Typography sx={{ color: '#364F6B' }}>{file && `${file.name}`}</Typography>
+                                {typeError && <Alert severity="error">{typeError}</Alert>}
+                                {file !== '' && <Alert severity="success">Chọn file thành công!</Alert>}
                             </Box>
-                            {file && <Button
+                            {file !== '' && <Button
                                 onClick={handleSubOpen}
                                 sx={{
                                     color: 'white',
@@ -761,8 +926,30 @@ function DetailForm() {
                                         backgroundColor: '#2E4155', // Màu nền thay đổi khi hover
                                     }
                                 }}>
-                                Xử lý file
-                            </Button>}
+                                Xem dữ liệu
+                            </Button>
+                            }
+                            {file !== '' &&
+                                <Grid container spacing={2}>
+                                    {fields.map((field, index) => (
+                                        <Grid item xs={4} key={field} sx={{ marginTop: '20px' }}>
+                                            <FormControl fullWidth>
+                                                <InputLabel id="demo-simple-select-label">{field}</InputLabel>
+                                                {field === fields[index] ?
+                                                    <Select
+                                                        value={firstField}
+                                                        sx={{ marginTop: '10px' }}
+                                                        onChange={handleFieldChange}
+                                                    >
+                                                        {firstFieldArray.map((obj) => (
+                                                            <MenuItem key={obj} value={obj}>{obj}</MenuItem>
+                                                        ))}
+                                                    </Select> : null}
+                                            </FormControl>
+                                        </Grid>
+                                    ))
+                                    }
+                                </Grid>}
                         </Box>
                         : null
                     }
@@ -809,48 +996,40 @@ function DetailForm() {
                 <Box sx={{ ...style, width: 800 }}>
                     {subopen === 'linkedData' ?
                         <Box>
-                            <Typography variant='h6' component="div">
-                                Chọn các trường thêm vào
-                            </Typography>
-                            <Typography variant='body1' component="div">
-                                Content Here
-                            </Typography>
-                            <Typography variant='body1' component="div">
-                                Content Here
-                            </Typography>
-                            <Typography variant='body1' component="div">
-                                Content Here
-                            </Typography>
-                            <Box sx={{ display: 'flex', flexDirection: 'row-reverse' }} >
-                                <Button
-                                    onClick={handleSubClose}
-                                    sx={{
-                                        color: 'white',
-                                        backgroundColor: '#364F6B',
-                                        borderRadius: '10px',
-                                        marginY: '10px',
-                                        marginX: '5px',
-                                        '&:hover': {
-                                            backgroundColor: '#2E4155', // Màu nền thay đổi khi hover
-                                        },
-                                    }}>
-                                    Xác nhận
-                                </Button>
-                                <Button
-                                    onClick={handleSubClose}
-                                    sx={{
-                                        color: '#000000',
-                                        backgroundColor: '#E7E7E8',
-                                        borderRadius: '10px',
-                                        marginY: '10px',
-                                        marginX: '5px',
-                                        '&:hover': {
-                                            backgroundColor: '#E7E7E7', // Màu nền thay đổi khi hover
-                                        },
-                                    }}>
-                                    Hủy
-                                </Button>
-                            </Box>
+                            {excelData ? (
+                                <Box sx={{ marginBottom: '10px' }}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                        <Typography variant='h6'>Trường dữ liệu đã tải lên</Typography>
+                                        <IconButton onClick={handleSubClose}>
+                                            <CloseIcon />
+                                        </IconButton>
+                                    </Box>
+                                    <Table>
+                                        <TableHead>
+                                            <TableRow>
+                                                {Object.keys(excelData[0]).map((header) => (
+                                                    <TableCell key={header}>{header}</TableCell>
+                                                ))
+                                                }
+                                            </TableRow>
+                                        </TableHead>
+                                        <TableBody>
+                                            {excelData.map((row, index) => (
+                                                <TableRow key={index}>
+                                                    {Object.keys(excelData[0]).map((header) => (
+                                                        <TableCell key={header}>{row[header]}</TableCell>
+                                                    ))
+                                                    }
+                                                </TableRow>
+                                            ))
+                                            }
+                                        </TableBody>
+                                    </Table>
+                                </Box>
+                            ) : (
+                                <Typography>No File is uploaded yet!</Typography>
+                            )
+                            }
                         </Box>
                         : null}
                     {subopen === 'dropDown' ?
