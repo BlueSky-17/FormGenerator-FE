@@ -44,13 +44,15 @@ import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormLabel from '@mui/material/FormLabel';
 import Checkbox from '@mui/material/Checkbox';
-import Alert from '@mui/material/Alert';
 
 import Pagination from '@mui/material/Pagination';
 import Stack from '@mui/material/Stack';
 import { Link } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 import { ChangeEvent } from 'react';
+import { DataGrid, GridColDef, GridValueGetterParams, GridRowModel, } from '@mui/x-data-grid';
+import Snackbar from '@mui/material/Snackbar';
+import Alert, { AlertProps } from '@mui/material/Alert';
 
 import * as XLSX from 'xlsx'
 
@@ -111,9 +113,9 @@ function addDate(
 
 // Content for linked data TYPE
 function addLinkedData(
-    LinkedData: { ImportedLink: string, ListOfOptions: {} }
+    LinkedData: { ImportedLink: string[], ListOfOptions: {} }
 ) {
-    return {  LinkedData };
+    return { LinkedData };
 }
 
 function DetailForm() {
@@ -190,82 +192,110 @@ function DetailForm() {
 
     console.log(fields);
 
+    const columns: GridColDef[] = [
+        {
+            field: fields[0],
+            headerName: fields[0],
+            width: 150,
+            editable: true,
+        },
+        {
+            field: fields[1],
+            headerName: fields[1],
+            width: 150,
+            editable: true,
+        },
+        {
+            field: fields[2],
+            headerName: fields[2],
+            width: 150,
+            editable: true,
+        },
+    ];
+
+    const handleSaveLinkedData = () => {
+        setSubOpen('');
+
+        const arr = Object.keys(excelData[0])[0]; //['Tính']
+
+        //Trả về mảng different value của field đầu tiên ['Nghệ An','Hà Tĩnh', 'TP.HCM']
+        const uniqueValues = excelData.reduce((accumulator: string[], row) => {
+            // Check if the name is not already in the accumulator
+            if (!accumulator.includes(row[arr])) {
+                accumulator.push(row[arr])
+            }
+            return accumulator;
+        }, []);
+
+        console.log(uniqueValues); //['Nghệ An', 'Hà Tĩnh', 'TP.HCM']
+
+        const tempObject = {};
+
+        uniqueValues.forEach(item => {
+            tempObject[item] = {}
+        });
+
+        const arr2 = Object.keys(excelData[0])[1]; //['Huyện']
+
+        const uniqueValues2 = excelData.reduce((accumulator: string[], row) => {
+            // Check if the name is not already in the accumulator
+            if (!accumulator.includes(row[arr2])) {
+                accumulator.push(row[arr2])
+            }
+            return accumulator;
+        }, []);
+
+        console.log(uniqueValues2); //['Thanh Chương', 'Nghi Lộc', 'Can Lộc', 'Quận 7']
+
+        uniqueValues2.forEach(item => {
+            excelData.forEach(item2 => {
+                // console.log(item);
+                // console.log(item2[arr2]);
+                // console.log(arr)
+                if (item2[arr2] === item) tempObject[item2[arr]][item] = {};
+            }
+            )
+        });
+
+        const arr3 = Object.keys(excelData[0])[2]; //['Xã']
+
+        const uniqueValues3 = excelData.reduce((accumulator: string[], row) => {
+            // Check if the name is not already in the accumulator
+            if (!accumulator.includes(row[arr3])) {
+                accumulator.push(row[arr3])
+            }
+            return accumulator;
+        }, []);
+
+        console.log(uniqueValues3); //['Thị Trấn', 'Thanh Đồng', 'Ngọc Sơn', 'Đông Tây']
+
+        uniqueValues3.forEach(item => {
+            excelData.forEach(item3 => {
+                // console.log(item);
+                // console.log(item2[arr2]);
+                // console.log(arr)
+                if (item3[arr3] === item) tempObject[item3[arr]][item3[arr2]] = item;
+            }
+            )
+        });
+
+        console.log(tempObject);
+        setMyObject(tempObject);
+
+        // console.log(myObject);
+        // setFirstFieldArray(uniqueValues);
+    }
+
     const handleSubOpen = (e) => {
         if (type === 'linkedData') {
             setSubOpen('linkedData');
 
             // Lấy mảng các field (keys) 
-            setFields(Object.keys(excelData[0])); // fields: ['Tính','Huyện','Xã']
+            const rest = Object.keys(excelData[0])
+            const lastElement = rest.pop();
+            setFields(rest); // fields: ['Tính','Huyện','Xã']
             // console.log(Object.keys(excelData[0]));
             // console.log(fields); //['Tính','Huyện','Xã']
-            const arr = Object.keys(excelData[0])[0]; //['Tính']
-
-            //Trả về mảng different value của field đầu tiên ['Nghệ An','Hà Tĩnh', 'TP.HCM']
-            const uniqueValues = excelData.reduce((accumulator: string[], row) => {
-                // Check if the name is not already in the accumulator
-                if (!accumulator.includes(row[arr])) {
-                    accumulator.push(row[arr])
-                }
-                return accumulator;
-            }, []);
-
-            console.log(uniqueValues); //['Nghệ An', 'Hà Tĩnh', 'TP.HCM']
-
-            const tempObject = {};
-
-            uniqueValues.forEach(item => {
-                tempObject[item] = {}
-            });
-
-            const arr2 = Object.keys(excelData[0])[1]; //['Huyện']
-
-            const uniqueValues2 = excelData.reduce((accumulator: string[], row) => {
-                // Check if the name is not already in the accumulator
-                if (!accumulator.includes(row[arr2])) {
-                    accumulator.push(row[arr2])
-                }
-                return accumulator;
-            }, []);
-
-            console.log(uniqueValues2); //['Thanh Chương', 'Nghi Lộc', 'Can Lộc', 'Quận 7']
-
-            uniqueValues2.forEach(item => {
-                excelData.forEach(item2 => {
-                    // console.log(item);
-                    // console.log(item2[arr2]);
-                    // console.log(arr)
-                    if(item2[arr2] === item) tempObject[item2[arr]][item] = {};
-                }
-                )
-            });
-
-            const arr3 = Object.keys(excelData[0])[2]; //['Xã']
-
-            const uniqueValues3 = excelData.reduce((accumulator: string[], row) => {
-                // Check if the name is not already in the accumulator
-                if (!accumulator.includes(row[arr3])) {
-                    accumulator.push(row[arr3])
-                }
-                return accumulator;
-            }, []);
-
-            console.log(uniqueValues3); //['Thị Trấn', 'Thanh Đồng', 'Ngọc Sơn', 'Đông Tây']
-
-            uniqueValues3.forEach(item => {
-                excelData.forEach(item3 => {
-                    // console.log(item);
-                    // console.log(item2[arr2]);
-                    // console.log(arr)
-                    if(item3[arr3] === item) tempObject[item3[arr]][item3[arr2]] = item;
-                }
-                )
-            });
-
-            console.log(tempObject);
-            setMyObject(tempObject);
-
-            // console.log(myObject);
-            // setFirstFieldArray(uniqueValues);
         }
         else if (type === 'dropDown') {
             setSubOpen('dropDown')
@@ -326,7 +356,7 @@ function DetailForm() {
         else if (type === "linkedData") {
 
             const updateLinkedData = addLinkedData({
-                ImportedLink: 'hi',
+                ImportedLink: fields,
                 ListOfOptions: myObject,
             });
 
@@ -338,12 +368,14 @@ function DetailForm() {
         console.log(formDetail.Questions)
 
         updateObjectInDatabase({
-            "QuestionOrder": formDetail.QuestionOrder,
-            "Questions": formDetail.Questions
+            "questionOrder": formDetail.QuestionOrder,
+            "questions": formDetail.Questions
         })
 
         setOpen(false);
     };
+
+    console.log(formDetail);
 
     // Delete question in a form 
     const [deleted, setDelete] = React.useState(false);
@@ -482,9 +514,12 @@ function DetailForm() {
                         const workbook = XLSX.read(binaryString, { type: 'binary' });
                         const worksheetName = workbook.SheetNames[0];
                         const worksheet = workbook.Sheets[worksheetName];
-                        const data: string[] = XLSX.utils.sheet_to_json(worksheet);
+                        const data: {}[] = XLSX.utils.sheet_to_json(worksheet);
 
-                        setExcelData(data);
+                        const rows = data.map((obj, index) => ({ ...obj, id: index }));
+
+                        setExcelData(rows);
+                        // setRows(rows); //có id
                         console.log(data);
                     }
                 };
@@ -502,8 +537,9 @@ function DetailForm() {
     };
     const [typeError, setTypeError] = useState<string>();
     //submit state
-    const [excelData, setExcelData] = useState<string[]>([]);
+    const [excelData, setExcelData] = useState<{ id: number }[]>([]);
 
+    // const [rows, setRows] = useState<{id: number}[]>([]);
     //submit event
     // const handleFileSubmit = (e) => {
     //     console.log(file);
@@ -532,6 +568,25 @@ function DetailForm() {
     }
 
     console.log(formDetail.Questions);
+
+    console.log(excelData);
+
+    const handleProcessRowUpdate = (updatedRow, originalRow) => {
+        // Find the index of the row that was edited
+        const rowIndex = excelData.findIndex((row) => row.id === updatedRow.id);
+
+        // Replace the old row with the updated row
+        const updatedRows = [...excelData];
+        updatedRows[rowIndex] = updatedRow;
+
+        // Update the state with the new rows
+        setExcelData(updatedRows);
+
+        // Return the updated row to update the internal state of the DataGrid
+        return updatedRow;
+    };
+
+    // console.log(rows);
 
     return (
         <Box>
@@ -929,7 +984,7 @@ function DetailForm() {
                                 Xem dữ liệu
                             </Button>
                             }
-                            {file !== '' &&
+                            {/* {file !== '' &&
                                 <Grid container spacing={2}>
                                     {fields.map((field, index) => (
                                         <Grid item xs={4} key={field} sx={{ marginTop: '20px' }}>
@@ -949,7 +1004,7 @@ function DetailForm() {
                                         </Grid>
                                     ))
                                     }
-                                </Grid>}
+                                </Grid>} */}
                         </Box>
                         : null
                     }
@@ -997,40 +1052,54 @@ function DetailForm() {
                     {subopen === 'linkedData' ?
                         <Box>
                             {excelData ? (
-                                <Box sx={{ marginBottom: '10px' }}>
-                                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                <Box>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom:'10px' }}>
                                         <Typography variant='h6'>Trường dữ liệu đã tải lên</Typography>
                                         <IconButton onClick={handleSubClose}>
                                             <CloseIcon />
                                         </IconButton>
                                     </Box>
-                                    <Table>
-                                        <TableHead>
-                                            <TableRow>
-                                                {Object.keys(excelData[0]).map((header) => (
-                                                    <TableCell key={header}>{header}</TableCell>
-                                                ))
-                                                }
-                                            </TableRow>
-                                        </TableHead>
-                                        <TableBody>
-                                            {excelData.map((row, index) => (
-                                                <TableRow key={index}>
-                                                    {Object.keys(excelData[0]).map((header) => (
-                                                        <TableCell key={header}>{row[header]}</TableCell>
-                                                    ))
-                                                    }
-                                                </TableRow>
-                                            ))
-                                            }
-                                        </TableBody>
-                                    </Table>
+                                    <Box sx={{ height: 400, width: '100%' }}>
+                                        <DataGrid
+                                            rows={excelData}
+                                            columns={columns}
+                                            // processRowUpdate={processRowUpdate}
+                                            // onProcessRowUpdateError={handleProcessRowUpdateError}
+                                            // onCellEditCommit={onCellEditCommit}
+                                            processRowUpdate={handleProcessRowUpdate}
+                                            initialState={{
+                                                pagination: {
+                                                    paginationModel: {
+                                                        pageSize: 5,
+                                                    },
+                                                },
+                                            }}
+                                            pageSizeOptions={[5]}
+                                            checkboxSelection
+                                            disableRowSelectionOnClick
+                                        />
+                                    </Box>
+                                    <Button
+                                        onClick={handleSaveLinkedData}
+                                        sx={{
+                                            color: 'white',
+                                            backgroundColor: '#364F6B',
+                                            borderRadius: '10px',
+                                            marginTop: '10px',
+                                            marginX: '5px',
+                                            '&:hover': {
+                                                backgroundColor: '#2E4155', // Màu nền thay đổi khi hover
+                                            },
+                                        }}>
+                                        Lưu
+                                    </Button>
                                 </Box>
                             ) : (
                                 <Typography>No File is uploaded yet!</Typography>
                             )
                             }
                         </Box>
+
                         : null}
                     {subopen === 'dropDown' ?
                         <Box>

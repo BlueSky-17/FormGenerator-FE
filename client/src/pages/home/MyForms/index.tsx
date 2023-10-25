@@ -190,16 +190,17 @@ function MyForms() {
             {
                 "name": name,
                 "header": {
-                    "Title": name,
-                    "Description": description,
-                    "ImagePath": ""
+                    "title": name,
+                    "description": description,
+                    "imagePath": ""
                 },
                 "owner": JSON.parse(sessionStorage.getItem('token') as string)?.user.ID,
                 "answersCounter": 0,
                 "latestModified": "2023-10-14T12:34:56Z",
                 "createDate": "2023-10-14T12:34:56Z",
-                "questions": [],
-                "questionOrder": []
+                "closedDate": "2023-10-14T12:34:56Z",
+                "Questions": [],
+                "QuestionOrder": []
             }
         )
 
