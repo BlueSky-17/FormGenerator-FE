@@ -53,6 +53,7 @@ import { ChangeEvent } from 'react';
 import { DataGrid, GridColDef, GridValueGetterParams, GridRowModel, } from '@mui/x-data-grid';
 import Snackbar from '@mui/material/Snackbar';
 import Alert, { AlertProps } from '@mui/material/Alert';
+import jsonData from '../../../assets/i18n/vi.json'
 
 import * as XLSX from 'xlsx'
 
@@ -168,8 +169,12 @@ function DetailForm() {
     };
 
     // Đóng/Mở Modal edit form
-    const [open, setOpen] = React.useState(false);
-    const handleOpen = () => {
+    const [open, setOpen] = useState(false);
+    const handleOpen = () => setOpen(true);
+    
+    const handleClose = () => {
+        setOpen(false);
+
         // return default value when open modal: type and title
         setType('');
         setTextFieldValue('');
@@ -180,10 +185,10 @@ function DetailForm() {
             setOptionLength(0);
             setActive(-1);
         }
-
-        setOpen(true);
+        else if (type === "linkedData") {
+            setFile('');
+        }
     }
-    const handleClose = () => setOpen(false);
 
     // Đóng/Mở Submodal edit form (using with linked-data type)
     const [subopen, setSubOpen] = React.useState('');
@@ -249,9 +254,6 @@ function DetailForm() {
 
         uniqueValues2.forEach(item => {
             excelData.forEach(item2 => {
-                // console.log(item);
-                // console.log(item2[arr2]);
-                // console.log(arr)
                 if (item2[arr2] === item) tempObject[item2[arr]][item] = {};
             }
             )
@@ -271,19 +273,12 @@ function DetailForm() {
 
         uniqueValues3.forEach(item => {
             excelData.forEach(item3 => {
-                // console.log(item);
-                // console.log(item2[arr2]);
-                // console.log(arr)
                 if (item3[arr3] === item) tempObject[item3[arr]][item3[arr2]] = item;
             }
             )
         });
 
-        console.log(tempObject);
         setMyObject(tempObject);
-
-        // console.log(myObject);
-        // setFirstFieldArray(uniqueValues);
     }
 
     const handleSubOpen = (e) => {
@@ -294,8 +289,6 @@ function DetailForm() {
             const rest = Object.keys(excelData[0])
             const lastElement = rest.pop();
             setFields(rest); // fields: ['Tính','Huyện','Xã']
-            // console.log(Object.keys(excelData[0]));
-            // console.log(fields); //['Tính','Huyện','Xã']
         }
         else if (type === 'dropDown') {
             setSubOpen('dropDown')
@@ -310,13 +303,6 @@ function DetailForm() {
     const [type, setType] = React.useState('');
     const handleChange = (event: SelectChangeEvent) => {
         setType(event.target.value as string);
-    };
-
-    const [firstFieldArray, setFirstFieldArray] = useState<string[]>([]);
-
-    const [firstField, setFirstField] = useState('');
-    const handleFieldChange = (event: SelectChangeEvent) => {
-        setFirstField(event.target.value as string);
     };
 
     // Set title of question
@@ -372,7 +358,7 @@ function DetailForm() {
             "questions": formDetail.Questions
         })
 
-        setOpen(false);
+        handleClose();
     };
 
     console.log(formDetail);
@@ -394,7 +380,10 @@ function DetailForm() {
 
         if (deleted === true) setDelete(false);
         else setDelete(true);
-        updateObjectInDatabase(formDetail)
+        updateObjectInDatabase({
+            "questionOrder": formDetail.QuestionOrder,
+            "questions": formDetail.Questions
+        })
     };
 
     // Biến tạm: optionFieldValue
@@ -698,7 +687,7 @@ function DetailForm() {
                                             {index + 1}
                                         </TableCell>
                                         <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="left">{formDetail.Questions[ques].Question}</TableCell>
-                                        <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="left">{formDetail.Questions[ques].Type}</TableCell>
+                                        <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="left">{jsonData[formDetail.Questions[ques].Type]}</TableCell>
                                         <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="left">{formDetail.Questions[ques].Description}</TableCell>
                                         <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="center">
                                             <IconButton
@@ -952,21 +941,30 @@ function DetailForm() {
                     }
                     {type === 'linkedData' ?
                         <Box>
-                            <Typography sx={{ color: '#6D7073' }}>Nhập <b>1 file excel</b> để thêm trường dữ liệu liên kết</Typography>
-                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingY: '7px' }}>
-                                <Button
-                                    sx={{ color: "#364F6B" }}
-                                    component="label"
-                                >
-                                    Nhập tại đây
-                                    <input
-                                        onChange={handleFileChange}
-                                        type="file"
-                                        hidden
-                                    />
-                                </Button>
-                                {typeError && <Alert severity="error">{typeError}</Alert>}
-                                {file !== '' && <Alert severity="success">Chọn file thành công!</Alert>}
+                            <Box sx={{ color: '#6D7073', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                <Box sx={{ color: '#6D7073', display: 'flex', alignItems: 'center', flexDirection: 'row' }}>
+                                    <Typography>Lựa chọn: Nhập</Typography>
+                                    <Button sx={{ color: '#364F6B', textTransform: 'lowercase', padding: 0, fontSize: '16px', paddingX: '3px' }} component="label">
+                                        thủ công
+                                    </Button>
+                                    <Typography>hoặc nhập </Typography>
+                                    <Button
+                                        sx={{ color: '#364F6B', textTransform: 'lowercase', padding: 0, fontSize: '16px', paddingX: '2px' }}
+                                        component="label"
+                                    >
+                                        1 file excel
+                                        <input
+                                            onChange={handleFileChange}
+                                            type="file"
+                                            hidden
+                                        />
+                                    </Button>
+                                </Box>
+                                <Box>
+                                    {typeError && <Alert severity="error">{typeError}</Alert>}
+                                    {file !== '' && <Alert severity="success">Chọn file thành công!</Alert>}
+                                </Box>
+                                {/* để thêm trường dữ liệu liên kết */}
                             </Box>
                             {file !== '' && <Button
                                 onClick={handleSubOpen}
@@ -976,12 +974,14 @@ function DetailForm() {
                                     borderRadius: '10px',
                                     paddingY: '10px',
                                     paddingX: '5px',
+                                    marginTop: '10px',
                                     width: '100%',
+                                    textTransform: 'capitalize',
                                     '&:hover': {
                                         backgroundColor: '#2E4155', // Màu nền thay đổi khi hover
                                     }
                                 }}>
-                                Xem dữ liệu
+                                Xem  | Chỉnh sửa
                             </Button>
                             }
                             {/* {file !== '' &&
@@ -1053,7 +1053,7 @@ function DetailForm() {
                         <Box>
                             {excelData ? (
                                 <Box>
-                                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom:'10px' }}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
                                         <Typography variant='h6'>Trường dữ liệu đã tải lên</Typography>
                                         <IconButton onClick={handleSubClose}>
                                             <CloseIcon />
@@ -1063,9 +1063,6 @@ function DetailForm() {
                                         <DataGrid
                                             rows={excelData}
                                             columns={columns}
-                                            // processRowUpdate={processRowUpdate}
-                                            // onProcessRowUpdateError={handleProcessRowUpdateError}
-                                            // onCellEditCommit={onCellEditCommit}
                                             processRowUpdate={handleProcessRowUpdate}
                                             initialState={{
                                                 pagination: {
