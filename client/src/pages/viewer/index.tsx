@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Box, Typography, Drawer, Avatar, IconButton, Toolbar, List, Divider, Icon } from '@mui/material'
+import { Box, Typography, Drawer, Avatar, IconButton, Toolbar, List, Divider, Icon, Grid  } from '@mui/material'
 import { styled, useTheme, alpha } from '@mui/material/styles';
 import Button from '@mui/material/Button';
 
@@ -55,6 +55,12 @@ function addResultShortText(
     shortText: string
 ) {
     return { shortText }
+}
+
+function addResultLinkedData(
+    linkedData: string[]
+) {
+    return { linkedData }
 }
 
 function addResultDate(
@@ -154,6 +160,15 @@ function Form() {
                         )
                     )
                 }
+                else if (formDetail.Questions[i].Type === "linkedData") {
+                    formResponses.push(
+                        Responses(
+                            formDetail.Questions[i].Question,
+                            formDetail.Questions[i].Type,
+                            addResultLinkedData([])
+                        )
+                    )
+                }
                 // setFormResponse(formResponses);
                 i++;
             }
@@ -162,7 +177,7 @@ function Form() {
     catch (error) {
         console.log("Error");
     }
-    
+
     // Lưu giá trị cho các field dạng multi-choice
     const handleChange = (ques: number, index: number) => (e) => {
         formResponses[ques].content.multiChoice = formDetail.Questions[ques].Content.MultiChoice.Options[index];
@@ -174,7 +189,7 @@ function Form() {
     const handleChangeInputValue = (ques: number) => (e) => {
         setInputValue(e.target.value);
     };
-    const saveInputValue = (ques:number) => (e) =>{
+    const saveInputValue = (ques: number) => (e) => {
         formResponses[ques].content.shortText = inputValue;
     };
 
@@ -197,14 +212,36 @@ function Form() {
         setSubmit(true);
     }
 
+    const [firstField, setFirstField] = useState('');
+    const handleFirstFieldChange = (e) => {
+        setFirstField(e.target.value);
+        setSecondField('');
+        setThirdField('');
+      };
+
+    console.log(firstField)
+
+    const [secondField, setSecondField] = useState('');
+    const handleSecondFieldChange = (e) => {
+        setSecondField(e.target.value);
+        setThirdField('');
+      };
+
+    const [thirdField, setThirdField] = useState('');
+    const handleThirdFieldChange = (event: SelectChangeEvent) => {
+        setThirdField(event.target.value);
+      };
+
     console.log(formResponses);
+
+    console.log(formDetail);
 
     return (
         <div>
             <Box sx={{ backgroundColor: '#E9F2F4', border: "2px solid #DEDEDE", height: '100vh', width: '100vw' }}>
-                <Box sx={{ backgroundColor: 'white', border: "2px solid #DEDEDE", marginX: '300px', marginTop: '70px' }}>
+                <Box sx={{ backgroundColor: 'white', border: "2px solid #DEDEDE", borderRadius: '10px', marginX: '300px', marginTop: '70px' }}>
                     {/* Header of Form */}
-                    <Box sx={{ textAlign: 'center', backgroundColor: '#008272', paddingY: '30px' }}>
+                    <Box sx={{ textAlign: 'center', backgroundColor: '#008272', paddingY: '30px', borderRadius: '10px 10px 0 0' }}>
                         <Typography sx={{ color: 'white', padding: '15px', fontWeight: 600 }} variant="h4" noWrap component="div">
                             {Object.keys(formDetail).length !== 0 ? formDetail.header.Title : null}
                         </Typography>
@@ -273,9 +310,53 @@ function Form() {
                                 }
                                 {formDetail.Questions[ques].Type === 'datePicker' ?
                                     <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                        <DatePicker onChange={handleChangeDate(ques)}/>
+                                        <DatePicker onChange={handleChangeDate(ques)} />
                                     </LocalizationProvider>
                                     : null
+                                }
+                                {formDetail.Questions[ques].Type === 'linkedData' ?
+                                    <Grid container spacing={2}>
+                                        {formDetail.Questions[ques].Content.LinkedData.ImportedLink.map((field, index) => (
+                                            <Grid item xs={4} key={field} sx={{ marginTop: '20px' }}>
+                                                <FormControl fullWidth>
+                                                    <InputLabel id="demo-simple-select-label">{field}</InputLabel>
+                                                        {index === 0 ? <Select
+                                                            value={firstField}
+                                                            sx={{ marginTop: '10px' }}
+                                                            onChange={handleFirstFieldChange}
+                                                        >
+                                                            {formDetail.Questions[ques].Content.LinkedData.ListOfOptions.map((obj, idx) => (
+                                                                <MenuItem key={obj.Key} value={idx} >{obj.Key}</MenuItem>
+                                                            ))}
+                                                        </Select> : null
+                                                        } 
+                                                        {index === 1 && firstField !== '' ? <Select
+                                                            value={secondField}
+                                                            sx={{ marginTop: '10px' }}
+                                                            onChange={handleSecondFieldChange}
+                                                        >
+                                                            {formDetail.Questions[ques].Content.LinkedData.ListOfOptions[firstField].Value.map((obj,idx) => (
+                                                                <MenuItem key={obj.Key} value={idx} >{obj.Key}</MenuItem>
+                                                            ))}
+                                                        </Select> : null
+                                                        } 
+                                                        {index === 2 && secondField !== '' ? <Select
+                                                            value={thirdField}
+                                                            sx={{ marginTop: '10px' }}
+                                                            onChange={handleThirdFieldChange}
+                                                        >
+                                                            {/* {formDetail.Questions[ques].Content.LinkedData.ListOfOptions[firstField].Value[secondField].Value.map((obj,idx) => (
+                                                                <MenuItem key={obj.Key} value={idx} >{obj.Key}</MenuItem>
+                                                            ))} */}
+                                                             <MenuItem value={formDetail.Questions[ques].Content.LinkedData.ListOfOptions[firstField].Value[secondField].Value}>{formDetail.Questions[ques].Content.LinkedData.ListOfOptions[firstField].Value[secondField].Value}</MenuItem>
+                                                        </Select> : null
+                                                        } 
+                                                </FormControl>
+                                            </Grid>
+                                        ))
+                                        }
+                                    </Grid>
+                                : null
                                 }
                             </Box>
                         ))
@@ -284,8 +365,8 @@ function Form() {
 
                     {/* Body of Form | In case: Form submitted */}
                     {submit && <Box sx={{ margin: '50px' }}>
-                                Phản hồi đã được gửi thành công.
-                        </Box>
+                        Phản hồi đã được gửi thành công.
+                    </Box>
                     }
                 </Box>
                 {!submit && <Box sx={{ display: 'grid', justifyItems: 'right', width: '100%' }}>

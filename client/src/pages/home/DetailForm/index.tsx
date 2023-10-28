@@ -287,6 +287,7 @@ function DetailForm() {
     const handleSubOpen = (e) => {
         if (type === 'linkedData' && file !== '') {
             setSubOpen('linkedData-uploadFile');
+            // setColumn([]);
 
             // Lấy mảng các field (keys) 
             const rest = Object.keys(excelData[0])
@@ -303,6 +304,7 @@ function DetailForm() {
             }
 
             setFields(rest); // fields: ['Tính','Huyện','Xã']
+            // setColumn(rest);
         }
         else if (type === 'linkedData' && file === '') {
             setSubOpen('linkedData-manual');
@@ -314,7 +316,10 @@ function DetailForm() {
             solveTextInDropDown(textInDropdown);
         }
     }
-    const handleSubClose = () => setSubOpen('');
+    const handleSubClose = () => {
+        setSubOpen('');
+        if (subopen === 'linkedData-uploadFile') setColumn([]);
+    }
 
     console.log(myObject);
 
