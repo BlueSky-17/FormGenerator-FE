@@ -171,7 +171,7 @@ function DetailForm() {
     // Đóng/Mở Modal edit form
     const [open, setOpen] = useState(false);
     const handleOpen = () => setOpen(true);
-    
+
     const handleClose = () => {
         setOpen(false);
 
@@ -187,6 +187,7 @@ function DetailForm() {
         }
         else if (type === "linkedData") {
             setFile('');
+            setExcelData([]);
         }
     }
 
@@ -197,26 +198,28 @@ function DetailForm() {
 
     console.log(fields);
 
-    const columns: GridColDef[] = [
-        {
-            field: fields[0],
-            headerName: fields[0],
-            width: 150,
-            editable: true,
-        },
-        {
-            field: fields[1],
-            headerName: fields[1],
-            width: 150,
-            editable: true,
-        },
-        {
-            field: fields[2],
-            headerName: fields[2],
-            width: 150,
-            editable: true,
-        },
-    ];
+    const [columns, setColumn] = useState<GridColDef[]>([])
+
+    // const columns: GridColDef[] = [
+    //     // {
+    //     //     field: fields[0],
+    //     //     headerName: fields[0],
+    //     //     width: 150,
+    //     //     editable: true,
+    //     // },
+    //     // {
+    //     //     field: fields[1],
+    //     //     headerName: fields[1],
+    //     //     width: 150,
+    //     //     editable: true,
+    //     // },
+    //     // {
+    //     //     field: fields[2],
+    //     //     headerName: fields[2],
+    //     //     width: 150,
+    //     //     editable: true,
+    //     // },
+    // ];
 
     const handleSaveLinkedData = () => {
         setSubOpen('');
@@ -282,13 +285,29 @@ function DetailForm() {
     }
 
     const handleSubOpen = (e) => {
-        if (type === 'linkedData') {
-            setSubOpen('linkedData');
+        if (type === 'linkedData' && file !== '') {
+            setSubOpen('linkedData-uploadFile');
 
             // Lấy mảng các field (keys) 
             const rest = Object.keys(excelData[0])
-            const lastElement = rest.pop();
+            const lastElement = rest.pop(); //Xóa property id ở cuối mảng
+            console.log(rest.length)
+
+            for (let i = 0; i < rest.length; ++i) {
+                columns.push({
+                    field: rest[i],
+                    headerName: rest[i],
+                    width: 150,
+                    editable: true,
+                })
+            }
+
             setFields(rest); // fields: ['Tính','Huyện','Xã']
+        }
+        else if (type === 'linkedData' && file === '') {
+            setSubOpen('linkedData-manual');
+
+            // Lấy mảng các field (keys) 
         }
         else if (type === 'dropDown') {
             setSubOpen('dropDown')
@@ -528,23 +547,6 @@ function DetailForm() {
     //submit state
     const [excelData, setExcelData] = useState<{ id: number }[]>([]);
 
-    // const [rows, setRows] = useState<{id: number}[]>([]);
-    //submit event
-    // const handleFileSubmit = (e) => {
-    //     console.log(file);
-    //     console.log(excelData);
-    //     e.preventDefault();
-    //     if (file !== '') {
-    //         const workbook = XLSX.read(file, { type: 'buffer' })
-    //         const worksheetName = workbook.SheetNames[0];
-    //         const worksheet = workbook.Sheets[worksheetName];
-    //         const data: string[] = XLSX.utils.sheet_to_json(worksheet);
-    //         setExcelData(data);
-    //         console.log(data);
-    //         console.log(excelData);
-    //     }
-    // }
-
     const [textInDropdown, setTextInDropdown] = useState('');
     const handleTextInDropdown = (e) => {
         setTextInDropdown(e.target.value)
@@ -575,7 +577,9 @@ function DetailForm() {
         return updatedRow;
     };
 
-    // console.log(rows);
+    console.log(columns)
+
+    console.log(excelData);
 
     return (
         <Box>
@@ -944,7 +948,11 @@ function DetailForm() {
                             <Box sx={{ color: '#6D7073', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                 <Box sx={{ color: '#6D7073', display: 'flex', alignItems: 'center', flexDirection: 'row' }}>
                                     <Typography>Lựa chọn: Nhập</Typography>
-                                    <Button sx={{ color: '#364F6B', textTransform: 'lowercase', padding: 0, fontSize: '16px', paddingX: '3px' }} component="label">
+                                    <Button
+                                        sx={{ color: '#364F6B', textTransform: 'lowercase', padding: 0, fontSize: '16px', paddingX: '3px' }}
+                                        component="label"
+                                        onClick={handleSubOpen}
+                                    >
                                         thủ công
                                     </Button>
                                     <Typography>hoặc nhập </Typography>
@@ -1049,7 +1057,7 @@ function DetailForm() {
                 aria-describedby="modal-modal-description"
             >
                 <Box sx={{ ...style, width: 800 }}>
-                    {subopen === 'linkedData' ?
+                    {subopen === 'linkedData-uploadFile' ?
                         <Box>
                             {excelData ? (
                                 <Box>
@@ -1096,8 +1104,67 @@ function DetailForm() {
                             )
                             }
                         </Box>
-
                         : null}
+                    {subopen === 'linkedData-manual' ?
+                        <Box>
+                            <Box>
+                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
+                                    <Typography variant='h6'>Trường dữ liệu đã tải lên</Typography>
+                                    <IconButton onClick={handleSubClose}>
+                                        <CloseIcon />
+                                    </IconButton>
+                                </Box>
+                                <Box sx={{ height: 400, width: '100%' }}>
+                                    <DataGrid
+                                        rows={excelData}
+                                        columns={columns}
+                                        processRowUpdate={handleProcessRowUpdate}
+                                        initialState={{
+                                            pagination: {
+                                                paginationModel: {
+                                                    pageSize: 5,
+                                                },
+                                            },
+                                        }}
+                                        pageSizeOptions={[5]}
+                                        checkboxSelection
+                                        disableRowSelectionOnClick
+                                    />
+                                </Box>
+                                <Box sx={{ display: 'flex', flexDirection: 'row-reverse' }} >
+                                    <Button
+                                        // onClick={addQuestion}
+                                        sx={{
+                                            color: 'white',
+                                            backgroundColor: '#364F6B',
+                                            borderRadius: '10px',
+                                            marginY: '10px',
+                                            marginX: '5px',
+                                            '&:hover': {
+                                                backgroundColor: '#2E4155', // Màu nền thay đổi khi hover
+                                            },
+                                        }}>
+                                        Lưu
+                                    </Button>
+                                    <Button
+                                        onClick={handleSubClose}
+                                        sx={{
+                                            color: '#000000',
+                                            backgroundColor: '#E7E7E8',
+                                            borderRadius: '10px',
+                                            marginY: '10px',
+                                            marginX: '5px',
+                                            '&:hover': {
+                                                backgroundColor: '#E7E7E7', // Màu nền thay đổi khi hover
+                                            },
+                                        }}>
+                                        Hủy
+                                    </Button>
+                                </Box>
+                            </Box>
+                        </Box>
+                        : null
+                    }
                     {subopen === 'dropDown' ?
                         <Box>
                             <Typography>Xác nhận các trường dữ liệu trong <b>Menu thả xuống</b> là:</Typography>
