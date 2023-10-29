@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Box, Typography, Drawer, Avatar, IconButton, Toolbar, List, Divider, Icon, Grid  } from '@mui/material'
+import { Box, Typography, Drawer, Avatar, IconButton, Toolbar, List, Divider, Icon, Grid } from '@mui/material'
 import { styled, useTheme, alpha } from '@mui/material/styles';
 import Button from '@mui/material/Button';
 
@@ -209,37 +209,49 @@ function Form() {
             "Responses": formResponses
         });
 
-        setSubmit(true);
+        setSubmit(true)
+        setHeight('100vh')
     }
 
     const [firstField, setFirstField] = useState('');
-    const handleFirstFieldChange = (e) => {
+    const handleFirstFieldChange = (ques: number) => (e) => {
         setFirstField(e.target.value);
         setSecondField('');
         setThirdField('');
-      };
+
+        const firstChoice = formDetail.Questions[ques].Content.LinkedData.ListOfOptions[e.target.value].Key;
+        formResponses[ques].content.linkedData.push(firstChoice);
+    };
 
     console.log(firstField)
 
     const [secondField, setSecondField] = useState('');
-    const handleSecondFieldChange = (e) => {
+    const handleSecondFieldChange = (ques: number) => (e) => {
         setSecondField(e.target.value);
         setThirdField('');
-      };
+
+        const secondChoice = formDetail.Questions[ques].Content.LinkedData.ListOfOptions[firstField].Value[e.target.value].Key;
+        formResponses[ques].content.linkedData.push(secondChoice);
+    };
 
     const [thirdField, setThirdField] = useState('');
-    const handleThirdFieldChange = (event: SelectChangeEvent) => {
-        setThirdField(event.target.value);
-      };
+    const handleThirdFieldChange = (ques: number) => (e) => {
+        setThirdField(e.target.value);
+
+        const thirdChoice = formDetail.Questions[ques].Content.LinkedData.ListOfOptions[firstField].Value[secondField].Value;
+        formResponses[ques].content.linkedData.push(thirdChoice);
+    };
 
     console.log(formResponses);
 
     console.log(formDetail);
 
+    const [height, setHeight] = useState('100%')
+
     return (
         <div>
-            <Box sx={{ backgroundColor: '#E9F2F4', border: "2px solid #DEDEDE", height: '100vh', width: '100vw' }}>
-                <Box sx={{ backgroundColor: 'white', border: "2px solid #DEDEDE", borderRadius: '10px', marginX: '300px', marginTop: '70px' }}>
+            <Box sx={{ backgroundColor: '#E9F2F4', border: "2px solid #DEDEDE", height: {height}, width: '100vw' }}>
+                <Box sx={{ backgroundColor: 'white', border: "2px solid #DEDEDE", borderRadius: '10px', marginX: '450px', marginTop: '70px' }}>
                     {/* Header of Form */}
                     <Box sx={{ textAlign: 'center', backgroundColor: '#008272', paddingY: '30px', borderRadius: '10px 10px 0 0' }}>
                         <Typography sx={{ color: 'white', padding: '15px', fontWeight: 600 }} variant="h4" noWrap component="div">
@@ -264,8 +276,8 @@ function Form() {
                                     {index + 1}. {formDetail.Questions[ques].Question}
                                 </Typography>
                                 {/* Nội dung | Dạng câu hỏi */}
-                                {formDetail.Questions[ques].Type === 'multi-choice' ?
-                                    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                                <Box sx={{display: 'flex', flexDirection:'column', marginX:'35px', marginY:'10px'}}>
+                                    {formDetail.Questions[ques].Type === 'multi-choice' ?
                                         <FormControl sx={{ marginLeft: '15px' }}>
                                             <RadioGroup
                                                 key={index}
@@ -285,79 +297,109 @@ function Form() {
                                                 ))}
                                             </RadioGroup>
                                         </FormControl>
-                                    </Box >
-                                    : null
-                                }
-                                {formDetail.Questions[ques].Type === 'checkbox' ?
-                                    <FormControl sx={{ marginLeft: '15px' }}>
-                                        {/* <FormLabel id="demo-radio-buttons-group-label">Gender</FormLabel> */}
-                                        <FormControlLabel control={<Checkbox defaultChecked />} label="Label" />
-                                        <FormControlLabel required control={<Checkbox />} label="Required" />
-                                        <FormControlLabel disabled control={<Checkbox />} label="Disabled" />
-                                    </FormControl>
-                                    : null
-                                }
-                                {formDetail.Questions[ques].Type === 'shortText' ?
-                                    <TextField
-                                        value={inputValue}
-                                        onChange={handleChangeInputValue(ques)}
-                                        onBlur={saveInputValue(ques)}
-                                        sx={{ width: '100%' }}
-                                        id="filled-basic"
-                                        label="Điền ngắn"
-                                        variant="filled" />
-                                    : null
-                                }
-                                {formDetail.Questions[ques].Type === 'datePicker' ?
-                                    <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                        <DatePicker onChange={handleChangeDate(ques)} />
-                                    </LocalizationProvider>
-                                    : null
-                                }
-                                {formDetail.Questions[ques].Type === 'linkedData' ?
-                                    <Grid container spacing={2}>
-                                        {formDetail.Questions[ques].Content.LinkedData.ImportedLink.map((field, index) => (
-                                            <Grid item xs={4} key={field} sx={{ marginTop: '20px' }}>
-                                                <FormControl fullWidth>
-                                                    <InputLabel id="demo-simple-select-label">{field}</InputLabel>
-                                                        {index === 0 ? <Select
-                                                            value={firstField}
-                                                            sx={{ marginTop: '10px' }}
-                                                            onChange={handleFirstFieldChange}
-                                                        >
-                                                            {formDetail.Questions[ques].Content.LinkedData.ListOfOptions.map((obj, idx) => (
-                                                                <MenuItem key={obj.Key} value={idx} >{obj.Key}</MenuItem>
-                                                            ))}
-                                                        </Select> : null
-                                                        } 
-                                                        {index === 1 && firstField !== '' ? <Select
-                                                            value={secondField}
-                                                            sx={{ marginTop: '10px' }}
-                                                            onChange={handleSecondFieldChange}
-                                                        >
-                                                            {formDetail.Questions[ques].Content.LinkedData.ListOfOptions[firstField].Value.map((obj,idx) => (
-                                                                <MenuItem key={obj.Key} value={idx} >{obj.Key}</MenuItem>
-                                                            ))}
-                                                        </Select> : null
-                                                        } 
-                                                        {index === 2 && secondField !== '' ? <Select
-                                                            value={thirdField}
-                                                            sx={{ marginTop: '10px' }}
-                                                            onChange={handleThirdFieldChange}
-                                                        >
-                                                            {/* {formDetail.Questions[ques].Content.LinkedData.ListOfOptions[firstField].Value[secondField].Value.map((obj,idx) => (
+                                        : null
+                                    }
+                                    {formDetail.Questions[ques].Type === 'checkbox' ?
+                                        <FormControl sx={{ marginLeft: '15px' }}>
+                                            {/* <FormLabel id="demo-radio-buttons-group-label">Gender</FormLabel> */}
+                                            <FormControlLabel control={<Checkbox defaultChecked />} label="Label" />
+                                            <FormControlLabel required control={<Checkbox />} label="Required" />
+                                            <FormControlLabel disabled control={<Checkbox />} label="Disabled" />
+                                        </FormControl>
+                                        : null
+                                    }
+                                    {formDetail.Questions[ques].Type === 'shortText' ?
+                                        <TextField
+                                            value={inputValue}
+                                            onChange={handleChangeInputValue(ques)}
+                                            onBlur={saveInputValue(ques)}
+                                            sx={{ width: '100%' }}
+                                            id="outlined-basic"
+                                            label="Điền ngắn"
+                                            variant="outlined" />
+                                        : null
+                                    }
+                                    {formDetail.Questions[ques].Type === 'datePicker' ?
+                                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                            <DatePicker onChange={handleChangeDate(ques)} />
+                                        </LocalizationProvider>
+                                        : null
+                                    }
+                                    {formDetail.Questions[ques].Type === 'linkedData' ?
+                                        <Grid container spacing={2}>
+                                            {formDetail.Questions[ques].Content.LinkedData.ImportedLink.map((field, index) => (
+                                                <Grid item xs={4} key={field}>
+                                                    {index === 0 ?
+                                                        <FormControl fullWidth>
+                                                            <InputLabel id="demo-simple-select-label">{field}</InputLabel>
+                                                            <Select
+                                                                value={firstField}
+                                                                sx={{ marginTop: '10px' }}
+                                                                onChange={handleFirstFieldChange(ques)}
+                                                            >
+                                                                {formDetail.Questions[ques].Content.LinkedData.ListOfOptions.map((obj, idx) => (
+                                                                    <MenuItem key={obj.Key} value={idx} >{obj.Key}</MenuItem>
+                                                                ))}
+                                                            </Select>
+                                                        </FormControl>
+                                                        : null
+                                                    }
+                                                    {index === 1 && firstField !== '' ?
+                                                        <FormControl fullWidth>
+                                                            <InputLabel id="demo-simple-select-label">{field}</InputLabel>
+                                                            <Select
+                                                                value={secondField}
+                                                                sx={{ marginTop: '10px' }}
+                                                                onChange={handleSecondFieldChange(ques)}
+                                                            >
+                                                                {formDetail.Questions[ques].Content.LinkedData.ListOfOptions[firstField].Value.map((obj, idx) => (
+                                                                    <MenuItem key={obj.Key} value={idx} >{obj.Key}</MenuItem>
+                                                                ))}
+                                                            </Select>
+                                                        </FormControl>
+                                                        : null
+                                                    }
+                                                    {index === 1 && firstField === '' ?
+                                                        <FormControl fullWidth disabled>
+                                                            <InputLabel id="demo-simple-select-label">{field}</InputLabel>
+                                                            <Select sx={{ marginTop: '10px' }}>
+                                                                <MenuItem></MenuItem>
+                                                            </Select>
+                                                        </FormControl>
+                                                        : null
+                                                    }
+                                                    {index === 2 && secondField !== '' ?
+                                                        <FormControl fullWidth>
+                                                            <InputLabel id="demo-simple-select-label">{field}</InputLabel>
+                                                            <Select
+                                                                value={thirdField}
+                                                                sx={{ marginTop: '10px' }}
+                                                                onChange={handleThirdFieldChange(ques)}
+                                                            >
+                                                                {/* {formDetail.Questions[ques].Content.LinkedData.ListOfOptions[firstField].Value[secondField].Value.map((obj,idx) => (
                                                                 <MenuItem key={obj.Key} value={idx} >{obj.Key}</MenuItem>
                                                             ))} */}
-                                                             <MenuItem value={formDetail.Questions[ques].Content.LinkedData.ListOfOptions[firstField].Value[secondField].Value}>{formDetail.Questions[ques].Content.LinkedData.ListOfOptions[firstField].Value[secondField].Value}</MenuItem>
-                                                        </Select> : null
-                                                        } 
-                                                </FormControl>
-                                            </Grid>
-                                        ))
-                                        }
-                                    </Grid>
-                                : null
-                                }
+                                                                <MenuItem value={formDetail.Questions[ques].Content.LinkedData.ListOfOptions[firstField].Value[secondField].Value}>{formDetail.Questions[ques].Content.LinkedData.ListOfOptions[firstField].Value[secondField].Value}</MenuItem>
+                                                            </Select>
+                                                        </FormControl>
+                                                        : null
+                                                    }
+                                                    {index === 2 && secondField === '' ?
+                                                        <FormControl fullWidth disabled>
+                                                            <InputLabel id="demo-simple-select-label">{field}</InputLabel>
+                                                            <Select sx={{ marginTop: '10px' }}>
+                                                                <MenuItem></MenuItem>
+                                                            </Select>
+                                                        </FormControl>
+                                                        : null
+                                                    }
+                                                </Grid>
+                                            ))
+                                            }
+                                        </Grid>
+                                        : null
+                                    }
+                                </Box>
                             </Box>
                         ))
                             : null}
@@ -373,7 +415,7 @@ function Form() {
                     <Button
                         onClick={handleSubmitForm}
                         sx={{
-                            background: '#008272', color: 'white', marginRight: '300px', marginBottom: '30px', marginTop: '30px', width: '100px', height: '50px', '&:hover': {
+                            background: '#008272', color: 'white', marginRight: '450px', marginBottom: '30px', marginTop: '30px', width: '100px', height: '50px', '&:hover': {
                                 backgroundColor: '#008272', // Màu nền thay đổi khi hover
                                 color: 'white'
                             },

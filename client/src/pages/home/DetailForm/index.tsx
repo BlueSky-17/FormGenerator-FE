@@ -285,9 +285,8 @@ function DetailForm() {
     }
 
     const handleSubOpen = (e) => {
-        if (type === 'linkedData' && file !== '') {
-            setSubOpen('linkedData-uploadFile');
-            // setColumn([]);
+        if (type === 'linkedData') {
+            setSubOpen('linkedData')
 
             // Lấy mảng các field (keys) 
             const rest = Object.keys(excelData[0])
@@ -306,20 +305,13 @@ function DetailForm() {
             setFields(rest); // fields: ['Tính','Huyện','Xã']
             // setColumn(rest);
         }
-        else if (type === 'linkedData' && file === '') {
-            setSubOpen('linkedData-manual');
-
-            // Lấy mảng các field (keys) 
-        }
         else if (type === 'dropDown') {
             setSubOpen('dropDown')
             solveTextInDropDown(textInDropdown);
         }
     }
-    const handleSubClose = () => {
-        setSubOpen('');
-        if (subopen === 'linkedData-uploadFile') setColumn([]);
-    }
+    const handleSubClose = () => setSubOpen('');
+    
 
     console.log(myObject);
 
@@ -952,17 +944,9 @@ function DetailForm() {
                         <Box>
                             <Box sx={{ color: '#6D7073', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                 <Box sx={{ color: '#6D7073', display: 'flex', alignItems: 'center', flexDirection: 'row' }}>
-                                    <Typography>Lựa chọn: Nhập</Typography>
+                                    <Typography>Nhập</Typography>
                                     <Button
                                         sx={{ color: '#364F6B', textTransform: 'lowercase', padding: 0, fontSize: '16px', paddingX: '3px' }}
-                                        component="label"
-                                        onClick={handleSubOpen}
-                                    >
-                                        thủ công
-                                    </Button>
-                                    <Typography>hoặc nhập </Typography>
-                                    <Button
-                                        sx={{ color: '#364F6B', textTransform: 'lowercase', padding: 0, fontSize: '16px', paddingX: '2px' }}
                                         component="label"
                                     >
                                         1 file excel
@@ -972,6 +956,7 @@ function DetailForm() {
                                             hidden
                                         />
                                     </Button>
+                                    <Typography>để thêm trường dữ liệu</Typography>
                                 </Box>
                                 <Box>
                                     {typeError && <Alert severity="error">{typeError}</Alert>}
@@ -997,27 +982,6 @@ function DetailForm() {
                                 Xem  | Chỉnh sửa
                             </Button>
                             }
-                            {/* {file !== '' &&
-                                <Grid container spacing={2}>
-                                    {fields.map((field, index) => (
-                                        <Grid item xs={4} key={field} sx={{ marginTop: '20px' }}>
-                                            <FormControl fullWidth>
-                                                <InputLabel id="demo-simple-select-label">{field}</InputLabel>
-                                                {field === fields[index] ?
-                                                    <Select
-                                                        value={firstField}
-                                                        sx={{ marginTop: '10px' }}
-                                                        onChange={handleFieldChange}
-                                                    >
-                                                        {firstFieldArray.map((obj) => (
-                                                            <MenuItem key={obj} value={obj}>{obj}</MenuItem>
-                                                        ))}
-                                                    </Select> : null}
-                                            </FormControl>
-                                        </Grid>
-                                    ))
-                                    }
-                                </Grid>} */}
                         </Box>
                         : null
                     }
@@ -1062,7 +1026,7 @@ function DetailForm() {
                 aria-describedby="modal-modal-description"
             >
                 <Box sx={{ ...style, width: 800 }}>
-                    {subopen === 'linkedData-uploadFile' ?
+                    {subopen === 'linkedData' ?
                         <Box>
                             {excelData ? (
                                 <Box>
@@ -1110,66 +1074,6 @@ function DetailForm() {
                             }
                         </Box>
                         : null}
-                    {subopen === 'linkedData-manual' ?
-                        <Box>
-                            <Box>
-                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
-                                    <Typography variant='h6'>Trường dữ liệu đã tải lên</Typography>
-                                    <IconButton onClick={handleSubClose}>
-                                        <CloseIcon />
-                                    </IconButton>
-                                </Box>
-                                <Box sx={{ height: 400, width: '100%' }}>
-                                    <DataGrid
-                                        rows={excelData}
-                                        columns={columns}
-                                        processRowUpdate={handleProcessRowUpdate}
-                                        initialState={{
-                                            pagination: {
-                                                paginationModel: {
-                                                    pageSize: 5,
-                                                },
-                                            },
-                                        }}
-                                        pageSizeOptions={[5]}
-                                        checkboxSelection
-                                        disableRowSelectionOnClick
-                                    />
-                                </Box>
-                                <Box sx={{ display: 'flex', flexDirection: 'row-reverse' }} >
-                                    <Button
-                                        // onClick={addQuestion}
-                                        sx={{
-                                            color: 'white',
-                                            backgroundColor: '#364F6B',
-                                            borderRadius: '10px',
-                                            marginY: '10px',
-                                            marginX: '5px',
-                                            '&:hover': {
-                                                backgroundColor: '#2E4155', // Màu nền thay đổi khi hover
-                                            },
-                                        }}>
-                                        Lưu
-                                    </Button>
-                                    <Button
-                                        onClick={handleSubClose}
-                                        sx={{
-                                            color: '#000000',
-                                            backgroundColor: '#E7E7E8',
-                                            borderRadius: '10px',
-                                            marginY: '10px',
-                                            marginX: '5px',
-                                            '&:hover': {
-                                                backgroundColor: '#E7E7E7', // Màu nền thay đổi khi hover
-                                            },
-                                        }}>
-                                        Hủy
-                                    </Button>
-                                </Box>
-                            </Box>
-                        </Box>
-                        : null
-                    }
                     {subopen === 'dropDown' ?
                         <Box>
                             <Typography>Xác nhận các trường dữ liệu trong <b>Menu thả xuống</b> là:</Typography>
