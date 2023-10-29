@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useReducer } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Box, Typography, TextField, Drawer, Avatar, IconButton, Toolbar, List, Divider, Icon, Modal } from '@mui/material'
 import { styled, useTheme, alpha } from '@mui/material/styles';
@@ -28,6 +28,7 @@ import Pagination from '@mui/material/Pagination';
 import Stack from '@mui/material/Stack';
 import Tooltip from '@mui/material/Tooltip';
 import { useParams } from 'react-router-dom';
+import { initialState, actions, reducer, setName, setDescription, setModal } from '../../../reducers/formReducer'
 
 const DrawerHeader = styled('div')(({ theme }) => ({
     display: 'flex',
@@ -96,13 +97,6 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 function MyForms() {
-    //Page Pagination
-    const [itemsPerPage, setItemsPerPage] = useState('');
-    const [forms, setForms] = useState<any[]>([])
-    const handleChange = (event: SelectChangeEvent) => {
-        setItemsPerPage(event.target.value);
-    };
-
     // render: use to re-render after create or delete form
     const [render, setRender] = useState(false);
 
@@ -122,6 +116,62 @@ function MyForms() {
                 setForms(forms);
             })
     }, [render])
+
+    //API POST: create new form
+    const createForm = async (data) => {
+        try {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + JSON.parse(sessionStorage.getItem('token') as string)?.accessToken,
+                },
+                body: JSON.stringify(data)
+            });
+
+            console.log(response);
+
+            if (!response.ok) {
+                throw new Error(`HTTP Error! Status: ${response.status}`);
+            }
+
+            const dataFromServer = await response.json();
+            // Xử lý dữ liệu từ máy chủ (nếu cần)
+            console.log(dataFromServer);
+        } catch (error) {
+            console.error('Lỗi khi gửi yêu cầu:', error);
+        }
+    };
+    const handleCreateForm = () => {
+        // Close modal
+        dispatch(setModal({ modal: '', isOpen: false }))
+
+        // Call API POST to create a new form
+        createForm(
+            {
+                "name": name,
+                "header": {
+                    "title": name,
+                    "description": description,
+                    "imagePath": ""
+                },
+                "owner": JSON.parse(sessionStorage.getItem('token') as string)?.user.ID,
+                "answersCounter": 0,
+                "latestModified": "2023-10-14T12:34:56Z",
+                "createDate": "2023-10-14T12:34:56Z",
+                "closedDate": "2023-10-14T12:34:56Z",
+                "Questions": [],
+                "QuestionOrder": []
+            }
+        )
+
+        // Return default value of Create Modal
+        dispatch(setName(''));
+        dispatch(setDescription(''));
+
+        // Re-render component
+        setRender(!render)
+    }
 
     // API DELETE: delete form by FormId
     const deleteForm = async (objectId) => {
@@ -145,105 +195,40 @@ function MyForms() {
             console.error('Lỗi khi gửi yêu cầu DELETE:', error);
         }
     };
-
     const handleDeleteForm = () => {
         // Close modal
-        setOpen(false);
+        dispatch(setModal({ modal: '', isOpen: false }))
+
         // Call API DELETE form by ID
         deleteForm(formID);
+        
         // Re-render component
         setRender(!render);
     }
 
-    //API POST: create new form
-    const createForm = async (data) => {
-        try {
-            const response = await fetch(API_URL, {
-                method: 'POST',
-                // mode: 'no-cors',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + JSON.parse(sessionStorage.getItem('token') as string)?.accessToken,
-                },
-                body: JSON.stringify(data)
-            });
+    // Modal ADD + DELETE Form
+    const [state, dispatch] = useReducer(reducer, initialState);
+    const { name, description, modal, isOpen } = state;
+    const [formID, setFormID] = useState(''); // Get formID to delete form
 
-            console.log(response);
-
-            if (!response.ok) {
-                throw new Error(`HTTP Error! Status: ${response.status}`);
-            }
-
-            const dataFromServer = await response.json();
-            // Xử lý dữ liệu từ máy chủ (nếu cần)
-            console.log(dataFromServer);
-        } catch (error) {
-            console.error('Lỗi khi gửi yêu cầu:', error);
-        }
-    };
-
-    const handleCreateForm = () => {
-        // Close modal
-        setOpen(false);
-        // Call API POST to create a new form
-        createForm(
-            {
-                "name": name,
-                "header": {
-                    "title": name,
-                    "description": description,
-                    "imagePath": ""
-                },
-                "owner": JSON.parse(sessionStorage.getItem('token') as string)?.user.ID,
-                "answersCounter": 0,
-                "latestModified": "2023-10-14T12:34:56Z",
-                "createDate": "2023-10-14T12:34:56Z",
-                "closedDate": "2023-10-14T12:34:56Z",
-                "Questions": [],
-                "QuestionOrder": []
-            }
-        )
-
-        // Return default value of Create Modal
-        setName('');
-        setDescription('');
-
-        // Re-render component
-        setRender(!render)
-    }
-
-    // // Handle MODAL
-    const [open, setOpen] = React.useState(false);
-    const [modal, setModal] = useState('');
-    const [formID, setFormID] = useState('');
-    const [name, setName] = useState('');
-    const [description, setDescription] = useState('');
-    // Open Create Modal 
-    const handleOpenAdd = () => {
-        setOpen(true);
-        setModal('add');
-    }
-    // Open Delete Modal
-    const handleOpenDelete = (formID: string) => (e) => {
-        setOpen(true);
-        setModal('delete');
+    const openModalAdd = () => dispatch(setModal({ modal: 'add', isOpen: true }))
+    const openModalDelete = (formID: string) => (e) => {
+        dispatch(setModal({ modal: 'delete', isOpen: true }))
         setFormID(formID);
     }
-    // Close Modal
-    const handleClose = () => setOpen(false);
-    // Set name of form
-    const handleName = (e) => {
-        setName(e.target.value);
-    };
-    // Set description of form
-    const handleDescription = (e) => {
-        setDescription(e.target.value);
-    };
+    const handleCloseModal = () => dispatch(setModal({ modal: '', isOpen: false }))
 
     // Navigate when click edit form
     const navigate = useNavigate();
     const editForm = (id: string) => (event: any) => {
         navigate('/form/' + id);
+    };
+
+    //Page Pagination
+    const [itemsPerPage, setItemsPerPage] = useState('');
+    const [forms, setForms] = useState<any[]>([])
+    const handleChange = (event: SelectChangeEvent) => {
+        setItemsPerPage(event.target.value);
     };
 
     console.log(forms)
@@ -270,7 +255,7 @@ function MyForms() {
                     <Box sx={{ flexGrow: 1 }} />
 
                     <Button
-                        onClick={handleOpenAdd}
+                        onClick={openModalAdd}
                         sx={{
                             backgroundColor: '#364F6B',
                             margin: '10px',
@@ -370,7 +355,7 @@ function MyForms() {
                                                 </Tooltip>
                                             </Link>
                                             <IconButton
-                                                onClick={handleOpenDelete(form.id)}
+                                                onClick={openModalDelete(form.id)}
                                                 sx={{
                                                     backgroundColor: '#364F6B',
                                                     color: 'white',
@@ -419,74 +404,75 @@ function MyForms() {
 
             {/* Modal create form */}
             <Modal
-                open={open}
-                // onClose={handleClose}
+                open={isOpen}
                 aria-labelledby="modal-modal-title"
                 aria-describedby="modal-modal-description"
             >
                 <Box>
-                    {modal === 'add' ? <Box sx={style}>
-                        <Typography variant='h6' component="div">
-                            Vui lòng điền thông tin form
-                        </Typography>
+                    {
+                        modal === 'add' ?
+                            <Box sx={style}>
+                                <Typography variant='h6' component="div">
+                                    Vui lòng điền thông tin form
+                                </Typography>
 
-                        <Box component="form" sx={{ marginY: '10px', display: 'flex', flexDirection: 'column' }}>
-                            <Typography variant='subtitle1' component="div">
-                                <b>Tên form</b>
-                            </Typography>
-                            <TextField
-                                required
-                                value={name}
-                                onChange={handleName}
-                                sx={{ margin: '10px', width: '100%' }}
-                                variant="outlined"
-                                placeholder='Tên form'
-                            />
-                            <Typography variant='subtitle1' component="div">
-                                <b>Mô tả</b>
-                            </Typography>
-                            <TextField
-                                required
-                                value={description}
-                                onChange={handleDescription}
-                                sx={{ margin: '10px', width: '100%' }}
-                                variant="outlined"
-                                placeholder='Mô tả'
-                            />
-                        </Box>
+                                <Box component="form" sx={{ marginY: '10px', display: 'flex', flexDirection: 'column' }}>
+                                    <Typography variant='subtitle1' component="div">
+                                        <b>Tên form</b>
+                                    </Typography>
+                                    <TextField
+                                        required
+                                        value={name}
+                                        onChange={e => { dispatch(setName(e.target.value)) }}
+                                        sx={{ margin: '10px', width: '100%' }}
+                                        variant="outlined"
+                                        placeholder='Tên form'
+                                    />
+                                    <Typography variant='subtitle1' component="div">
+                                        <b>Mô tả</b>
+                                    </Typography>
+                                    <TextField
+                                        required
+                                        value={description}
+                                        onChange={e => { dispatch(setDescription(e.target.value)) }}
+                                        sx={{ margin: '10px', width: '100%' }}
+                                        variant="outlined"
+                                        placeholder='Mô tả'
+                                    />
+                                </Box>
 
-                        <Box sx={{ display: 'flex', flexDirection: 'row-reverse' }} >
-                            <Button
-                                onClick={handleCreateForm}
-                                sx={{
-                                    color: 'white',
-                                    backgroundColor: '#364F6B',
-                                    borderRadius: '10px',
-                                    marginY: '10px',
-                                    marginX: '5px',
-                                    '&:hover': {
-                                        backgroundColor: '#2E4155', // Màu nền thay đổi khi hover
-                                    },
-                                }}>
-                                Xác nhận
-                            </Button>
-                            <Button
-                                onClick={handleClose}
-                                sx={{
-                                    color: '#000000',
-                                    backgroundColor: '#E7E7E8',
-                                    borderRadius: '10px',
-                                    marginY: '10px',
-                                    marginX: '5px',
-                                    '&:hover': {
-                                        backgroundColor: '#E7E7E7', // Màu nền thay đổi khi hover
-                                    },
-                                }}>
-                                Hủy
-                            </Button>
-                        </Box>
-                    </Box>
-                        : null}
+                                <Box sx={{ display: 'flex', flexDirection: 'row-reverse' }} >
+                                    <Button
+                                        onClick={handleCreateForm}
+                                        sx={{
+                                            color: 'white',
+                                            backgroundColor: '#364F6B',
+                                            borderRadius: '10px',
+                                            marginY: '10px',
+                                            marginX: '5px',
+                                            '&:hover': {
+                                                backgroundColor: '#2E4155', // Màu nền thay đổi khi hover
+                                            },
+                                        }}>
+                                        Xác nhận
+                                    </Button>
+                                    <Button
+                                        onClick={handleCloseModal}
+                                        sx={{
+                                            color: '#000000',
+                                            backgroundColor: '#E7E7E8',
+                                            borderRadius: '10px',
+                                            marginY: '10px',
+                                            marginX: '5px',
+                                            '&:hover': {
+                                                backgroundColor: '#E7E7E7', // Màu nền thay đổi khi hover
+                                            },
+                                        }}>
+                                        Hủy
+                                    </Button>
+                                </Box>
+                            </Box>
+                            : null}
                     {
                         modal === 'delete' ?
                             <Box sx={{ ...style }}>
@@ -508,7 +494,7 @@ function MyForms() {
                                         Xác nhận
                                     </Button>
                                     <Button
-                                        onClick={handleClose}
+                                        onClick={handleCloseModal}
                                         sx={{
                                             color: '#000000',
                                             backgroundColor: '#E7E7E8',
