@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-import { Box, Typography, Drawer, Avatar, IconButton, Toolbar, List, Divider, Icon, Modal, Grid } from '@mui/material'
+import { Box, Typography, Drawer, Avatar, IconButton, Toolbar, List, Divider, Icon, Modal, Grid, Switch } from '@mui/material'
 import { styled, useTheme, alpha } from '@mui/material/styles';
 import Button from '@mui/material/Button';
 import Table from '@mui/material/Table';
@@ -29,6 +29,8 @@ import EventIcon from '@mui/icons-material/Event';
 import DatasetLinkedIcon from '@mui/icons-material/DatasetLinked';
 import ArrowDropDownCircleIcon from '@mui/icons-material/ArrowDropDownCircle';
 import CloseIcon from '@mui/icons-material/Close';
+import AddIcon from '@mui/icons-material/Add';
+import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 
 import TextField from '@mui/material/TextField';
 import InputLabel from '@mui/material/InputLabel';
@@ -39,6 +41,7 @@ import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
+import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormLabel from '@mui/material/FormLabel';
 import Checkbox from '@mui/material/Checkbox';
@@ -102,7 +105,7 @@ function DetailForm() {
             .then(formDetail => {
                 setFormDetail(formDetail);
             })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     //API PUT: Update form 
@@ -145,7 +148,6 @@ function DetailForm() {
         // return default value when open modal: multi-choice TYPE
         if (type === "multi-choice") {
             setOptionFieldValueArray([]);
-            setOptionLength(0);
             setActive(-1);
         }
         else if (type === "linkedData") {
@@ -273,7 +275,7 @@ function DetailForm() {
         const newQuestion: Question = {
             Question: textFieldValue,
             Description: "",
-            Required: true,
+            Required: required,
             ImagePath: "",
             Type: type,
             Content: {}
@@ -359,46 +361,26 @@ function DetailForm() {
         })
     };
 
-    // Biến tạm: optionFieldValue
-    const [optionFieldValue, setOptionFieldValue] = useState('');
+    // Xử lý câu hỏi multi-choice và checkbox
+    const [optionFieldValue, setOptionFieldValue] = useState(''); //Lưu value của option
+    const [optionFieldValueArray, setOptionFieldValueArray] = useState<string[]>(['']); //Lưu value của mảng các option
 
     const handleOptionFieldChange = (e) => {
         setOptionFieldValue(e.target.value);
     };
 
-    // Lưu giá trị các options[]
-    const [optionFieldValueArray, setOptionFieldValueArray] = useState<string[]>(['']);
-
-    // Lưu chiều dài của options, sử dụng để re-render khi bấm nút "Thêm" option
-    const [optionLength, setOptionLength] = useState<number>(1);
-
     // active === index thì value của TextField sẽ thay đổi
     const [active, setActive] = useState<number>(-1);
-
-    // active === index thì value của TextField sẽ thay đổi
     const handleActive = (index: number) => (e) => {
         setActive(index);
         setOptionFieldValue(optionFieldValueArray[index]);
     }
 
     // Khi onBlur thì sẽ lưu value vào mảng options[]
-    const saveOption = (index: number) => (e) => {
-        optionFieldValueArray[index] = optionFieldValue;
-
-        console.log(optionFieldValueArray);
-    };
+    const saveOption = (index: number) => (e) => optionFieldValueArray[index] = optionFieldValue;
 
     // Thêm option trống 
-    const handleOption = () => {
-        // const newIndex = optionFieldArray.length - 1;
-        const newIndex = optionLength + 1;
-
-        optionFieldValueArray.push('')
-
-        console.log(optionFieldValueArray);
-
-        setOptionLength(newIndex);
-    }
+    const handleOption = () => setOptionFieldValueArray([...optionFieldValueArray, ''])
 
     // Navigate to view form page
     const navigate = useNavigate();
@@ -534,6 +516,12 @@ function DetailForm() {
     console.log(columns)
 
     console.log(excelData);
+
+    const [required, setRequired] = useState(false);
+
+    const handleChangeRequired = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setRequired(!required);
+    };
 
     return (
         <Box>
@@ -815,14 +803,17 @@ function DetailForm() {
                             </Select>
                         </FormControl>
                     </Box>
-                    {type === 'multi-choice' ?
+                    {type === 'multi-choice' || type === 'checkbox' ?
                         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                             {
                                 optionFieldValueArray.map((item, index) => (
                                     <Box key={index} sx={{ display: 'flex', alignItems: 'center' }}>
-                                        <RadioButtonUncheckedIcon
+                                        {type === 'multi-choice' && <RadioButtonUncheckedIcon
                                             sx={{ color: 'gray', marginRight: '10px' }}
-                                        />
+                                        />}
+                                        {type === 'checkbox' && <CheckBoxOutlineBlankIcon
+                                            sx={{ color: 'gray', marginRight: '10px' }}
+                                        />}
                                         <TextField
                                             value={index === active ? optionFieldValue : optionFieldValueArray[index]}
                                             onChange={handleOptionFieldChange}
@@ -848,23 +839,17 @@ function DetailForm() {
                                 ))
                             }
                             <Button
+                                sx={{ width: '30%', fontSize: '1.1rem', color: '#364F6B', paddingY: '10px', marginBottom: '10px', textTransform: 'initial', borderRadius: '20px' }}
                                 onClick={handleOption}
                             >
-                                Thêm tùy chọn
+                                <AddIcon />
+                                Thêm lựa chọn
                             </Button>
                         </Box >
                         : null
                     }
-                    {type === 'checkbox' ?
-                        <FormControl>
-                            <FormControlLabel control={<Checkbox defaultChecked />} label="Label" />
-                            <FormControlLabel required control={<Checkbox />} label="Required" />
-                            <FormControlLabel disabled control={<Checkbox />} label="Disabled" />
-                        </FormControl>
-                        : null
-                    }
                     {type === 'shortText' ?
-                        <TextField disabled sx={{ width: '100%' }} id="standard-basic" label="Điền ngắn" variant="standard" />
+                        <TextField disabled sx={{ width: '100%' }} id="standard-basic" label="Nhập câu trả lời" variant="standard" />
                         : null
                     }
                     {type === 'dropDown' ?
@@ -942,6 +927,26 @@ function DetailForm() {
                         </Box>
                         : null
                     }
+
+                    {type !== '' &&
+                        <Box>
+                            <Divider />
+                            <FormGroup sx={{ display: 'flex', flexDirection: 'row-reverse', marginTop: '5px' }}>
+                                <FormControlLabel control={<Switch checked={required}
+                                    onChange={handleChangeRequired} />} label="Bắt buộc"
+                                />
+                                {type === 'multi-choice' &&
+                                    <FormControlLabel control={<Switch defaultChecked={false} />} label="Nhiều lựa chọn"
+                                    />
+                                }
+                                {type === 'checkbox' &&
+                                    <FormControlLabel control={<Switch defaultChecked={false} />} label="Một lựa chọn"
+                                    />
+                                }
+                            </FormGroup>
+                        </Box>
+                    }
+
                     <Box sx={{ display: 'flex', flexDirection: 'row-reverse' }} >
                         <Button
                             onClick={addQuestion}
