@@ -82,8 +82,6 @@ const style = {
 };
 
 function DetailForm() {
-
-    console.log('re-sender-DetailForm');
     const [formDetail, setFormDetail] = useState<any>({})
 
     const FormDetailAPI_URL = `http://localhost:8080/form/${useParams()?.formID}`;
@@ -146,8 +144,8 @@ function DetailForm() {
         setTextFieldValue('');
 
         // return default value when open modal: multi-choice TYPE
-        if (type === "multi-choice") {
-            setOptionFieldValueArray([]);
+        if (type === "multi-choice" || type === "checkbox") {
+            setOptionFieldValueArray(['']);
             setActive(-1);
         }
         else if (type === "linkedData") {
@@ -260,15 +258,15 @@ function DetailForm() {
 
     // Set type of question
     const [type, setType] = React.useState('');
-    const handleChange = (event: SelectChangeEvent) => {
-        setType(event.target.value as string);
-    };
+    const handleChange = (event: SelectChangeEvent) => setType(event.target.value as string);
 
     // Set title of question
     const [textFieldValue, setTextFieldValue] = useState('');
-    const handleTextFieldChange = (e) => {
-        setTextFieldValue(e.target.value);
-    };
+    const handleTextFieldChange = (e) => setTextFieldValue(e.target.value);
+
+    // Set question isRequired or not
+    const [required, setRequired] = useState(false);
+    const handleChangeRequired = (e) => setRequired(!required);
 
     // Add question to a form 
     const addQuestion = async () => {
@@ -323,10 +321,6 @@ function DetailForm() {
 
             Object.assign(formDetail.Questions[newIndex].Content, updateLinkedData);
         }
-
-        console.log(formDetail);
-
-        console.log(formDetail.Questions)
 
         updateObjectInDatabase({
             "questionOrder": formDetail.QuestionOrder,
@@ -496,8 +490,6 @@ function DetailForm() {
 
     console.log(formDetail.Questions);
 
-    console.log(excelData);
-
     const handleProcessRowUpdate = (updatedRow, originalRow) => {
         // Find the index of the row that was edited
         const rowIndex = excelData.findIndex((row) => row.id === updatedRow.id);
@@ -516,12 +508,6 @@ function DetailForm() {
     console.log(columns)
 
     console.log(excelData);
-
-    const [required, setRequired] = useState(false);
-
-    const handleChangeRequired = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setRequired(!required);
-    };
 
     return (
         <Box>
