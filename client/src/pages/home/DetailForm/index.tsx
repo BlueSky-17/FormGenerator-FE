@@ -69,10 +69,10 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 
 // Style cho modal edit
 const style = {
-    position: 'absolute' as 'absolute',
-    top: '35%',
+    position: 'fixed',
+    top: '15%',
     left: '50%',
-    transform: 'translate(-50%, -50%)',
+    marginLeft: '-350px',
     width: 700,
     bgcolor: 'background.paper',
     border: '1px solid #000',
