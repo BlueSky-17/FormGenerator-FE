@@ -19,11 +19,11 @@ function getToken() {
   //   const userToken = JSON.parse(tokenString);
   //   return userToken?.accessToken;
   // }
-  try{
+  try {
     const userToken = JSON.parse(tokenString as string);
     return userToken?.accessToken;
   }
-  catch(error){
+  catch (error) {
     console.log(error);
   }
   return null;
@@ -49,30 +49,42 @@ function App() {
 
   const token = getToken();
 
-  if (!token) {
-    return (
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<SignInSide setToken={setToken} />} />
-          <Route path="/signin" element={<SignInSide setToken={setToken} />} />
-          <Route path="/home" element={<HomePage pageComponent={MyForms} />} />
-        </Routes>
-      </BrowserRouter>
-    );
-  }
+  // if (!token) {
+  //   return (
+  //     <BrowserRouter>
+  //       <Routes>
+  //         <Route path="/" element={<SignInSide setToken={setToken} />} />
+  //         <Route path="/signin" element={<SignInSide setToken={setToken} />} />
+  //         <Route path="/home" element={<HomePage pageComponent={MyForms} />} />
+  //       </Routes>
+  //     </BrowserRouter>
+  //   );
+  // }
 
   return (
     <div className="wrapper">
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<HomePage pageComponent={MyForms} />} />
-          <Route path="/home" element={<HomePage pageComponent={MyForms} />} />
+          <Route path="/signup" element={<SignUp />} />
+          <Route path="/signin" element={<SignInSide setToken={setToken} />} />
+          <Route path="/" element={<SignInSide setToken={setToken} />} />
+          <Route
+            path="/home"
+            element={
+              <HomePage>
+                <MyForms />
+              </HomePage>
+            }
+          />
           <Route
             path="/form/:formID"
-            element={<HomePage pageComponent={DetailForm} />}
+            element={
+              <HomePage>
+                <DetailForm />
+              </HomePage>
+            }
           />
           <Route path="/form/:formID/view" element={<Form />} />
-          <Route path="/signup" element={<SignUp />} />
           {/* <Route path="/signin" element={<SignInSide setToken={setToken} />} /> */}
         </Routes>
       </BrowserRouter>

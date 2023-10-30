@@ -70,6 +70,8 @@ export default function SignInSide({ setToken }) {
     nav('/home')
   };
 
+  console.log("hii");
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);

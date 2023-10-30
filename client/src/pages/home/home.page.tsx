@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, ReactNode } from 'react';
 import { styled, useTheme, alpha } from '@mui/material/styles';
 import { Box, Typography, Drawer, Avatar, IconButton, Toolbar, List, Divider, Icon } from '@mui/material'
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
@@ -83,40 +83,28 @@ const DrawerHeader = styled('div')(({ theme }) => ({
     ...theme.mixins.toolbar,
     justifyContent: 'flex-end',
 }));
+interface LayoutProps {
+    children: ReactNode;
+  }
 
-type ParentComponentProps = {
-    pageComponent: React.ComponentType;
-};
-
-function HomePage({ pageComponent: PageComponent }: ParentComponentProps): JSX.Element {
+function HomePage({ children }: LayoutProps) {
 
     const theme = useTheme();
     const [open, setOpen] = React.useState(false);
 
-    const handleDrawerOpen = () => {
-        setOpen(true);
-    };
-
-    const handleDrawerClose = () => {
-        setOpen(false);
-    };
+    const handleDrawerOpen = () => setOpen(true);
+    const handleDrawerClose = () => setOpen(false);
 
     const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
-
-    const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-        setAnchorEl(event.currentTarget);
-    };
-
-    const handleClose = () => {
-        setAnchorEl(null);
-    };
+    const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => setAnchorEl(event.currentTarget);
+    const handleClose = () => setAnchorEl(null);
 
     const open_avatar = Boolean(anchorEl);
     const id = open_avatar ? 'simple-popover' : undefined;
 
     const navigate: any = useNavigate();
 
-    function handleLogout() {
+    const handleLogout = () => {
         // Clear the token from sessionStorage or perform any other logout actions
         sessionStorage.removeItem('token');
 
@@ -257,7 +245,7 @@ function HomePage({ pageComponent: PageComponent }: ParentComponentProps): JSX.E
             </Drawer >
 
             <Main sx={{ backgroundColor: '#EBEBEB' }} open={open}>
-                <PageComponent />
+                {children}
             </Main>
         </Box >
     );

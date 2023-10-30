@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useReducer } from 'react'
+import React, { useState, useEffect, useReducer, useLayoutEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Box, Typography, TextField, Drawer, Avatar, IconButton, Toolbar, List, Divider, Icon, Modal } from '@mui/material'
 import { styled, useTheme, alpha } from '@mui/material/styles';
@@ -115,6 +115,7 @@ function MyForms() {
             .then(forms => {
                 setForms(forms);
             })
+            console.log('GET API');
     }, [render])
 
     //API POST: create new form
@@ -224,7 +225,7 @@ function MyForms() {
         navigate('/form/' + id);
     };
 
-    //Page Pagination
+    // Page Pagination
     const [itemsPerPage, setItemsPerPage] = useState('');
     const [forms, setForms] = useState<any[]>([])
     const handleChange = (event: SelectChangeEvent) => {
