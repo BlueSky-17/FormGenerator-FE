@@ -51,6 +51,8 @@ import { Link } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 import { ChangeEvent } from 'react';
 import { DataGrid, GridColDef, GridValueGetterParams, GridRowModel, } from '@mui/x-data-grid';
+import { useGridApiContext, useGridApiEventHandler } from '@mui/x-data-grid'; // Additional Material-UI grid functions
+
 import Snackbar from '@mui/material/Snackbar';
 import Alert, { AlertProps } from '@mui/material/Alert';
 import jsonData from '../../../assets/i18n/vi.json'
@@ -508,6 +510,25 @@ function DetailForm() {
     console.log(columns)
 
     console.log(excelData);
+
+    const handleEvent: GridEventListener<'columnHeaderClick'> = (
+        params,  // GridColumnHeaderParams
+        event,   // MuiEvent<React.MouseEvent<HTMLElement>>
+        details, // GridCallbackDetails
+      ) => {
+        console.log("HiJO")
+      }
+      
+      // Imperative subscription
+      const apiRef = useGridApiContext();
+      apiRef.current.subscribeEvent(
+        'columnHeaderClick',
+        handleEvent,
+      );
+      
+      useGridApiEventHandler(apiRef, 'columnHeaderClick', handleEvent);
+
+
 
     return (
         <Box>
@@ -988,6 +1009,7 @@ function DetailForm() {
                                         <DataGrid
                                             rows={excelData}
                                             columns={columns}
+                                            onColumnHeaderClick={handleEvent}
                                             processRowUpdate={handleProcessRowUpdate}
                                             initialState={{
                                                 pagination: {
