@@ -88,7 +88,7 @@ interface LayoutProps {
   }
 
 function HomePage({ children }: LayoutProps) {
-
+``
     const theme = useTheme();
     const [open, setOpen] = React.useState(false);
 
