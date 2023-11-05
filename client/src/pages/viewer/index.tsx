@@ -69,14 +69,6 @@ function addResultDate(
     return { date }
 }
 
-// const countrys = [
-//     { label: 'Nghệ An', year: 1994 },
-//     { label: 'Tây Ninh', year: 1972 },
-//     { label: 'Quảng Trị', year: 1974 },
-//     { label: 'Cà Mau', year: 2008 },
-//     { label: 'TP.HCM', year: 1957 }
-// ]
-
 function Form() {
     const [formDetail, setFormDetail] = useState<any>({})
     const [formResponses, setFormResponse] = useState<any[]>([])

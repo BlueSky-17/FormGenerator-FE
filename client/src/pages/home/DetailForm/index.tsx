@@ -57,6 +57,8 @@ import jsonData from '../../../assets/i18n/vi.json'
 
 import { Question, ShortText, MultiChoice, Date, LinkedData } from './interface';
 import * as XLSX from 'xlsx'
+import { MainModal } from './mainmodal';
+import { SubModal } from './submodal';
 
 const DrawerHeader = styled('div')(({ theme }) => ({
     display: 'flex',
@@ -66,20 +68,6 @@ const DrawerHeader = styled('div')(({ theme }) => ({
     ...theme.mixins.toolbar,
     justifyContent: 'flex-end',
 }));
-
-// Style cho modal edit
-const style = {
-    position: 'fixed',
-    top: '15%',
-    left: '50%',
-    marginLeft: '-350px',
-    width: 700,
-    bgcolor: 'background.paper',
-    border: '1px solid #000',
-    borderRadius: '15px',
-    boxShadow: 24,
-    p: 4,
-};
 
 function DetailForm() {
     const [formDetail, setFormDetail] = useState<any>({})
@@ -136,33 +124,48 @@ function DetailForm() {
     const [open, setOpen] = useState(false);
     const handleOpen = () => setOpen(true);
 
-    const handleClose = () => {
-        setOpen(false);
-
-        // return default value when open modal: type and title
-        setType('');
-        setTextFieldValue('');
-
-        // return default value when open modal: multi-choice TYPE
-        if (type === "multi-choice" || type === "checkbox") {
-            setOptionFieldValueArray(['']);
-            setActive(-1);
-        }
-        else if (type === "linkedData") {
-            setFile('');
-            setExcelData([]);
-        }
-    }
+    // Set type of question
+    const [type, setType] = React.useState('');
+    const handleChangeType = (event: SelectChangeEvent) => setType(event.target.value as string);
 
     // Đóng/Mở Submodal edit form (using with linked-data type)
     const [subopen, setSubOpen] = React.useState('');
+    const handleSubOpen = (e) => {
+        if (type === 'linkedData') {
+            setSubOpen('linkedData')
+
+            // Lấy mảng các field (keys) 
+            const rest = Object.keys(excelData[0])
+            const lastElement = rest.pop(); //Xóa property id ở cuối mảng
+            console.log(rest.length)
+
+            for (let i = 0; i < rest.length; ++i) {
+                columns.push({
+                    field: rest[i],
+                    headerName: rest[i],
+                    width: 150,
+                    editable: true,
+                })
+            }
+
+            setFields(rest); // fields: ['Tính','Huyện','Xã']
+            // setColumn(rest);
+        }
+        else if (type === 'dropDown') {
+            setSubOpen('dropDown')
+            solveTextInDropDown(textInDropdown);
+        }
+    }
+    const handleSubClose = () => {
+        setSubOpen('');
+        setColumn([]);
+    }
+
+    // Xử lý linkedData
+    const [excelData, setExcelData] = useState<{ id: number }[]>([]);
     const [fields, setFields] = useState<string[]>([]);
-    const [myObject, setMyObject] = useState({});
-
-    console.log(fields);
-
     const [columns, setColumn] = useState<GridColDef[]>([])
-
+    const [myObject, setMyObject] = useState({});
     const handleSaveLinkedData = () => {
         setSubOpen('');
 
@@ -225,110 +228,31 @@ function DetailForm() {
 
         setMyObject(tempObject);
     }
+    const handleProcessRowUpdate = (updatedRow, originalRow) => {
+        // Find the index of the row that was edited
+        const rowIndex = excelData.findIndex((row) => row.id === updatedRow.id);
 
-    const handleSubOpen = (e) => {
-        if (type === 'linkedData') {
-            setSubOpen('linkedData')
+        // Replace the old row with the updated row
+        const updatedRows = [...excelData];
+        updatedRows[rowIndex] = updatedRow;
 
-            // Lấy mảng các field (keys) 
-            const rest = Object.keys(excelData[0])
-            const lastElement = rest.pop(); //Xóa property id ở cuối mảng
-            console.log(rest.length)
+        // Update the state with the new rows
+        setExcelData(updatedRows);
 
-            for (let i = 0; i < rest.length; ++i) {
-                columns.push({
-                    field: rest[i],
-                    headerName: rest[i],
-                    width: 150,
-                    editable: true,
-                })
-            }
-
-            setFields(rest); // fields: ['Tính','Huyện','Xã']
-            // setColumn(rest);
-        }
-        else if (type === 'dropDown') {
-            setSubOpen('dropDown')
-            solveTextInDropDown(textInDropdown);
-        }
-    }
-    const handleSubClose = () => setSubOpen('');
-
-    console.log(myObject);
-
-    // Set type of question
-    const [type, setType] = React.useState('');
-    const handleChange = (event: SelectChangeEvent) => setType(event.target.value as string);
-
-    // Set title of question
-    const [textFieldValue, setTextFieldValue] = useState('');
-    const handleTextFieldChange = (e) => setTextFieldValue(e.target.value);
-
-    // Set question isRequired or not
-    const [required, setRequired] = useState(false);
-    const handleChangeRequired = (e) => setRequired(!required);
-
-    // Add question to a form 
-    const addQuestion = async () => {
-        const newQuestion: Question = {
-            Question: textFieldValue,
-            Description: "",
-            Required: required,
-            ImagePath: "",
-            Type: type,
-            Content: {}
-        };
-
-        // Tạo một Question có 5 trường: Question, Description, Required, ImagePath, Type, Content
-        formDetail.Questions.push(newQuestion);
-
-        // Push index vào QuestionOrder
-        const newIndex = formDetail.Questions.length - 1;
-        formDetail.QuestionOrder.push(newIndex);
-
-        // Lấy Object: Options có chứa Option[] và ImportedData
-        if (type === "multi-choice") {
-            const updateMultiChoice: MultiChoice = {
-                MultiChoice: {
-                    Options: optionFieldValueArray,
-                    ImportedData: ''
-                }
-            };
-
-            Object.assign(formDetail.Questions[newIndex].Content, updateMultiChoice);
-        }
-        else if (type === "shortText") {
-            const updateShortText: ShortText = {
-                shortText: ''
-            };
-
-            Object.assign(formDetail.Questions[newIndex].Content, updateShortText);
-        }
-        else if (type === "datePicker") {
-            const updateDate: Date = {
-                date: ''
-            };
-
-            Object.assign(formDetail.Questions[newIndex].Content, updateDate);
-        }
-        else if (type === "linkedData") {
-            const updateLinkedData: LinkedData = {
-                LinkedData: {
-                    ImportedLink: fields,
-                    ListOfOptions: myObject,
-                }
-            };
-
-            Object.assign(formDetail.Questions[newIndex].Content, updateLinkedData);
-        }
-
-        updateObjectInDatabase({
-            "questionOrder": formDetail.QuestionOrder,
-            "questions": formDetail.Questions
-        })
-
-        handleClose();
+        // Return the updated row to update the internal state of the DataGrid
+        return updatedRow;
     };
+
+    const [textInDropdown, setTextInDropdown] = useState('');
+    const handleTextInDropdown = (e) => {
+        setTextInDropdown(e.target.value)
+    }
+
+    const [optionInDropDown, setOptionInDropdown] = useState<string[]>([]);
+    const solveTextInDropDown = (textInDropDown: string) => {
+        const myDropdown = textInDropDown.split('\n');
+        setOptionInDropdown(myDropdown);
+    }
 
     console.log(formDetail);
 
@@ -354,27 +278,6 @@ function DetailForm() {
             "questions": formDetail.Questions
         })
     };
-
-    // Xử lý câu hỏi multi-choice và checkbox
-    const [optionFieldValue, setOptionFieldValue] = useState(''); //Lưu value của option
-    const [optionFieldValueArray, setOptionFieldValueArray] = useState<string[]>(['']); //Lưu value của mảng các option
-
-    const handleOptionFieldChange = (e) => {
-        setOptionFieldValue(e.target.value);
-    };
-
-    // active === index thì value của TextField sẽ thay đổi
-    const [active, setActive] = useState<number>(-1);
-    const handleActive = (index: number) => (e) => {
-        setActive(index);
-        setOptionFieldValue(optionFieldValueArray[index]);
-    }
-
-    // Khi onBlur thì sẽ lưu value vào mảng options[]
-    const saveOption = (index: number) => (e) => optionFieldValueArray[index] = optionFieldValue;
-
-    // Thêm option trống 
-    const handleOption = () => setOptionFieldValueArray([...optionFieldValueArray, ''])
 
     // Navigate to view form page
     const navigate = useNavigate();
@@ -428,86 +331,7 @@ function DetailForm() {
     };
     const open_settings = Boolean(anchorEl);
 
-    //Tùy chỉnh file: onchange state
-    const [file, setFile] = useState<string>('');
-    const handleFileChange = (e) => {
-        let fileType = ['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'text/csv'];
-        let selectedFile = e.target.files[0];
-        console.log(e.target.files[0]);
-
-        if (selectedFile) {
-            console.log(selectedFile.type);
-            if (selectedFile && fileType.includes(selectedFile.type)) {
-                setTypeError('');
-                setFile(e.target.files[0]);
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    if (event.target && event.target.result) {
-                        const fileContent = event.target.result as ArrayBuffer;
-
-                        // Convert ArrayBuffer to binary string
-                        const binaryString = String.fromCharCode.apply(null, Array.from(new Uint8Array(fileContent)));
-
-                        // Read Excel data
-                        const workbook = XLSX.read(binaryString, { type: 'binary' });
-                        const worksheetName = workbook.SheetNames[0];
-                        const worksheet = workbook.Sheets[worksheetName];
-                        const data: {}[] = XLSX.utils.sheet_to_json(worksheet);
-
-                        const rows = data.map((obj, index) => ({ ...obj, id: index }));
-
-                        setExcelData(rows);
-                        // setRows(rows); //có id
-                        console.log(data);
-                    }
-                };
-                reader.readAsArrayBuffer(selectedFile);
-            }
-            else {
-                setTypeError('Vui lòng lựa chọn dạng file excel');
-                setFile('');
-            }
-        }
-        else {
-            console.log('Vui lòng chọn file!');
-        }
-
-    };
-    const [typeError, setTypeError] = useState<string>();
-    //submit state
-    const [excelData, setExcelData] = useState<{ id: number }[]>([]);
-
-    const [textInDropdown, setTextInDropdown] = useState('');
-    const handleTextInDropdown = (e) => {
-        setTextInDropdown(e.target.value)
-    }
-
-    const [optionInDropDown, setOptionInDropdown] = useState<string[]>([]);
-    const solveTextInDropDown = (textInDropDown: string) => {
-        const myDropdown = textInDropDown.split('\n');
-        setOptionInDropdown(myDropdown);
-    }
-
     console.log(formDetail.Questions);
-
-    const handleProcessRowUpdate = (updatedRow, originalRow) => {
-        // Find the index of the row that was edited
-        const rowIndex = excelData.findIndex((row) => row.id === updatedRow.id);
-
-        // Replace the old row with the updated row
-        const updatedRows = [...excelData];
-        updatedRows[rowIndex] = updatedRow;
-
-        // Update the state with the new rows
-        setExcelData(updatedRows);
-
-        // Return the updated row to update the internal state of the DataGrid
-        return updatedRow;
-    };
-
-    console.log(columns)
-
-    console.log(excelData);
 
     return (
         <Box>
@@ -707,361 +531,31 @@ function DetailForm() {
                 </Box>
             </Box >
 
-            {/* Modal: Thêm mới Question */}
-            <Modal
+            <MainModal
                 open={open}
-                onClose={handleClose}
-                aria-labelledby="modal-modal-title"
-                aria-describedby="modal-modal-description"
-            >
-                <Box sx={style}>
-                    <Typography variant='h6' component="div">
-                        Chỉnh sửa câu hỏi
-                    </Typography>
+                setOpen={setOpen}
+                formDetail={formDetail}
+                excelData={excelData}
+                setExcelData={setExcelData}
+                fields={fields}
+                type={type}
+                setType={setType}
+                handleChangeType={handleChangeType}
+                myObject={myObject}
+                handleSubOpen={handleSubOpen}
+            />
 
-                    <Box component="form" sx={{ marginY: '10px', display: 'flex', alignItems: 'center' }}>
-                        <TextField
-                            required
-                            value={textFieldValue}
-                            onChange={handleTextFieldChange}
-                            sx={{ marginRight: '10px', width: '100%' }}
-                            id="outlined-basic"
-                            variant="outlined"
-                            placeholder='Nhập nội dung câu hỏi...'
-                        />
-                        <FormControl fullWidth>
-                            <InputLabel id="demo-simple-select-label">Dạng</InputLabel>
-                            <Select
-                                labelId="demo-simple-select-label"
-                                id="demo-simple-select"
-                                value={type}
-                                label="Dạng"
-                                onChange={handleChange}
-                            >
-                                <MenuItem value={'shortText'}>
-                                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                                        <NotesIcon sx={{ marginRight: '10px', color: '#6D7073' }} />
-                                        <ListItemText>
-                                            Điền ngắn
-                                        </ListItemText>
-                                    </div>
-                                </MenuItem>
-                                <MenuItem value={'multi-choice'}>
-                                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                                        <RadioButtonCheckedIcon sx={{ marginRight: '10px', color: '#6D7073' }} />
-                                        <ListItemText>
-                                            Trắc nghiệm
-                                        </ListItemText>
-                                    </div>
-                                </MenuItem>
-                                <MenuItem value={'checkbox'}>
-                                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                                        <CheckBoxIcon sx={{ marginRight: '10px', color: '#6D7073' }} />
-                                        <ListItemText>
-                                            Ô đánh dấu
-                                        </ListItemText>
-                                    </div>
-                                </MenuItem>
-                                <MenuItem value={'dropDown'}>
-                                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                                        <ArrowDropDownCircleIcon sx={{ marginRight: '10px', color: '#6D7073' }} />
-                                        <ListItemText>
-                                            Menu thả xuống
-                                        </ListItemText>
-                                    </div>
-                                </MenuItem>
-                                <MenuItem value={'datePicker'}>
-                                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                                        <EventIcon sx={{ marginRight: '10px', color: '#6D7073' }} />
-                                        <ListItemText>
-                                            Lịch
-                                        </ListItemText>
-                                    </div>
-                                </MenuItem>
-                                <MenuItem value={'linkedData'}>
-                                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                                        <DatasetLinkedIcon sx={{ marginRight: '10px', color: '#6D7073' }} />
-                                        <ListItemText>
-                                            Dữ liệu liên kết
-                                        </ListItemText>
-                                    </div>
-                                </MenuItem>
-                            </Select>
-                        </FormControl>
-                    </Box>
-                    {type === 'multi-choice' || type === 'checkbox' ?
-                        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                            {
-                                optionFieldValueArray.map((item, index) => (
-                                    <Box key={index} sx={{ display: 'flex', alignItems: 'center' }}>
-                                        {type === 'multi-choice' && <RadioButtonUncheckedIcon
-                                            sx={{ color: 'gray', marginRight: '10px' }}
-                                        />}
-                                        {type === 'checkbox' && <CheckBoxOutlineBlankIcon
-                                            sx={{ color: 'gray', marginRight: '10px' }}
-                                        />}
-                                        <TextField
-                                            value={index === active ? optionFieldValue : optionFieldValueArray[index]}
-                                            onChange={handleOptionFieldChange}
-                                            onBlur={saveOption(index)}
-                                            onClick={handleActive(index)}
-                                            sx={{ marginRight: '10px', width: '100%' }}
-                                            // id={index.toString()}
-                                            variant="standard"
-                                        />
-                                        <IconButton
-                                            // onClick={deleteQuestion(ques)}
-                                            sx={{
-                                                backgroundColor: '#white',
-                                                color: '#7B7B7B',
-                                                margin: '5px',
-                                                '&:hover': {
-                                                    backgroundColor: '#EBEBEB', // Màu nền thay đổi khi hover
-                                                },
-                                            }}>
-                                            <ClearIcon />
-                                        </IconButton>
-                                    </Box>
-                                ))
-                            }
-                            <Button
-                                sx={{ width: '30%', fontSize: '1.1rem', color: '#364F6B', paddingY: '10px', marginBottom: '10px', textTransform: 'initial', borderRadius: '20px' }}
-                                onClick={handleOption}
-                            >
-                                <AddIcon />
-                                Thêm lựa chọn
-                            </Button>
-                        </Box >
-                        : null
-                    }
-                    {type === 'shortText' ?
-                        <TextField disabled sx={{ width: '100%' }} id="standard-basic" label="Nhập câu trả lời" variant="standard" />
-                        : null
-                    }
-                    {type === 'dropDown' ?
-                        <Box>
-                            <Typography sx={{ color: '#6D7073', marginBottom: '15px' }}>Nhập <b>mỗi lựa chọn</b> là <b> một dòng</b></Typography>
-                            <TextField
-                                value={textInDropdown}
-                                onChange={handleTextInDropdown}
-                                id="outlined-multiline-flexible"
-                                multiline
-                                rows={5}
-                                sx={{ width: '100%' }}
-                            />
-                            <Button
-                                onClick={handleSubOpen}
-                                sx={{
-                                    color: 'white',
-                                    backgroundColor: '#364F6B',
-                                    borderRadius: '10px',
-                                    paddingY: '10px',
-                                    paddingX: '5px',
-                                    marginTop: '10px',
-                                    width: '100%',
-                                    '&:hover': {
-                                        backgroundColor: '#2E4155', // Màu nền thay đổi khi hover
-                                    }
-                                }}>
-                                Xử lý dữ liệu
-                            </Button>
-                        </Box>
-                        : null
-                    }
-                    {type === 'linkedData' ?
-                        <Box>
-                            <Box sx={{ color: '#6D7073', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                <Box sx={{ color: '#6D7073', display: 'flex', alignItems: 'center', flexDirection: 'row' }}>
-                                    <Typography>Nhập</Typography>
-                                    <Button
-                                        sx={{ color: '#364F6B', textTransform: 'lowercase', padding: 0, fontSize: '16px', paddingX: '3px' }}
-                                        component="label"
-                                    >
-                                        1 file excel
-                                        <input
-                                            onChange={handleFileChange}
-                                            type="file"
-                                            hidden
-                                        />
-                                    </Button>
-                                    <Typography>để thêm trường dữ liệu</Typography>
-                                </Box>
-                                <Box>
-                                    {typeError && <Alert severity="error">{typeError}</Alert>}
-                                    {file !== '' && <Alert severity="success">Chọn file thành công!</Alert>}
-                                </Box>
-                                {/* để thêm trường dữ liệu liên kết */}
-                            </Box>
-                            {file !== '' && <Button
-                                onClick={handleSubOpen}
-                                sx={{
-                                    color: 'white',
-                                    backgroundColor: '#364F6B',
-                                    borderRadius: '10px',
-                                    paddingY: '10px',
-                                    paddingX: '5px',
-                                    marginTop: '10px',
-                                    width: '100%',
-                                    textTransform: 'capitalize',
-                                    '&:hover': {
-                                        backgroundColor: '#2E4155', // Màu nền thay đổi khi hover
-                                    }
-                                }}>
-                                Xem  | Chỉnh sửa
-                            </Button>
-                            }
-                        </Box>
-                        : null
-                    }
+            <SubModal
+                subopen={subopen}
+                handleSubClose={handleSubClose}
+                excelData={excelData}
+                setExcelData={setExcelData}
+                optionInDropDown={optionInDropDown}
+                handleProcessRowUpdate={handleProcessRowUpdate}
+                columns={columns}
+                handleSaveLinkedData={handleSaveLinkedData}
+            />
 
-                    {type !== '' &&
-                        <Box>
-                            <Divider />
-                            <FormGroup sx={{ display: 'flex', flexDirection: 'row-reverse', marginTop: '5px' }}>
-                                <FormControlLabel control={<Switch checked={required}
-                                    onChange={handleChangeRequired} />} label="Bắt buộc"
-                                />
-                                {type === 'multi-choice' &&
-                                    <FormControlLabel control={<Switch defaultChecked={false} />} label="Nhiều lựa chọn"
-                                    />
-                                }
-                                {type === 'checkbox' &&
-                                    <FormControlLabel control={<Switch defaultChecked={false} />} label="Một lựa chọn"
-                                    />
-                                }
-                            </FormGroup>
-                        </Box>
-                    }
-
-                    <Box sx={{ display: 'flex', flexDirection: 'row-reverse' }} >
-                        <Button
-                            onClick={addQuestion}
-                            sx={{
-                                color: 'white',
-                                backgroundColor: '#364F6B',
-                                borderRadius: '10px',
-                                marginY: '10px',
-                                marginX: '5px',
-                                '&:hover': {
-                                    backgroundColor: '#2E4155', // Màu nền thay đổi khi hover
-                                },
-                            }}>
-                            Lưu
-                        </Button>
-                        <Button
-                            onClick={handleClose}
-                            sx={{
-                                color: '#000000',
-                                backgroundColor: '#E7E7E8',
-                                borderRadius: '10px',
-                                marginY: '10px',
-                                marginX: '5px',
-                                '&:hover': {
-                                    backgroundColor: '#E7E7E7', // Màu nền thay đổi khi hover
-                                },
-                            }}>
-                            Hủy
-                        </Button>
-                    </Box>
-                </Box>
-            </Modal>
-
-            {/* SubModal */}
-            <Modal
-                open={subopen !== ''}
-                onClose={handleSubClose}
-                aria-labelledby="modal-modal-title"
-                aria-describedby="modal-modal-description"
-            >
-                <Box sx={{ ...style, width: 800 }}>
-                    {subopen === 'linkedData' ?
-                        <Box>
-                            {excelData ? (
-                                <Box>
-                                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
-                                        <Typography variant='h6'>Trường dữ liệu đã tải lên</Typography>
-                                        <IconButton onClick={handleSubClose}>
-                                            <CloseIcon />
-                                        </IconButton>
-                                    </Box>
-                                    <Box sx={{ height: 400, width: '100%' }}>
-                                        <DataGrid
-                                            rows={excelData}
-                                            columns={columns}
-                                            processRowUpdate={handleProcessRowUpdate}
-                                            initialState={{
-                                                pagination: {
-                                                    paginationModel: {
-                                                        pageSize: 5,
-                                                    },
-                                                },
-                                            }}
-                                            pageSizeOptions={[5]}
-                                            checkboxSelection
-                                            disableRowSelectionOnClick
-                                        />
-                                    </Box>
-                                    <Button
-                                        onClick={handleSaveLinkedData}
-                                        sx={{
-                                            color: 'white',
-                                            backgroundColor: '#364F6B',
-                                            borderRadius: '10px',
-                                            marginTop: '10px',
-                                            marginX: '5px',
-                                            '&:hover': {
-                                                backgroundColor: '#2E4155', // Màu nền thay đổi khi hover
-                                            },
-                                        }}>
-                                        Lưu
-                                    </Button>
-                                </Box>
-                            ) : (
-                                <Typography>No File is uploaded yet!</Typography>
-                            )
-                            }
-                        </Box>
-                        : null}
-                    {subopen === 'dropDown' ?
-                        <Box>
-                            <Typography>Xác nhận các trường dữ liệu trong <b>Menu thả xuống</b> là:</Typography>
-                            {
-                                optionInDropDown.map((char, index) => (
-                                    <Typography sx={{ textAlign: 'center' }} key={index}> {char}</Typography>
-                                ))
-                            }
-                            <Box sx={{ display: 'flex', flexDirection: 'row-reverse' }} >
-                                <Button
-                                    onClick={handleSubClose}
-                                    sx={{
-                                        color: 'white',
-                                        backgroundColor: '#364F6B',
-                                        borderRadius: '10px',
-                                        margin: '5px',
-                                        '&:hover': {
-                                            backgroundColor: '#2E4155', // Màu nền thay đổi khi hover
-                                        },
-                                    }}>
-                                    Xác nhận
-                                </Button>
-                                <Button
-                                    onClick={handleSubClose}
-                                    sx={{
-                                        color: '#000000',
-                                        backgroundColor: '#E7E7E8',
-                                        borderRadius: '10px',
-                                        margin: '5px',
-                                        '&:hover': {
-                                            backgroundColor: '#E7E7E7', // Màu nền thay đổi khi hover
-                                        },
-                                    }}>
-                                    Hủy
-                                </Button>
-                            </Box>
-                        </Box>
-                        : null}
-                </Box>
-            </Modal>
         </Box >
     )
 }
