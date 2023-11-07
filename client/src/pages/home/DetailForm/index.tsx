@@ -270,9 +270,10 @@ function DetailForm() {
     const handleDuplicate = (ques: string, index: number) => (event: any) => {
         // Push index vào QuestionOrder
         const newIndex = formDetail.Questions.length;
-        formDetail.QuestionOrder.push(newIndex);
 
-        formDetail.Questions.splice(index + 1, 0, formDetail.Questions[ques])
+        formDetail.QuestionOrder.splice(index + 1, 0, newIndex);
+
+        formDetail.Questions.splice(newIndex, 0, formDetail.Questions[ques])
 
         if (duplicated === true) setDuplicate(false);
         else setDuplicate(true);
