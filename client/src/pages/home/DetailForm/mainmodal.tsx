@@ -45,9 +45,6 @@ const style = {
 };
 
 export function MainModal(props) {
-
-    console.log(props.fields)
-    
     const UpdateFormAPI_URL = `http://localhost:8080/update-form/${useParams()?.formID}`;
 
     //API PUT: Update form 
@@ -76,8 +73,6 @@ export function MainModal(props) {
         }
     };
 
-    console.log('re-render: MainModal')
-
     // Add question to a form 
     const addQuestion = async () => {
         const newQuestion: Question = {
@@ -97,7 +92,7 @@ export function MainModal(props) {
         props.formDetail.QuestionOrder.push(newIndex);
 
         // Lấy Object: Options có chứa Option[] và ImportedData
-        if (props.type === "multi-choice") {
+        if (props.type === "multi-choice" || props.type === "checkbox") {
             const updateMultiChoice: MultiChoice = {
                 MultiChoice: {
                     Options: optionFieldValueArray,
@@ -164,8 +159,12 @@ export function MainModal(props) {
     const handleTextFieldChange = (e) => setTextFieldValue(e.target.value);
 
     // Set question isRequired or not
-    const [required, setRequired] = useState(false);
+    const [required, setRequired] = useState(true);
     const handleChangeRequired = (e) => setRequired(!required);
+    const handleChangeType = (e) => {
+        if (props.type === 'multi-choice') props.setType('checkbox');
+        else if (props.type === 'checkbox') props.setType('multi-choice');
+    }
 
     // Xử lý câu hỏi multi-choice và checkbox
     const [optionFieldValue, setOptionFieldValue] = useState(''); //Lưu value của option
@@ -456,11 +455,15 @@ export function MainModal(props) {
                                     onChange={handleChangeRequired} />} label="Bắt buộc"
                                 />
                                 {props.type === 'multi-choice' &&
-                                    <FormControlLabel control={<Switch defaultChecked={false} />} label="Nhiều lựa chọn"
+                                    <FormControlLabel control={<Switch defaultChecked={false} 
+                                    onChange={handleChangeType}
+                                    />} label="Nhiều lựa chọn"
                                     />
                                 }
                                 {props.type === 'checkbox' &&
-                                    <FormControlLabel control={<Switch defaultChecked={false} />} label="Một lựa chọn"
+                                    <FormControlLabel control={<Switch defaultChecked={true}
+                                    onChange={handleChangeType} 
+                                    />} label="Nhiều lựa chọn"
                                     />
                                 }
                             </FormGroup>

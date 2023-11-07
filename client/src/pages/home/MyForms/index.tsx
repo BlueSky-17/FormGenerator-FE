@@ -306,7 +306,7 @@ function MyForms() {
                                                     '&:hover': {
                                                         backgroundColor: '#176B87', // Màu nền thay đổi khi hover
                                                     },
-                                                }}>
+                                                }} disabled>
                                                     <Typography sx={{ color: 'white', paddingX: '5px', paddingY: '2px' }} variant="body2" noWrap component="div">
                                                         Đang mở
                                                     </Typography>
@@ -318,7 +318,7 @@ function MyForms() {
                                                     '&:hover': {
                                                         backgroundColor: '#FF6969', // Màu nền thay đổi khi hover
                                                     },
-                                                }}>
+                                                }} disabled>
                                                     <Typography sx={{ color: 'white', paddingX: '10px', paddingY: '4px' }} variant="body2" noWrap component="div">
                                                         Đã đóng
                                                     </Typography>

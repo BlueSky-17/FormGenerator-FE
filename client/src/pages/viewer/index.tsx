@@ -125,7 +125,7 @@ function Form() {
         // Tránh push thêm khi re-render component 
         if (formDetail.QuestionOrder.length !== formResponses.length) {
             while (i < formDetail.QuestionOrder.length) {
-                if (formDetail.Questions[i].Type === "multi-choice") {
+                if (formDetail.Questions[i].Type === "multi-choice" || formDetail.Questions[i].Type === "checkbox") {
                     formResponses.push(
                         Responses(
                             formDetail.Questions[i].Question,
@@ -242,8 +242,8 @@ function Form() {
 
     return (
         <div>
-            <Box sx={{ backgroundColor: '#E9F2F4', border: "2px solid #DEDEDE", height: {height}, width: '100vw' }}>
-                <Box sx={{ backgroundColor: 'white', border: "2px solid #DEDEDE", borderRadius: '10px', marginX: '450px', marginTop: '70px' }}>
+            <Box sx={{ backgroundColor: '#E9F2F4', border: "2px solid #DEDEDE", height: { height }, width: '100vw' }}>
+                <Box sx={{ backgroundColor: 'white', border: "2px solid #DEDEDE", borderRadius: '10px', marginX: '30vw', marginTop: '70px' }}>
                     {/* Header of Form */}
                     <Box sx={{ textAlign: 'center', backgroundColor: '#008272', paddingY: '30px', borderRadius: '10px 10px 0 0' }}>
                         <Typography sx={{ color: 'white', padding: '15px', fontWeight: 600 }} variant="h4" noWrap component="div">
@@ -263,12 +263,19 @@ function Form() {
                                 key={index}
                             >
                                 {/* Câu hỏi */}
-                                <Typography
-                                    sx={{ color: '#008272', justifySelft: 'left', padding: '10px', fontWeight: 500 }} variant='h5' noWrap component="div">
-                                    {index + 1}. {formDetail.Questions[ques].Question}
-                                </Typography>
+                                <Box sx={{display:'flex'}}>
+                                    <Typography
+                                        sx={{ color: '#008272', justifySelft: 'left', padding: '10px', fontWeight: 500 }} variant='h5' noWrap component="div">
+                                        {index + 1}. {formDetail.Questions[ques].Question}
+                                    </Typography>
+                                    {
+                                        formDetail.Questions[ques].Required &&
+                                        <Typography sx={{color: 'red', fontSize:'20px'}}>*</Typography>
+                                    }
+                                </Box>
+
                                 {/* Nội dung | Dạng câu hỏi */}
-                                <Box sx={{display: 'flex', flexDirection:'column', marginX:'35px', marginY:'10px'}}>
+                                <Box sx={{ display: 'flex', flexDirection: 'column', marginX: '35px', marginY: '10px' }}>
                                     {formDetail.Questions[ques].Type === 'multi-choice' ?
                                         <FormControl sx={{ marginLeft: '15px' }}>
                                             <RadioGroup
@@ -293,10 +300,16 @@ function Form() {
                                     }
                                     {formDetail.Questions[ques].Type === 'checkbox' ?
                                         <FormControl sx={{ marginLeft: '15px' }}>
-                                            {/* <FormLabel id="demo-radio-buttons-group-label">Gender</FormLabel> */}
-                                            <FormControlLabel control={<Checkbox defaultChecked />} label="Label" />
-                                            <FormControlLabel required control={<Checkbox />} label="Required" />
-                                            <FormControlLabel disabled control={<Checkbox />} label="Disabled" />
+                                            {formDetail.Questions[ques].Content.MultiChoice.Options.map((item, index) => (
+                                                <FormControlLabel
+                                                    key={index}
+                                                    // checked={selectedValue === item}
+                                                    // onChange={handleChange(ques, index)}
+                                                    value={item}
+                                                    control={<Checkbox />}
+                                                    label={item}
+                                                />
+                                            ))}
                                         </FormControl>
                                         : null
                                     }
@@ -407,7 +420,7 @@ function Form() {
                     <Button
                         onClick={handleSubmitForm}
                         sx={{
-                            background: '#008272', color: 'white', marginRight: '450px', marginBottom: '30px', marginTop: '30px', width: '100px', height: '50px', '&:hover': {
+                            background: '#008272', color: 'white', marginRight: '30vw', marginBottom: '30px', marginTop: '30px', width: '100px', height: '50px', '&:hover': {
                                 backgroundColor: '#008272', // Màu nền thay đổi khi hover
                                 color: 'white'
                             },
