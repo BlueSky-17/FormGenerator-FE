@@ -14,6 +14,7 @@ import ArrowDropDownCircleIcon from '@mui/icons-material/ArrowDropDownCircle';
 import CloseIcon from '@mui/icons-material/Close';
 import AddIcon from '@mui/icons-material/Add';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
+import AttachFileIcon from '@mui/icons-material/AttachFile';
 
 import TextField from '@mui/material/TextField';
 import InputLabel from '@mui/material/InputLabel';
@@ -304,6 +305,14 @@ export function MainModal(props) {
                                         <EventIcon sx={{ marginRight: '10px', color: '#6D7073' }} />
                                         <ListItemText>
                                             Lịch
+                                        </ListItemText>
+                                    </div>
+                                </MenuItem>
+                                <MenuItem value={'file'}>
+                                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                                        <AttachFileIcon sx={{ marginRight: '10px', color: '#6D7073' }} />
+                                        <ListItemText>
+                                            File
                                         </ListItemText>
                                     </div>
                                 </MenuItem>

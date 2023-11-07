@@ -264,18 +264,25 @@ function DetailForm() {
         navigate('/form/' + formDetail.id + '/view');
     };
 
-    const [duplicated, setDuplicate] = React.useState('');
-    // const handleDuplicate = (id_: string, index: number) => (event: any) => {
-    //     // console.log(rows, id_, index);
-    //     let temp = rows.filter(row => row.id === id_);
-    //     let result = temp[0];
-    //     temp = [];
-    //     // console.log(result);
-    //     rows.splice(index + 1, 0, createData(uuid(), result.title, result.type, result.note, result.isHead, false));
-    //     setDuplicate(rows[index].id);
-    // }
+    // Duplicate Question
+    const [duplicated, setDuplicate] = React.useState(true);
+    const handleDuplicate = (ques: string, index: number) => (event: any) => {
+        // Push index vào QuestionOrder
+        const newIndex = formDetail.Questions.length;
+        formDetail.QuestionOrder.push(newIndex);
 
-    const [swaped, setSwap] = React.useState('');
+        formDetail.Questions.splice(index + 1, 0, formDetail.Questions[ques])
+
+        if (duplicated === true) setDuplicate(false);
+        else setDuplicate(true);
+        updateObjectInDatabase({
+            "questionOrder": formDetail.QuestionOrder,
+            "questions": formDetail.Questions
+        })
+    }
+
+    // Swap Question
+    const [swaped, setSwap] = React.useState(true);
     function swapElements<T>(arr: T[], index: number): T[] {
         // Kiểm tra xem index có hợp lệ không
         if (index < 0 || index >= arr.length - 1) {
@@ -290,11 +297,27 @@ function DetailForm() {
 
         return arr;
     }
-    // const handleSwap = (id_: string, index: number) => (event: any) => {
-    //     rows = swapElements(rows, index);
-    //     console.log(rows[index].title)
-    //     setSwap(rows[index].id);
-    // }
+    const handleSwapDown = (ques: string, index: number) => (event: any) => {
+        formDetail.QuestionOrder = swapElements(formDetail.QuestionOrder, index);
+        // console.log(formDetail.QuestionOrder)
+        if (swaped === true) setSwap(false);
+        else setSwap(true);
+        updateObjectInDatabase({
+            "questionOrder": formDetail.QuestionOrder,
+            "questions": formDetail.Questions
+        })
+    }
+    const handleSwapUp = (ques: string, index: number) => (event: any) => {
+        console.log(formDetail.QuestionOrder)
+        formDetail.QuestionOrder = swapElements(formDetail.QuestionOrder, index - 1);
+        console.log(formDetail.QuestionOrder)
+        if (swaped === true) setSwap(false);
+        else setSwap(true);
+        updateObjectInDatabase({
+            "questionOrder": formDetail.QuestionOrder,
+            "questions": formDetail.Questions
+        })
+    }
 
     // Tùy chỉnh nút Settings
     const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
@@ -448,7 +471,7 @@ function DetailForm() {
                                                     <EditIcon />
                                                 </IconButton>
                                                 <IconButton
-                                                    // onClick={handleDuplicate(row.id, index)}
+                                                    onClick={handleDuplicate(ques, index)}
                                                     sx={{
                                                         backgroundColor: '#364F6B',
                                                         color: 'white',
@@ -460,7 +483,19 @@ function DetailForm() {
                                                     <ContentCopyIcon />
                                                 </IconButton>
                                                 <IconButton
-                                                    // onClick={handleSwap(row.id, index)}
+                                                    onClick={handleSwapUp(ques, index)}
+                                                    sx={{
+                                                        backgroundColor: '#364F6B',
+                                                        color: 'white',
+                                                        margin: '5px',
+                                                        '&:hover': {
+                                                            backgroundColor: '#176B87', // Màu nền thay đổi khi hover
+                                                        },
+                                                    }}>
+                                                    <ArrowCircleUpIcon />
+                                                </IconButton>
+                                                <IconButton
+                                                    onClick={handleSwapDown(ques, index)}
                                                     sx={{
                                                         backgroundColor: '#364F6B',
                                                         color: 'white',
@@ -471,16 +506,7 @@ function DetailForm() {
                                                     }}>
                                                     <ArrowCircleDownIcon />
                                                 </IconButton>
-                                                <IconButton sx={{
-                                                    backgroundColor: '#364F6B',
-                                                    color: 'white',
-                                                    margin: '5px',
-                                                    '&:hover': {
-                                                        backgroundColor: '#176B87', // Màu nền thay đổi khi hover
-                                                    },
-                                                }}>
-                                                    <ArrowCircleUpIcon />
-                                                </IconButton>
+
                                                 <IconButton
                                                     onClick={deleteQuestion(ques)}
                                                     sx={{
