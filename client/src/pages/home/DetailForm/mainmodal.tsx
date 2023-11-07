@@ -77,9 +77,9 @@ export function MainModal(props) {
     // Add question to a form 
     const addQuestion = async () => {
         const newQuestion: Question = {
-            Question: textFieldValue,
+            Question: props.titleQuestion,
             Description: "",
-            Required: required,
+            Required: props.required,
             ImagePath: "",
             Type: props.type,
             Content: {}
@@ -136,13 +136,31 @@ export function MainModal(props) {
         handleClose();
     };
 
+    // Save question after Edit
+    const saveQuestion = () => {
+        props.formDetail.Questions[props.quesEdit].Type = props.type;
+        props.formDetail.Questions[props.quesEdit].Question = props.titleQuestion;
+        props.formDetail.Questions[props.quesEdit].Required = props.required;
+
+        if (props.type === "multi-choice" || props.type === "checkbox") {
+            props.formDetail.Questions[props.quesEdit].Content.Options = props.optionList;
+        }
+
+        updateObjectInDatabase({
+            "questionOrder": props.formDetail.QuestionOrder,
+            "questions": props.formDetail.Questions
+        })
+
+        handleClose();
+    }
+
     // Close MainModal Edit
     const handleClose = () => {
         props.setOpen(false);
 
         // return default value when open modal: type and title
         props.setType('');
-        setTextFieldValue('');
+        props.setTitleQuestion('');
 
         // return default value when open modal: multi-choice TYPE
         if (props.type === "multi-choice" || props.type === "checkbox") {
@@ -155,13 +173,14 @@ export function MainModal(props) {
         }
     }
 
-    // Set title of question
-    const [textFieldValue, setTextFieldValue] = useState('');
-    const handleTextFieldChange = (e) => setTextFieldValue(e.target.value);
+    // Get Type of question
+    const handleChangeType = (event: SelectChangeEvent) => props.setType(event.target.value as string);
 
-    // Set question isRequired or not
-    const [required, setRequired] = useState(false);
-    const handleChangeRequired = (e) => setRequired(!required);
+    // Get Title of question 
+    const handleTitleQuestion = (e) => props.setTitleQuestion(e.target.value);
+
+    // Get question isRequired or not
+    const handleChangeRequired = (e) => props.setRequired(!props.required);
 
     // convert Multi-choice <-> Checkbox
     const convertType = (e) => {
@@ -171,7 +190,7 @@ export function MainModal(props) {
 
     // Xử lý câu hỏi multi-choice và checkbox
     const [optionValue, setOptionValue] = useState(''); //Lưu value của option
-   
+
     const handleOptionChange = (e) => {
         setOptionValue(e.target.value);
     };
@@ -252,8 +271,8 @@ export function MainModal(props) {
                     <Box component="form" sx={{ marginY: '10px', display: 'flex', alignItems: 'center' }}>
                         <TextField
                             required
-                            value={textFieldValue}
-                            onChange={handleTextFieldChange}
+                            value={props.titleQuestion}
+                            onChange={handleTitleQuestion}
                             sx={{ marginRight: '10px', width: '100%' }}
                             id="outlined-basic"
                             variant="outlined"
@@ -266,7 +285,7 @@ export function MainModal(props) {
                                 id="demo-simple-select"
                                 value={props.type}
                                 label="Dạng"
-                                onChange={props.handleChangeType}
+                                onChange={handleChangeType}
                             >
                                 <MenuItem value={'shortText'}>
                                     <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -465,7 +484,7 @@ export function MainModal(props) {
                         <Box>
                             <Divider />
                             <FormGroup sx={{ display: 'flex', flexDirection: 'row-reverse', marginTop: '5px' }}>
-                                <FormControlLabel control={<Switch checked={required}
+                                <FormControlLabel control={<Switch checked={props.required}
                                     onChange={handleChangeRequired} />} label="Bắt buộc"
                                 />
                                 {props.type === 'multi-choice' &&
@@ -485,7 +504,7 @@ export function MainModal(props) {
                     }
 
                     <Box sx={{ display: 'flex', flexDirection: 'row-reverse' }} >
-                        <Button
+                        {props.quesEdit === '-1' ? <Button
                             onClick={addQuestion}
                             sx={{
                                 color: 'white',
@@ -498,7 +517,21 @@ export function MainModal(props) {
                                 },
                             }}>
                             Lưu
-                        </Button>
+                        </Button> :
+                            <Button
+                                onClick={saveQuestion}
+                                sx={{
+                                    color: 'white',
+                                    backgroundColor: '#364F6B',
+                                    borderRadius: '10px',
+                                    marginY: '10px',
+                                    marginX: '5px',
+                                    '&:hover': {
+                                        backgroundColor: '#2E4155', // Màu nền thay đổi khi hover
+                                    },
+                                }}>
+                                Lưu
+                            </Button>}
                         <Button
                             onClick={handleClose}
                             sx={{

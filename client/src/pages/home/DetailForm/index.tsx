@@ -90,14 +90,21 @@ function DetailForm() {
         }
     };
 
+    // Navigate to view form page
+    const navigate = useNavigate();
+    const viewForm = () => {
+        navigate('/form/' + formDetail.id + '/view');
+    };
+
     // View Edit-Page or Responses
     const [typeView, setTypeView] = useState('ViewEdit'); //ViewEdit or ViewResponses
     const changeToViewEdit = () => setTypeView('ViewEdit')
     const changeToViewResponses = () => setTypeView('ViewResponses')
 
-    // Set type of question
+    // Set type, title, required of question
     const [type, setType] = React.useState('');
-    const handleChangeType = (event: SelectChangeEvent) => setType(event.target.value as string);
+    const [titleQuestion, setTitleQuestion] = useState('');
+    const [required, setRequired] = useState(false);
 
     // Close/Open Main Modal 
     const [open, setOpen] = useState(false);
@@ -235,7 +242,7 @@ function DetailForm() {
 
     console.log(formDetail);
 
-    // Delete question in a form 
+    // Delete Question 
     const [deleted, setDelete] = React.useState(false);
     const deleteQuestion = (index: string) => (event: any) => {
         // Xóa 1 phần tử ở vị trí index
@@ -256,12 +263,6 @@ function DetailForm() {
             "questionOrder": formDetail.QuestionOrder,
             "questions": formDetail.Questions
         })
-    };
-
-    // Navigate to view form page
-    const navigate = useNavigate();
-    const viewForm = () => {
-        navigate('/form/' + formDetail.id + '/view');
     };
 
     // Duplicate Question
@@ -317,6 +318,20 @@ function DetailForm() {
             "questionOrder": formDetail.QuestionOrder,
             "questions": formDetail.Questions
         })
+    }
+
+    // Edit Question
+    const [quesEdit, setQuesEdit] = React.useState('-1');
+    const editQuestion = (ques: string, index: string) => (event: any) => {
+        setOpen(true);
+        setType(formDetail.Questions[ques].Type);
+        setTitleQuestion(formDetail.Questions[ques].Question)
+        setRequired(formDetail.Questions[ques].Required);
+
+        if (formDetail.Questions[ques].Type === 'multi-choice' || formDetail.Questions[ques].Type === 'checkbox')
+            setOptionList(formDetail.Questions[ques].Content.MultiChoice.Options)
+
+        setQuesEdit(ques);
     }
 
     // Tùy chỉnh nút Settings
@@ -459,7 +474,7 @@ function DetailForm() {
                                             <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="left">{formDetail.Questions[ques].Description}</TableCell>
                                             <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="center">
                                                 <IconButton
-                                                    onClick={handleOpen}
+                                                    onClick={editQuestion(ques, index)}
                                                     sx={{
                                                         backgroundColor: '#364F6B',
                                                         color: 'white',
@@ -557,7 +572,10 @@ function DetailForm() {
                 formDetail={formDetail}
                 type={type}
                 setType={setType}
-                handleChangeType={handleChangeType}
+                titleQuestion={titleQuestion}
+                setTitleQuestion={setTitleQuestion}
+                required={required}
+                setRequired={setRequired}
 
                 excelData={excelData}
                 setExcelData={setExcelData}
@@ -566,6 +584,7 @@ function DetailForm() {
                 handleSubOpen={handleSubOpen}
                 optionList={optionList}
                 setOptionList={setOptionList}
+                quesEdit={quesEdit}
             />
 
             <SubModal
