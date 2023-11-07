@@ -2,6 +2,7 @@ import React, { useState, useEffect, useLayoutEffect } from 'react'
 
 import { Box, Typography, Drawer, Avatar, IconButton, Toolbar, List, Divider, Icon, Modal, Grid, Switch } from '@mui/material'
 import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
 
 import CloseIcon from '@mui/icons-material/Close';
 
@@ -12,8 +13,8 @@ const style = {
     position: 'fixed',
     top: '15%',
     left: '50%',
-    marginLeft: '-350px',
-    width: 700,
+    marginLeft: '-400px',
+    width: 800,
     bgcolor: 'background.paper',
     border: '1px solid #000',
     borderRadius: '15px',
@@ -22,6 +23,12 @@ const style = {
 };
 
 export function SubModal(props) {
+
+    const solveMultiOptions = () => {
+        props.convertTextToOptionList(props.inputText);
+        props.setInputText('');
+    }
+
     return (
         <div>
             <Modal
@@ -30,7 +37,36 @@ export function SubModal(props) {
                 aria-labelledby="modal-modal-title"
                 aria-describedby="modal-modal-description"
             >
-                <Box sx={{ ...style, width: 800 }}>
+                <Box sx={{ ...style }}>
+                    {props.subopen === 'multi-choice' || props.subopen === 'checkbox' ?
+                        <Box>
+                            <Typography sx={{ color: '#6D7073', marginBottom: '15px' }}>Nhập <b>mỗi lựa chọn</b> là <b> một dòng</b></Typography>
+                            <TextField
+                                value={props.inputText}
+                                onChange={props.handleInputText}
+                                id="outlined-multiline-flexible"
+                                multiline
+                                rows={8}
+                                sx={{ width: '100%' }}
+                            />
+                            <Button
+                                onClick={solveMultiOptions}
+                                sx={{
+                                    color: 'white',
+                                    backgroundColor: '#364F6B',
+                                    borderRadius: '10px',
+                                    paddingY: '10px',
+                                    paddingX: '5px',
+                                    marginTop: '10px',
+                                    width: '100%',
+                                    '&:hover': {
+                                        backgroundColor: '#2E4155', // Màu nền thay đổi khi hover
+                                    }
+                                }}>
+                                Xử lý dữ liệu
+                            </Button>
+                        </Box>
+                        : null}
                     {props.subopen === 'linkedData' ?
                         <Box>
                             {props.excelData ? (

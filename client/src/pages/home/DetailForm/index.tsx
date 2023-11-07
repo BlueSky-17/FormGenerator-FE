@@ -40,17 +40,13 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 }));
 
 function DetailForm() {
-    const [typeView, setTypeView] = useState('ViewEdit'); //ViewEdit or ViewResponses
-    const changeToViewEdit = () => setTypeView('ViewEdit')
-    const changeToViewResponses = () => setTypeView('ViewResponses')
-
     const [formDetail, setFormDetail] = useState<any>({})
 
     const FormDetailAPI_URL = `http://localhost:8080/form/${useParams()?.formID}`;
 
     const UpdateFormAPI_URL = `http://localhost:8080/update-form/${useParams()?.formID}`;
 
-    //API GET: Get detail of form
+    // API GET: Get detail of form
     useEffect(() => {
         console.log(FormDetailAPI_URL);
 
@@ -68,7 +64,7 @@ function DetailForm() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
-    //API PUT: Update form 
+    // API PUT: Update form 
     const updateObjectInDatabase = async (updateData) => {
         try {
             const response = await fetch(UpdateFormAPI_URL, {
@@ -94,15 +90,20 @@ function DetailForm() {
         }
     };
 
-    // Đóng/Mở Modal edit form
-    const [open, setOpen] = useState(false);
-    const handleOpen = () => setOpen(true);
+    // View Edit-Page or Responses
+    const [typeView, setTypeView] = useState('ViewEdit'); //ViewEdit or ViewResponses
+    const changeToViewEdit = () => setTypeView('ViewEdit')
+    const changeToViewResponses = () => setTypeView('ViewResponses')
 
     // Set type of question
     const [type, setType] = React.useState('');
     const handleChangeType = (event: SelectChangeEvent) => setType(event.target.value as string);
 
-    // Đóng/Mở Submodal edit form (using with linked-data type)
+    // Close/Open Main Modal 
+    const [open, setOpen] = useState(false);
+    const handleOpen = () => setOpen(true);
+
+    // Close/Open Sub Modal
     const [subopen, setSubOpen] = React.useState('');
     const handleSubOpen = (e) => {
         if (type === 'linkedData') {
@@ -127,8 +128,9 @@ function DetailForm() {
         }
         else if (type === 'dropDown') {
             setSubOpen('dropDown')
-            solveTextInDropDown(textInDropdown);
+            convertTextToOptionList(inputText);
         }
+        else if (type === 'multi-choice' || type === 'checkbox') setSubOpen('multi-choice')
     }
     const handleSubClose = () => {
         setSubOpen('');
@@ -217,15 +219,18 @@ function DetailForm() {
         return updatedRow;
     };
 
-    const [textInDropdown, setTextInDropdown] = useState('');
-    const handleTextInDropdown = (e) => {
-        setTextInDropdown(e.target.value)
+    // Get text in InputBox (include '\n')
+    const [inputText, setInputText] = useState('');
+    const handleInputText = (e) => {
+        setInputText(e.target.value)
     }
 
-    const [optionInDropDown, setOptionInDropdown] = useState<string[]>([]);
-    const solveTextInDropDown = (textInDropDown: string) => {
-        const myDropdown = textInDropDown.split('\n');
-        setOptionInDropdown(myDropdown);
+    // Option List
+    const [optionList, setOptionList] = useState<string[]>(['']); //Mảng lưu value các option
+    const convertTextToOptionList = (inputText: string) => {
+        const myDropdown = inputText.split('\n');
+        setOptionList(myDropdown)
+        setSubOpen('')
     }
 
     console.log(formDetail);
@@ -255,13 +260,11 @@ function DetailForm() {
 
     // Navigate to view form page
     const navigate = useNavigate();
-
     const viewForm = () => {
         navigate('/form/' + formDetail.id + '/view');
     };
 
     const [duplicated, setDuplicate] = React.useState('');
-
     // const handleDuplicate = (id_: string, index: number) => (event: any) => {
     //     // console.log(rows, id_, index);
     //     let temp = rows.filter(row => row.id === id_);
@@ -273,7 +276,6 @@ function DetailForm() {
     // }
 
     const [swaped, setSwap] = React.useState('');
-
     function swapElements<T>(arr: T[], index: number): T[] {
         // Kiểm tra xem index có hợp lệ không
         if (index < 0 || index >= arr.length - 1) {
@@ -288,7 +290,6 @@ function DetailForm() {
 
         return arr;
     }
-
     // const handleSwap = (id_: string, index: number) => (event: any) => {
     //     rows = swapElements(rows, index);
     //     console.log(rows[index].title)
@@ -354,7 +355,7 @@ function DetailForm() {
                 <Divider />
 
                 {/*Tabs: Chỉnh sửa & Xem phản hồi*/}
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding:'3px', borderBottom: "10px solid #364F6B" }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '3px', borderBottom: "10px solid #364F6B" }}>
                     {typeView === 'ViewEdit' &&
                         <Button
                             sx={{
@@ -404,13 +405,13 @@ function DetailForm() {
                     <Box sx={{ margin: '15px' }}>
 
                         {/* Form Description */}
-                        <Typography sx={{marginBottom:'10px'}} variant='body1' component="div">
+                        <Typography sx={{ marginBottom: '10px' }} variant='body1' component="div">
                             {Object.keys(formDetail).length !== 0 ? formDetail.header.Description : null}
                         </Typography>
 
-                        <Divider/>
+                        <Divider />
 
-                        <TableContainer component={Paper} sx={{marginTop:'10px'}}>
+                        <TableContainer component={Paper} sx={{ marginTop: '10px' }}>
                             <Table sx={{ minWidth: 650 }} aria-label="simple table">
                                 <TableHead>
                                     <TableRow>
@@ -519,7 +520,7 @@ function DetailForm() {
                         </Box>
                     </Box>}
             </Box >
-            
+
             {typeView === 'ViewResponses' &&
                 <Responses />
             }
@@ -528,14 +529,17 @@ function DetailForm() {
                 open={open}
                 setOpen={setOpen}
                 formDetail={formDetail}
-                excelData={excelData}
-                setExcelData={setExcelData}
-                fields={fields}
                 type={type}
                 setType={setType}
                 handleChangeType={handleChangeType}
+
+                excelData={excelData}
+                setExcelData={setExcelData}
+                fields={fields}
                 myObject={myObject}
                 handleSubOpen={handleSubOpen}
+                optionList={optionList}
+                setOptionList={setOptionList}
             />
 
             <SubModal
@@ -543,10 +547,13 @@ function DetailForm() {
                 handleSubClose={handleSubClose}
                 excelData={excelData}
                 setExcelData={setExcelData}
-                optionInDropDown={optionInDropDown}
                 handleProcessRowUpdate={handleProcessRowUpdate}
                 columns={columns}
                 handleSaveLinkedData={handleSaveLinkedData}
+                inputText={inputText}
+                setInputText={setInputText}
+                handleInputText={handleInputText}
+                convertTextToOptionList={convertTextToOptionList}
             />
 
         </Box >

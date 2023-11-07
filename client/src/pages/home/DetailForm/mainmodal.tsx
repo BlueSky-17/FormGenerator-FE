@@ -95,7 +95,7 @@ export function MainModal(props) {
         if (props.type === "multi-choice" || props.type === "checkbox") {
             const updateMultiChoice: MultiChoice = {
                 MultiChoice: {
-                    Options: optionFieldValueArray,
+                    Options: props.optionList,
                     ImportedData: ''
                 }
             };
@@ -145,7 +145,7 @@ export function MainModal(props) {
 
         // return default value when open modal: multi-choice TYPE
         if (props.type === "multi-choice" || props.type === "checkbox") {
-            setOptionFieldValueArray(['']);
+            props.setOptionList(['']);
             setActive(-1);
         }
         else if (props.type === "linkedData") {
@@ -159,34 +159,36 @@ export function MainModal(props) {
     const handleTextFieldChange = (e) => setTextFieldValue(e.target.value);
 
     // Set question isRequired or not
-    const [required, setRequired] = useState(true);
+    const [required, setRequired] = useState(false);
     const handleChangeRequired = (e) => setRequired(!required);
-    const handleChangeType = (e) => {
+
+    // convert Multi-choice <-> Checkbox
+    const convertType = (e) => {
         if (props.type === 'multi-choice') props.setType('checkbox');
         else if (props.type === 'checkbox') props.setType('multi-choice');
     }
 
     // Xử lý câu hỏi multi-choice và checkbox
-    const [optionFieldValue, setOptionFieldValue] = useState(''); //Lưu value của option
-    const [optionFieldValueArray, setOptionFieldValueArray] = useState<string[]>(['']); //Lưu value của mảng các option
-    const handleOptionFieldChange = (e) => {
-        setOptionFieldValue(e.target.value);
+    const [optionValue, setOptionValue] = useState(''); //Lưu value của option
+   
+    const handleOptionChange = (e) => {
+        setOptionValue(e.target.value);
     };
 
     // active === index thì value của TextField sẽ thay đổi
     const [active, setActive] = useState<number>(-1);
     const handleActive = (index: number) => (e) => {
         setActive(index);
-        setOptionFieldValue(optionFieldValueArray[index]);
+        setOptionValue(props.optionList[index]);
     }
 
     // Khi onBlur thì sẽ lưu value vào mảng options[]
-    const saveOption = (index: number) => (e) => optionFieldValueArray[index] = optionFieldValue;
+    const saveOption = (index: number) => (e) => props.optionList[index] = optionValue;
 
     // Thêm option trống 
-    const handleOption = () => setOptionFieldValueArray([...optionFieldValueArray, ''])
+    const handleOption = () => props.setOptionList([...props.optionList, ''])
 
-    //Tùy chỉnh file: onchange state
+    // Process file -> linkedData
     const [file, setFile] = useState<string>('');
     const handleFileChange = (e) => {
         let fileType = ['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'text/csv'];
@@ -231,13 +233,7 @@ export function MainModal(props) {
         }
 
     };
-    const [typeError, setTypeError] = useState<string>();
-    //submit state
-
-    const [textInDropdown, setTextInDropdown] = useState('');
-    const handleTextInDropdown = (e) => {
-        setTextInDropdown(e.target.value)
-    }
+    const [typeError, setTypeError] = useState<string>(); //Display error when upload invalid file
 
     return (
         <div>
@@ -325,7 +321,7 @@ export function MainModal(props) {
                     {props.type === 'multi-choice' || props.type === 'checkbox' ?
                         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                             {
-                                optionFieldValueArray.map((item, index) => (
+                                props.optionList.map((item, index) => (
                                     <Box key={index} sx={{ display: 'flex', alignItems: 'center' }}>
                                         {props.type === 'multi-choice' && <RadioButtonUncheckedIcon
                                             sx={{ color: 'gray', marginRight: '10px' }}
@@ -334,8 +330,8 @@ export function MainModal(props) {
                                             sx={{ color: 'gray', marginRight: '10px' }}
                                         />}
                                         <TextField
-                                            value={index === active ? optionFieldValue : optionFieldValueArray[index]}
-                                            onChange={handleOptionFieldChange}
+                                            value={index === active ? optionValue : props.optionList[index]}
+                                            onChange={handleOptionChange}
                                             onBlur={saveOption(index)}
                                             onClick={handleActive(index)}
                                             sx={{ marginRight: '10px', width: '100%' }}
@@ -357,13 +353,22 @@ export function MainModal(props) {
                                     </Box>
                                 ))
                             }
-                            <Button
-                                sx={{ width: '30%', fontSize: '1.1rem', color: '#364F6B', paddingY: '10px', marginBottom: '10px', textTransform: 'initial', borderRadius: '20px' }}
-                                onClick={handleOption}
-                            >
-                                <AddIcon />
-                                Thêm lựa chọn
-                            </Button>
+                            <Box>
+                                <Button
+                                    sx={{ width: '30%', fontSize: '1.1rem', color: '#364F6B', paddingY: '10px', marginBottom: '10px', textTransform: 'initial', borderRadius: '20px' }}
+                                    onClick={handleOption}
+                                >
+                                    <AddIcon />
+                                    Thêm lựa chọn
+                                </Button>
+                                <Button
+                                    sx={{ width: '40%', fontSize: '1.1rem', color: '#364F6B', paddingY: '10px', marginBottom: '10px', textTransform: 'initial', borderRadius: '20px' }}
+                                    onClick={props.handleSubOpen}
+                                >
+                                    <AddIcon />
+                                    Thêm nhiều lựa chọn
+                                </Button>
+                            </Box>
                         </Box >
                         : null
                     }
@@ -375,8 +380,8 @@ export function MainModal(props) {
                         <Box>
                             <Typography sx={{ color: '#6D7073', marginBottom: '15px' }}>Nhập <b>mỗi lựa chọn</b> là <b> một dòng</b></Typography>
                             <TextField
-                                value={textInDropdown}
-                                onChange={handleTextInDropdown}
+                                value={props.inputText}
+                                onChange={props.handleInputText}
                                 id="outlined-multiline-flexible"
                                 multiline
                                 rows={5}
@@ -455,14 +460,14 @@ export function MainModal(props) {
                                     onChange={handleChangeRequired} />} label="Bắt buộc"
                                 />
                                 {props.type === 'multi-choice' &&
-                                    <FormControlLabel control={<Switch defaultChecked={false} 
-                                    onChange={handleChangeType}
+                                    <FormControlLabel control={<Switch defaultChecked={false}
+                                        onChange={convertType}
                                     />} label="Nhiều lựa chọn"
                                     />
                                 }
                                 {props.type === 'checkbox' &&
                                     <FormControlLabel control={<Switch defaultChecked={true}
-                                    onChange={handleChangeType} 
+                                        onChange={convertType}
                                     />} label="Nhiều lựa chọn"
                                     />
                                 }
