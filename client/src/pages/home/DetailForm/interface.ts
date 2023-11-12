@@ -17,7 +17,7 @@ export interface MultiChoice {
 
 // Content for multi-choice TYPE
 export interface ShortText {
-    shortText: string
+    shortText: boolean
 }
 
 // Content for date TYPE

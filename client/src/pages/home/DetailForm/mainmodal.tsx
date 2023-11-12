@@ -105,7 +105,7 @@ export function MainModal(props) {
         }
         else if (props.type === "shortText") {
             const updateShortText: ShortText = {
-                shortText: ''
+                shortText: true
             };
 
             Object.assign(props.formDetail.Questions[newIndex].Content, updateShortText);
@@ -143,8 +143,10 @@ export function MainModal(props) {
         props.formDetail.Questions[props.quesEdit].Required = props.required;
 
         if (props.type === "multi-choice" || props.type === "checkbox") {
-            props.formDetail.Questions[props.quesEdit].Content.Options = props.optionList;
+            props.formDetail.Questions[props.quesEdit].Content.MultiChoice.Options = props.optionList;
         }
+
+        // console.log(props.formDetail.Questions[props.quesEdit].Content)
 
         updateObjectInDatabase({
             "questionOrder": props.formDetail.QuestionOrder,

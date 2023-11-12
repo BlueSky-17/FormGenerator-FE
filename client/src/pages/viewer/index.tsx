@@ -37,6 +37,36 @@ import Autocomplete from '@mui/material/Autocomplete';
 import { useParams } from 'react-router-dom';
 import { stringify } from 'querystring';
 
+async function getNewToken(refreshToken, user) {
+    const refreshTokenEndpoint = 'http://localhost:8080/refresh';
+
+    try {
+        const response = await fetch(refreshTokenEndpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                refreshToken: refreshToken,
+            }),
+        });
+
+        // Kiểm tra xem yêu cầu có thành công hay không
+        if (response.ok) {
+            // Đọc nội dung của Response và chuyển đổi thành JSON
+            const data = await response.json();
+            data.user = user;
+            return data;
+        } else {
+            console.error('Failed to refresh access token');
+            return null;
+        }
+    } catch (error) {
+        console.error('Error refreshing access token:', error);
+        return null;
+    }
+}
+
 function Responses(
     questionName: string,
     type: string,
@@ -46,7 +76,10 @@ function Responses(
 }
 
 function addResultMultiChoice(
-    multiChoice: string
+    multiChoice: {
+        options: string[],
+        result: boolean[]
+    }
 ) {
     return { multiChoice }
 }
@@ -69,28 +102,58 @@ function addResultDate(
     return { date }
 }
 
-function Form() {
+function Form({ getToken }) {
+    // render: use to re-render after create or delete form
+    const [render, setRender] = useState(false);
+
     const [formDetail, setFormDetail] = useState<any>({})
     const [formResponses, setFormResponse] = useState<any[]>([])
 
     const FormDetailAPI_URL = `http://localhost:8080/form/${useParams()?.formID}`;
     const ResponseAPI_URL = `http://localhost:8080/form-response/${useParams()?.formID}`;
 
-    //API GET: get detail of form 
+    // API GET: Get detail of form
     useEffect(() => {
-        fetch(FormDetailAPI_URL, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + JSON.parse(sessionStorage.getItem('token') as string)?.accessToken
-            }
-        })
-            .then(data => data.json())
-            .then(formDetail => {
+        const fetchData = async () => {
+            try {
+                const response = await fetch(FormDetailAPI_URL, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + JSON.parse(sessionStorage.getItem('token') as string)?.accessToken
+                    }
+                });
+
+                if (!response.ok) {
+                    // Handle non-OK responses (e.g., 401 Unauthorized)
+                    if (response.status === 401) {
+                        const refreshToken = getToken().refreshToken;
+                        const user = getToken().user;
+                        console.log(refreshToken, user);
+                        const newToken = await getNewToken(refreshToken, user);
+                        console.log(newToken);
+                        sessionStorage.setItem('token', JSON.stringify(newToken));
+                        // You might want to trigger the useEffect again to retry the fetch
+                        setRender(prev => !prev);
+                    } else {
+                        // Handle other non-OK responses
+                        console.error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return;
+                }
+
+                const formDetail = await response.json();
+                // console.log(forms);
                 setFormDetail(formDetail);
-            })
+            } catch (error) {
+                // Handle fetch errors (e.g., network issues)
+                console.error('Error fetching data:', error);
+            }
+        };
+
+        fetchData();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
+    },[render]);
 
     //API POST: create a new response
     const addResponsetoDatabase = async (data) => {
@@ -126,11 +189,15 @@ function Form() {
         if (formDetail.QuestionOrder.length !== formResponses.length) {
             while (i < formDetail.QuestionOrder.length) {
                 if (formDetail.Questions[i].Type === "multi-choice" || formDetail.Questions[i].Type === "checkbox") {
+                    let res = new Array(formDetail.Questions[i].Content.MultiChoice.Options.length).fill(false);
                     formResponses.push(
                         Responses(
                             formDetail.Questions[i].Question,
                             formDetail.Questions[i].Type,
-                            addResultMultiChoice("")
+                            addResultMultiChoice({
+                                options: formDetail.Questions[i].Content.MultiChoice.Options,
+                                result: res
+                            })
                         )
                     )
                 }
@@ -172,8 +239,12 @@ function Form() {
 
     // Lưu giá trị cho các field dạng multi-choice
     const handleChange = (ques: number, index: number) => (e) => {
-        formResponses[ques].content.multiChoice = formDetail.Questions[ques].Content.MultiChoice.Options[index];
-        console.log(formResponses[ques].content.multiChoice)
+        //set all options to result 0
+        formResponses[ques].content.multiChoice.result.fill(false);
+
+        //set select options to result 1
+        formResponses[ques].content.multiChoice.result[index] = true;
+        console.log(formResponses[ques].content.multiChoice.result)
     };
 
     //Lưu giá trị cho các field dạng shortText
@@ -193,12 +264,12 @@ function Form() {
     const [submit, setSubmit] = useState(false);
     const handleSubmitForm = () => {
         addResponsetoDatabase({
-            "ID": "6526518a6b149bcb2510172f",
-            "FormID": "651dbc9d49502243191371e3",
-            "Username": formDetail.owner,
-            "UserID": formDetail.owner,
-            "SubmitTime": "2023-10-11T07:40:58.1078101Z",
-            "Responses": formResponses
+            "id": "6526518a6b149bcb2510172f",
+            "formID": "651dbc9d49502243191371e3",
+            "username": formDetail.owner,
+            "userID": formDetail.owner,
+            "submitTime": "2023-10-11T07:40:58.1078101Z",
+            "responses": formResponses
         });
 
         setSubmit(true)
@@ -243,7 +314,7 @@ function Form() {
     return (
         <div>
             <Box sx={{ backgroundColor: '#E9F2F4', border: "2px solid #DEDEDE", height: { height }, width: '100vw' }}>
-                <Box sx={{ backgroundColor: 'white', border: "2px solid #DEDEDE", borderRadius: '10px', marginX: '30vw', marginTop: '70px' }}>
+                <Box sx={{ backgroundColor: 'white', border: "2px solid #DEDEDE", borderRadius: '10px', marginX: '25vw', marginTop: '70px' }}>
                     {/* Header of Form */}
                     <Box sx={{ textAlign: 'center', backgroundColor: '#008272', paddingY: '30px', borderRadius: '10px 10px 0 0' }}>
                         <Typography sx={{ color: 'white', padding: '15px', fontWeight: 600 }} variant="h4" noWrap component="div">
@@ -257,25 +328,26 @@ function Form() {
                     <Divider />
 
                     {/* Body of Form | In case: Unsubmit form */}
-                    {!submit && <Box sx={{ margin: '50px' }}>
+                    {!submit && <Box sx={{ margin: '60px' }}>
                         {formDetail.Questions !== undefined ? formDetail.QuestionOrder.map((ques, index) => (
                             <Box
                                 key={index}
+                                sx={{ marginY: '15px' }}
                             >
                                 {/* Câu hỏi */}
-                                <Box sx={{display:'flex'}}>
+                                <Box sx={{ display: 'flex' }}>
                                     <Typography
-                                        sx={{ color: '#008272', justifySelft: 'left', padding: '10px', fontWeight: 500 }} variant='h5' noWrap component="div">
+                                        sx={{ color: '#008272', justifySelft: 'left', paddingY: '10px', fontWeight: 500 }} variant='h5' noWrap component="div">
                                         {index + 1}. {formDetail.Questions[ques].Question}
                                     </Typography>
                                     {
                                         formDetail.Questions[ques].Required &&
-                                        <Typography sx={{color: 'red', fontSize:'20px'}}>*</Typography>
+                                        <Typography sx={{ color: 'red', fontSize: '18px' }}>*</Typography>
                                     }
                                 </Box>
 
                                 {/* Nội dung | Dạng câu hỏi */}
-                                <Box sx={{ display: 'flex', flexDirection: 'column', marginX: '35px', marginY: '10px' }}>
+                                <Box sx={{ display: 'flex', flexDirection: 'column', marginX: '30px', marginY: '15px' }}>
                                     {formDetail.Questions[ques].Type === 'multi-choice' ?
                                         <FormControl sx={{ marginLeft: '15px' }}>
                                             <RadioGroup

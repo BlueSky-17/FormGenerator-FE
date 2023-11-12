@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {useState} from 'react';
+import { useState } from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -40,24 +40,6 @@ function Copyright(props: any) {
     </Typography>
   );
 }
-//@ts-ignore
-async function loginUser(credentials, setLoginState) {
-  return fetch('http://localhost:8080/login', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(credentials)
-  })
-    .then((response) => {
-      if (response.status === 200) {
-        setLoginState(1)
-        return response.json();
-      } else if (response.status === 404 || response.status === 401) {
-        setLoginState(0)
-      }
-    })
-}
 
 //@ts-ignore
 export default function SignInSide({ setToken }) {
@@ -66,11 +48,31 @@ export default function SignInSide({ setToken }) {
 
   const nav: any = useNavigate()
 
-  if (loginState) {
-    nav('/home')
-  };
+  // if (loginState) {
+  //   nav('/home')
+  // };
 
-  console.log("hii");
+  //@ts-ignore
+  async function loginUser(credentials) {
+    return fetch('http://localhost:8080/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(credentials)
+    })
+      .then((response) => {
+        if (response.status === 200) {
+          return response.json();
+        }
+        else if (response.status === 404) {
+          setLoginState(false)
+        }
+        else if (response.status === 401) {
+          //
+        } 
+      })
+  }
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -80,10 +82,11 @@ export default function SignInSide({ setToken }) {
       const token = await loginUser({
         username: data.get('username'),
         password: data.get('password'),
-      }, setLoginState);
-      setToken(token);
+      });
+      setToken(token); //token là accessToken, refreshToken và userInfo
 
-      console.log(setLoginState);
+      // if has token, nav to HomePage
+      if (token !== undefined) nav('/home');
     }
     catch (error) {
       console.log(error)
@@ -181,10 +184,12 @@ export default function SignInSide({ setToken }) {
                 id="password"
                 autoComplete="current-password"
               />
-              { loginState === undefined && loginState === false &&
+              {loginState === false ?
                 <Typography component="p" sx={{ color: "red" }}>
                   Đăng nhập thất bại: Sai tên tài khoản hoặc mật khẩu
-                </Typography>}
+                </Typography>
+                : null
+              }
               <FormControlLabel
                 control={<Checkbox value="remember" color="primary" />}
                 label="Duy trì đăng nhập"
