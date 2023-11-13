@@ -39,88 +39,69 @@ const DrawerHeader = styled('div')(({ theme }) => ({
     justifyContent: 'flex-end',
 }));
 
-async function getNewToken(refreshToken, user) {
-    const refreshTokenEndpoint = 'http://localhost:8080/refresh';
-
-    try {
-        const response = await fetch(refreshTokenEndpoint, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                refreshToken: refreshToken,
-            }),
-        });
-
-        // Kiểm tra xem yêu cầu có thành công hay không
-        if (response.ok) {
-            // Đọc nội dung của Response và chuyển đổi thành JSON
-            const data = await response.json();
-            data.user = user;
-            return data;
-        } else {
-            console.error('Failed to refresh access token');
-            return null;
-        }
-    } catch (error) {
-        console.error('Error refreshing access token:', error);
-        return null;
-    }
-}
-
-function DetailForm({ getToken }) {
-    // render: use to re-render after create or delete form
-    const [render, setRender] = useState(false);
-
+function DetailForm() {
     const [formDetail, setFormDetail] = useState<any>({})
 
     const FormDetailAPI_URL = `http://localhost:8080/form/${useParams()?.formID}`;
 
     const UpdateFormAPI_URL = `http://localhost:8080/update-form/${useParams()?.formID}`;
 
-    // API GET: Get detail of form
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await fetch(FormDetailAPI_URL, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + JSON.parse(sessionStorage.getItem('token') as string)?.accessToken
-                    }
-                });
-
-                if (!response.ok) {
-                    // Handle non-OK responses (e.g., 401 Unauthorized)
-                    if (response.status === 401) {
-                        const refreshToken = getToken().refreshToken;
-                        const user = getToken().user;
-                        console.log(refreshToken, user);
-                        const newToken = await getNewToken(refreshToken, user);
-                        console.log(newToken);
-                        sessionStorage.setItem('token', JSON.stringify(newToken));
-                        // You might want to trigger the useEffect again to retry the fetch
-                        setRender(prev => !prev);
-                    } else {
-                        // Handle other non-OK responses
-                        console.error(`HTTP error! Status: ${response.status}`);
-                    }
-                    return;
-                }
-
-                const formDetail = await response.json();
-                // console.log(forms);
-                setFormDetail(formDetail);
-            } catch (error) {
-                // Handle fetch errors (e.g., network issues)
-                console.error('Error fetching data:', error);
+        fetch(FormDetailAPI_URL, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + JSON.parse(sessionStorage.getItem('token') as string)?.accessToken
             }
-        };
+        })
+            .then(data => data.json())
+            .then(formDetail => {
+                setFormDetail(formDetail);
+            })
+    }, [])
 
-        fetchData();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    },[render]);
+    // API GET: Get detail of form
+    // useEffect(() => {
+    //     const fetchData = async () => {
+    //         try {
+    //             const response = await fetch(FormDetailAPI_URL, {
+    //                 method: 'GET',
+    //                 headers: {
+    //                     'Content-Type': 'application/json',
+    //                     'Authorization': 'Bearer ' + JSON.parse(sessionStorage.getItem('token') as string)?.accessToken
+    //                 }
+    //             });
+
+    //             if (!response.ok) {
+    //                 // Handle non-OK responses (e.g., 401 Unauthorized)
+    //                 if (response.status === 401) {
+    //                     const refreshToken = getToken().refreshToken;
+    //                     const user = getToken().user;
+    //                     console.log(refreshToken, user);
+    //                     const newToken = await getNewToken(refreshToken, user);
+    //                     console.log(newToken);
+    //                     sessionStorage.setItem('token', JSON.stringify(newToken));
+    //                     // You might want to trigger the useEffect again to retry the fetch
+    //                     setRender(prev => !prev);
+    //                 } else {
+    //                     // Handle other non-OK responses
+    //                     console.error(`HTTP error! Status: ${response.status}`);
+    //                 }
+    //                 return;
+    //             }
+
+    //             const formDetail = await response.json();
+    //             // console.log(forms);
+    //             setFormDetail(formDetail);
+    //         } catch (error) {
+    //             // Handle fetch errors (e.g., network issues)
+    //             console.error('Error fetching data:', error);
+    //         }
+    //     };
+
+    //     fetchData();
+    //     // eslint-disable-next-line react-hooks/exhaustive-deps
+    // },[render]);
 
     // API PUT: Update form 
     const updateObjectInDatabase = async (updateData) => {

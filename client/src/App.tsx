@@ -29,8 +29,6 @@ function App() {
     }
   }
 
-  console.log('hi')
-
   // const token = getToken()
   // console.log(token.refreshToken)
 
@@ -75,7 +73,8 @@ function App() {
             path="/home"
             element={
               <HomePage>
-                <MyForms getToken={getToken} />
+                <MyForms />
+                {/* <MyForms getToken={getToken} /> */}
               </HomePage>
             }
           />
@@ -83,11 +82,13 @@ function App() {
             path="/form/:formID"
             element={
               <HomePage>
-                <DetailForm getToken={getToken} />
+                <DetailForm />
+                {/* <DetailForm getToken={getToken} /> */}
               </HomePage>
             }
           />
-          <Route path="/form/:formID/view" element={<Form getToken={getToken}/>} />
+          <Route path="/form/:formID/view" element={<Form />}
+          />
           {/* <Route path="/signin" element={<SignInSide setToken={setToken} />} /> */}
         </Routes>
       </BrowserRouter>

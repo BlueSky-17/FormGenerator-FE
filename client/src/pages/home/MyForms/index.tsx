@@ -96,38 +96,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     },
 }));
 
-async function getNewToken(refreshToken, user) {
-    const refreshTokenEndpoint = 'http://localhost:8080/refresh';
-
-    try {
-        const response = await fetch(refreshTokenEndpoint, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                refreshToken: refreshToken,
-            }),
-        });
-
-        // Kiểm tra xem yêu cầu có thành công hay không
-        if (response.ok) {
-            // Đọc nội dung của Response và chuyển đổi thành JSON
-            const data = await response.json();
-            console.log(data);
-            data.user = user;
-            return data;
-        } else {
-            console.error('Failed to refresh access token');
-            return null;
-        }
-    } catch (error) {
-        console.error('Error refreshing access token:', error);
-        return null;
-    }
-}
-
-function MyForms({ getToken }) {
+function MyForms() {
     // render: use to re-render after create or delete form
     const [render, setRender] = useState(false);
 
@@ -135,47 +104,18 @@ function MyForms({ getToken }) {
 
     //API GET: fetch forms by UserId
     useEffect(() => {
-        const fetchData = async () => {
-          try {
-            const response = await fetch(`http://localhost:8080/forms/${JSON.parse(sessionStorage.getItem('token') as string)?.user.ID}`, {
-              method: 'GET',
-              headers: {
+        fetch(`http://localhost:8080/forms/${JSON.parse(sessionStorage.getItem('token') as string)?.user.ID}`, {
+            method: 'GET',
+            headers: {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + JSON.parse(sessionStorage.getItem('token') as string)?.accessToken
-              }
-            });
-      
-            if (!response.ok) {
-              // Handle non-OK responses (e.g., 401 Unauthorized)
-              if (response.status === 401) {
-                const refreshToken = getToken().refreshToken;
-                const user = getToken().user;
-                console.log(refreshToken,user);
-                const newToken = await getNewToken(refreshToken, user);
-                console.log(newToken);
-                sessionStorage.setItem('token', JSON.stringify(newToken));
-                // You might want to trigger the useEffect again to retry the fetch
-                setRender(prev => !prev);
-              } else {
-                // Handle other non-OK responses
-                console.error(`HTTP error! Status: ${response.status}`);
-              }
-              return;
             }
-      
-            const forms = await response.json();
-            // console.log(forms);
-            setForms(forms);
-          } catch (error) {
-            // Handle fetch errors (e.g., network issues)
-            console.error('Error fetching data:', error);
-          }
-        };
-      
-        fetchData();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-      }, [render]);
-      
+        })
+            .then(data => data.json())
+            .then(forms => {
+                setForms(forms);
+            })
+    }, [render])
 
     //API POST: create new form
     const createForm = async (data) => {
@@ -261,7 +201,7 @@ function MyForms({ getToken }) {
 
         // Call API DELETE form by ID
         deleteForm(formID);
-
+        
         // Re-render component
         setRender(!render);
     }

@@ -102,7 +102,7 @@ function addResultDate(
     return { date }
 }
 
-function Form({ getToken }) {
+function Form() {
     // render: use to re-render after create or delete form
     const [render, setRender] = useState(false);
 
@@ -112,48 +112,62 @@ function Form({ getToken }) {
     const FormDetailAPI_URL = `http://localhost:8080/form/${useParams()?.formID}`;
     const ResponseAPI_URL = `http://localhost:8080/form-response/${useParams()?.formID}`;
 
-    // API GET: Get detail of form
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await fetch(FormDetailAPI_URL, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + JSON.parse(sessionStorage.getItem('token') as string)?.accessToken
-                    }
-                });
-
-                if (!response.ok) {
-                    // Handle non-OK responses (e.g., 401 Unauthorized)
-                    if (response.status === 401) {
-                        const refreshToken = getToken().refreshToken;
-                        const user = getToken().user;
-                        console.log(refreshToken, user);
-                        const newToken = await getNewToken(refreshToken, user);
-                        console.log(newToken);
-                        sessionStorage.setItem('token', JSON.stringify(newToken));
-                        // You might want to trigger the useEffect again to retry the fetch
-                        setRender(prev => !prev);
-                    } else {
-                        // Handle other non-OK responses
-                        console.error(`HTTP error! Status: ${response.status}`);
-                    }
-                    return;
-                }
-
-                const formDetail = await response.json();
-                // console.log(forms);
-                setFormDetail(formDetail);
-            } catch (error) {
-                // Handle fetch errors (e.g., network issues)
-                console.error('Error fetching data:', error);
+        fetch(FormDetailAPI_URL, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + JSON.parse(sessionStorage.getItem('token') as string)?.accessToken
             }
-        };
+        })
+            .then(data => data.json())
+            .then(formDetail => {
+                setFormDetail(formDetail);
+            })
+    }, [])
 
-        fetchData();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    },[render]);
+    // API GET: Get detail of form
+    // useEffect(() => {
+    //     const fetchData = async () => {
+    //         try {
+    //             const response = await fetch(FormDetailAPI_URL, {
+    //                 method: 'GET',
+    //                 headers: {
+    //                     'Content-Type': 'application/json',
+    //                     'Authorization': 'Bearer ' + JSON.parse(sessionStorage.getItem('token') as string)?.accessToken
+    //                 }
+    //             });
+
+    //             if (!response.ok) {
+    //                 // Handle non-OK responses (e.g., 401 Unauthorized)
+    //                 if (response.status === 401) {
+    //                     const refreshToken = getToken().refreshToken;
+    //                     const user = getToken().user;
+    //                     console.log(refreshToken, user);
+    //                     const newToken = await getNewToken(refreshToken, user);
+    //                     console.log(newToken);
+    //                     sessionStorage.setItem('token', JSON.stringify(newToken));
+    //                     // You might want to trigger the useEffect again to retry the fetch
+    //                     setRender(prev => !prev);
+    //                 } else {
+    //                     // Handle other non-OK responses
+    //                     console.error(`HTTP error! Status: ${response.status}`);
+    //                 }
+    //                 return;
+    //             }
+
+    //             const formDetail = await response.json();
+    //             // console.log(forms);
+    //             setFormDetail(formDetail);
+    //         } catch (error) {
+    //             // Handle fetch errors (e.g., network issues)
+    //             console.error('Error fetching data:', error);
+    //         }
+    //     };
+
+    //     fetchData();
+    //     // eslint-disable-next-line react-hooks/exhaustive-deps
+    // },[render]);
 
     //API POST: create a new response
     const addResponsetoDatabase = async (data) => {
