@@ -51,7 +51,8 @@ function Responses() {
         })
             .then(data => data.json())
             .then(responses => {
-                setFormResponse(responses);
+                if (responses === null) setFormResponse([]);
+                else setFormResponse(responses);
             })
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])

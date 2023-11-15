@@ -10,11 +10,13 @@ import Tab from '@mui/material/Tab';
 
 function Detail(props) {
     return (
-        <Box>
-            <Box sx={{ backgroundColor: 'white', borderRadius: '15px', marginTop: '15px' }}>
-                <Typography sx={{ color: '#364F6B', padding: '20px', fontWeight: 500 }} variant="h5" noWrap component="div">{props.responses[props.indexDetail - 1].id}</Typography>
+        <Box>{
+            props.responses.length > 0 ?
+                <Box sx={{ backgroundColor: 'white', borderRadius: '15px', marginTop: '15px' }}>
+                    <Typography sx={{ color: '#364F6B', padding: '20px', fontWeight: 500 }} variant="h5" noWrap component="div">{props.responses[props.indexDetail - 1].id}</Typography>
                     {/* Xài hàm map với mảng response để display tất cả câu hỏi */}
-            </Box >
+                </Box > : null
+        }
         </Box>
     )
 }
