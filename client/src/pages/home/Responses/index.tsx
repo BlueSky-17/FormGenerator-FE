@@ -14,6 +14,7 @@ import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import Summary from './summary';
 import Question from './question';
 import Detail from './detail';
+import { Answer } from './interface';
 
 const DrawerHeader = styled('div')(({ theme }) => ({
     display: 'flex',
@@ -34,14 +35,12 @@ function Responses() {
         else setDetail(false);
     };
 
-    const [responses, setFormResponse] = useState<any[]>([])
+    const [responses, setFormResponse] = useState<Answer[]>([])
 
     const ResponsesAPI_URL = `http://localhost:8080/get-response/${useParams()?.formID}`;
 
     // API GET: Get responses
     useEffect(() => {
-        console.log(ResponsesAPI_URL);
-
         fetch(ResponsesAPI_URL, {
             method: 'GET',
             headers: {
@@ -57,7 +56,6 @@ function Responses() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
-    console.log(responses);
 
     const [detail, setDetail] = useState(false);
 
@@ -78,8 +76,6 @@ function Responses() {
             setIndexDetail(newIndex);
         }
     }
-
-    console.log(indexDetail)
 
     return (
         <div>

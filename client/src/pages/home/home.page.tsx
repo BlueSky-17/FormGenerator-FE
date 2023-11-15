@@ -113,7 +113,7 @@ function HomePage({ children }: LayoutProps) {
     }
 
     return (
-        <Box sx={{ display: 'flex', height:"100vh", witdh:'100vw' }}>
+        <Box sx={{ display: 'flex', witdh:'100vw' }}>
             <CssBaseline />
             <AppBar position="fixed" open={open}>
                 <Toolbar sx={{ backgroundColor: 'white' }}>
