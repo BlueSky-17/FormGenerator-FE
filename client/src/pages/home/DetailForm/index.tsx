@@ -58,6 +58,7 @@ function DetailForm() {
             .then(formDetail => {
                 setFormDetail(formDetail);
             })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     // API GET: Get detail of form
@@ -172,11 +173,7 @@ function DetailForm() {
             setFields(rest); // fields: ['Tính','Huyện','Xã']
             // setColumn(rest);
         }
-        else if (type === 'dropDown') {
-            setSubOpen('dropDown')
-            convertTextToOptionList(inputText);
-        }
-        else if (type === 'multi-choice' || type === 'checkbox') setSubOpen('multi-choice')
+        else if (type === 'multi-choice' || type === 'checkbox' || type === 'dropdown') setSubOpen('multi-choice')
     }
     const handleSubClose = () => {
         setSubOpen('');
@@ -368,7 +365,7 @@ function DetailForm() {
         setTitleQuestion(formDetail.Questions[ques].Question)
         setRequired(formDetail.Questions[ques].Required);
 
-        if (formDetail.Questions[ques].Type === 'multi-choice' || formDetail.Questions[ques].Type === 'checkbox')
+        if (formDetail.Questions[ques].Type === 'multi-choice' || formDetail.Questions[ques].Type === 'checkbox' || formDetail.Questions[ques].Type === 'dropdown')
             setOptionList(formDetail.Questions[ques].Content.MultiChoice.Options)
 
         setQuesEdit(ques);

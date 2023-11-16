@@ -10,8 +10,7 @@ export interface Question {
 // Content for multi-choice TYPE
 export interface MultiChoice {
     MultiChoice: {
-        Options: string[],
-        ImportedData: string
+        Options: string[]
     }
 }
 

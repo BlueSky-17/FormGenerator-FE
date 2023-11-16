@@ -93,11 +93,10 @@ export function MainModal(props) {
         props.formDetail.QuestionOrder.push(newIndex);
 
         // Lấy Object: Options có chứa Option[] và ImportedData
-        if (props.type === "multi-choice" || props.type === "checkbox") {
+        if (props.type === "multi-choice" || props.type === "checkbox" || props.type === "dropdown") {
             const updateMultiChoice: MultiChoice = {
                 MultiChoice: {
-                    Options: props.optionList,
-                    ImportedData: ''
+                    Options: props.optionList
                 }
             };
 
@@ -142,7 +141,7 @@ export function MainModal(props) {
         props.formDetail.Questions[props.quesEdit].Question = props.titleQuestion;
         props.formDetail.Questions[props.quesEdit].Required = props.required;
 
-        if (props.type === "multi-choice" || props.type === "checkbox") {
+        if (props.type === "multi-choice" || props.type === "checkbox" || props.type === "dropdown") {
             props.formDetail.Questions[props.quesEdit].Content.MultiChoice.Options = props.optionList;
         }
 
@@ -165,7 +164,7 @@ export function MainModal(props) {
         props.setTitleQuestion('');
 
         // return default value when open modal: multi-choice TYPE
-        if (props.type === "multi-choice" || props.type === "checkbox") {
+        if (props.type === "multi-choice" || props.type === "checkbox" || props.type === "dropdown") {
             props.setOptionList(['']);
             setActive(-1);
         }
@@ -192,7 +191,6 @@ export function MainModal(props) {
 
     // Xử lý câu hỏi multi-choice và checkbox
     const [optionValue, setOptionValue] = useState(''); //Lưu value của option
-
     const handleOptionChange = (e) => {
         setOptionValue(e.target.value);
     };
@@ -313,7 +311,7 @@ export function MainModal(props) {
                                         </ListItemText>
                                     </div>
                                 </MenuItem>
-                                <MenuItem value={'dropDown'}>
+                                <MenuItem value={'dropdown'}>
                                     <div style={{ display: 'flex', alignItems: 'center' }}>
                                         <ArrowDropDownCircleIcon sx={{ marginRight: '10px', color: '#6D7073' }} />
                                         <ListItemText>
@@ -348,7 +346,7 @@ export function MainModal(props) {
                             </Select>
                         </FormControl>
                     </Box>
-                    {props.type === 'multi-choice' || props.type === 'checkbox' ?
+                    {props.type === 'multi-choice' || props.type === 'checkbox' || props.type === 'dropdown' ?
                         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                             {
                                 props.optionList.map((item, index) => (
@@ -359,6 +357,11 @@ export function MainModal(props) {
                                         {props.type === 'checkbox' && <CheckBoxOutlineBlankIcon
                                             sx={{ color: 'gray', marginRight: '10px' }}
                                         />}
+                                        {props.type === 'dropdown' &&
+                                            <Typography sx={{ color: 'gray', marginRight: '10px' }}>
+                                                {index+1}.
+                                            </Typography>
+                                        }
                                         <TextField
                                             value={index === active ? optionValue : props.optionList[index]}
                                             onChange={handleOptionChange}
@@ -404,36 +407,6 @@ export function MainModal(props) {
                     }
                     {props.type === 'shortText' ?
                         <TextField disabled sx={{ width: '100%' }} id="standard-basic" label="Nhập câu trả lời" variant="standard" />
-                        : null
-                    }
-                    {props.type === 'dropDown' ?
-                        <Box>
-                            <Typography sx={{ color: '#6D7073', marginBottom: '15px' }}>Nhập <b>mỗi lựa chọn</b> là <b> một dòng</b></Typography>
-                            <TextField
-                                value={props.inputText}
-                                onChange={props.handleInputText}
-                                id="outlined-multiline-flexible"
-                                multiline
-                                rows={5}
-                                sx={{ width: '100%' }}
-                            />
-                            <Button
-                                onClick={props.handleSubOpen}
-                                sx={{
-                                    color: 'white',
-                                    backgroundColor: '#364F6B',
-                                    borderRadius: '10px',
-                                    paddingY: '10px',
-                                    paddingX: '5px',
-                                    marginTop: '10px',
-                                    width: '100%',
-                                    '&:hover': {
-                                        backgroundColor: '#2E4155', // Màu nền thay đổi khi hover
-                                    }
-                                }}>
-                                Xử lý dữ liệu
-                            </Button>
-                        </Box>
                         : null
                     }
                     {props.type === 'linkedData' ?

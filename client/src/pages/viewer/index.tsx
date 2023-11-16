@@ -202,7 +202,7 @@ function Form() {
         // Tránh push thêm khi re-render component 
         if (formDetail.QuestionOrder.length !== formResponses.length) {
             while (i < formDetail.QuestionOrder.length) {
-                if (formDetail.Questions[i].Type === "multi-choice" || formDetail.Questions[i].Type === "checkbox") {
+                if (formDetail.Questions[i].Type === "multi-choice" || formDetail.Questions[i].Type === "checkbox" || formDetail.Questions[i].Type === "dropdown") {
                     let res = new Array(formDetail.Questions[i].Content.MultiChoice.Options.length).fill(false);
                     formResponses.push(
                         Responses(
@@ -251,6 +251,17 @@ function Form() {
         console.log("Error");
     }
 
+    const [value, setValue] = useState('');
+    const handleChangeDropdown = (ques: number) => (e) => {
+        setValue(e.target.value as string);
+        //set all options to result 0
+        formResponses[ques].content.multiChoice.result.fill(false);
+
+        //set select options to result 1
+        formResponses[ques].content.multiChoice.result[e.target.value] = true;
+        console.log(formResponses[ques].content.multiChoice.result)
+    };
+
     // Lưu giá trị cho các field dạng multi-choice
     const handleChange = (ques: number, index: number) => (e) => {
         //set all options to result 0
@@ -258,6 +269,15 @@ function Form() {
 
         //set select options to result 1
         formResponses[ques].content.multiChoice.result[index] = true;
+        console.log(formResponses[ques].content.multiChoice.result)
+    };
+
+    // Lưu giá trị cho các field dạng checkbox
+    const handleChangeCheckbox = (ques: number, index: number) => (e) => {
+        //set select options to result 1
+        if (formResponses[ques].content.multiChoice.result[index] === false)
+            formResponses[ques].content.multiChoice.result[index] = true;
+        else formResponses[ques].content.multiChoice.result[index] = false
         console.log(formResponses[ques].content.multiChoice.result)
     };
 
@@ -384,13 +404,30 @@ function Form() {
                                         </FormControl>
                                         : null
                                     }
+                                    {formDetail.Questions[ques].Type === 'dropdown' ?
+                                        <FormControl fullWidth>
+                                            <Select
+                                                value={value}
+                                                onChange={handleChangeDropdown(ques)}
+                                            >
+                                                {formDetail.Questions[ques].Content.MultiChoice.Options.map((item, index) => (
+                                                    <MenuItem
+                                                        key={index}
+                                                        value={index}>
+                                                            {item}
+                                                    </MenuItem>
+                                                ))}
+                                            </Select>
+                                        </FormControl>
+                                        : null
+                                    }
                                     {formDetail.Questions[ques].Type === 'checkbox' ?
                                         <FormControl sx={{ marginLeft: '15px' }}>
                                             {formDetail.Questions[ques].Content.MultiChoice.Options.map((item, index) => (
                                                 <FormControlLabel
                                                     key={index}
                                                     // checked={selectedValue === item}
-                                                    // onChange={handleChange(ques, index)}
+                                                    onChange={handleChangeCheckbox(ques, index)}
                                                     value={item}
                                                     control={<Checkbox />}
                                                     label={item}

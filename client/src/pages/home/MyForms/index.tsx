@@ -231,7 +231,7 @@ function MyForms() {
         setItemsPerPage(event.target.value);
     };
 
-    console.log(forms)
+    // console.log(forms)
 
     return (
         <Box>
