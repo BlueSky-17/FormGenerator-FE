@@ -26,6 +26,7 @@ import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormLabel from '@mui/material/FormLabel';
 import Checkbox from '@mui/material/Checkbox';
+import Alert, { AlertProps } from '@mui/material/Alert';
 
 
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
@@ -72,9 +73,10 @@ async function getNewToken(refreshToken, user) {
 function Responses(
     questionName: string,
     type: string,
+    required: boolean,
     content: {}
 ) {
-    return { questionName, type, content };
+    return { questionName, type, required, content };
 }
 
 function addResultMultiChoice(
@@ -228,6 +230,7 @@ function Form() {
                         Responses(
                             formDetail.Questions[i].Question,
                             formDetail.Questions[i].Type,
+                            formDetail.Questions[i].Required,
                             addResultMultiChoice({
                                 options: formDetail.Questions[i].Content.MultiChoice.Options,
                                 result: res
@@ -240,6 +243,7 @@ function Form() {
                         Responses(
                             formDetail.Questions[i].Question,
                             formDetail.Questions[i].Type,
+                            formDetail.Questions[i].Required,
                             addResultShortText("")
                         )
                     )
@@ -251,6 +255,7 @@ function Form() {
                         Responses(
                             formDetail.Questions[i].Question,
                             formDetail.Questions[i].Type,
+                            formDetail.Questions[i].Required,
                             addResultDate(
                                 {
                                     single: {
@@ -282,6 +287,7 @@ function Form() {
                         Responses(
                             formDetail.Questions[i].Question,
                             formDetail.Questions[i].Type,
+                            formDetail.Questions[i].Required,
                             addResultDate(
                                 {
                                     single: {
@@ -311,6 +317,7 @@ function Form() {
                         Responses(
                             formDetail.Questions[i].Question,
                             formDetail.Questions[i].Type,
+                            formDetail.Questions[i].Required,
                             addResultLinkedData([])
                         )
                     )
@@ -375,19 +382,44 @@ function Form() {
         formResponses[ques].content.date.single.dateOnly = e.$d;
     };
 
-    const [submit, setSubmit] = useState(false);
+    const [submit, setSubmit] = useState<boolean>();
     const handleSubmitForm = () => {
-        addResponsetoDatabase({
-            "id": "6526518a6b149bcb2510172f",
-            "formID": "651dbc9d49502243191371e3",
-            "username": formDetail.owner,
-            "userID": formDetail.owner,
-            "submitTime": "2023-10-11T07:40:58.1078101Z",
-            "responses": formResponses
+        let checkRequired = true;
+
+        formResponses.forEach(item => {
+            // Gọi hàm callback với mỗi phần tử và chỉ số tương ứng
+            console.log(item)
+            if (item.required === true) {
+                if (item.type === 'multi-choice' || item.type === 'checkbox' || item.type === 'dropdown') {
+                    //có 1 giá trị true => true; không có giá trị true nào => false
+                    let checkSelect = item.content.multiChoice.result.some((giaTri) => giaTri === true);
+                    if (!checkSelect) checkRequired = false;
+                }
+                else if (item.type === 'shortText') {
+                    if (item.content.shortText === '') checkRequired = false;
+                }
+            }
         });
 
-        setSubmit(true)
-        setHeight('100vh')
+        console.log(checkRequired);
+
+        if (checkRequired) {
+            addResponsetoDatabase({
+                "id": "6526518a6b149bcb2510172f",
+                "formID": "651dbc9d49502243191371e3",
+                "username": formDetail.owner,
+                "userID": formDetail.owner,
+                "submitTime": "2023-10-11T07:40:58.1078101Z",
+                "responses": formResponses
+            });
+
+            setSubmit(true)
+            setHeight('100vh')
+        }
+        else {
+            setSubmit(false)
+        }
+
     }
 
     const [firstField, setFirstField] = useState('');
@@ -444,6 +476,7 @@ function Form() {
                     {/* Body of Form | In case: Unsubmit form */}
                     {!submit && <Box sx={{ margin: '60px' }}>
                         {formDetail.Questions !== undefined ? formDetail.QuestionOrder.map((ques, index) => (
+
                             <Box
                                 key={index}
                                 sx={{ marginY: '15px' }}
@@ -623,6 +656,7 @@ function Form() {
                             </Box>
                         ))
                             : null}
+                        {submit === false && <Alert severity="error">Vui lòng điền những câu hỏi đã bắt buộc</Alert>}
                     </Box>}
 
                     {/* Body of Form | In case: Form submitted */}
