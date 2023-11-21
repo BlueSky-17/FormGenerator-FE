@@ -3,7 +3,8 @@
     "multi-choice": "Trắc nghiệm",
     "checkbox": "Ô đánh dấu",
     "dropdown": "Menu thả xuống",
-    "datePicker": "Lịch",
+    "date-single": "Mốc thời gian",
+    "date-range": "Khoảng thời gian",
     "linkedData": "Dữ liệu liên kết",
     "file": "File"
 }

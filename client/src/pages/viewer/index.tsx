@@ -28,8 +28,10 @@ import FormLabel from '@mui/material/FormLabel';
 import Checkbox from '@mui/material/Checkbox';
 
 
+import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 import TextField from '@mui/material/TextField';
@@ -97,7 +99,25 @@ function addResultLinkedData(
 }
 
 function addResultDate(
-    date: string
+    date: {
+        single: {
+            dateOnly: Date,
+            hour: Date,
+            fulltime: Date
+        }
+        range: {
+            from: {
+                dateOnly: Date,
+                hour: Date,
+                fulltime: Date
+            }
+            to: {
+                dateOnly: Date,
+                hour: Date,
+                fulltime: Date
+            }
+        }
+    }
 ) {
     return { date }
 }
@@ -224,12 +244,65 @@ function Form() {
                         )
                     )
                 }
-                else if (formDetail.Questions[i].Type === "datePicker") {
+                else if (formDetail.Questions[i].Type === "date-single") {
+                    let dateString: string = "2023-11-16";
+
                     formResponses.push(
                         Responses(
                             formDetail.Questions[i].Question,
                             formDetail.Questions[i].Type,
-                            addResultDate("")
+                            addResultDate(
+                                {
+                                    single: {
+                                        dateOnly: new Date(dateString),
+                                        hour: new Date(dateString),
+                                        fulltime: new Date(dateString)
+                                    },
+                                    range: {
+                                        from: {
+                                            dateOnly: new Date(dateString),
+                                            hour: new Date(dateString),
+                                            fulltime: new Date(dateString)
+                                        },
+                                        to: {
+                                            dateOnly: new Date(dateString),
+                                            hour: new Date(dateString),
+                                            fulltime: new Date(dateString)
+                                        }
+                                    }
+                                }
+                            )
+                        )
+                    )
+                }
+                else if (formDetail.Questions[i].Type === "date-range") {
+                    let dateString: string = "2023-11-16";
+
+                    formResponses.push(
+                        Responses(
+                            formDetail.Questions[i].Question,
+                            formDetail.Questions[i].Type,
+                            addResultDate(
+                                {
+                                    single: {
+                                        dateOnly: new Date(dateString),
+                                        hour: new Date(dateString),
+                                        fulltime: new Date(dateString)
+                                    },
+                                    range: {
+                                        from: {
+                                            dateOnly: new Date(dateString),
+                                            hour: new Date(dateString),
+                                            fulltime: new Date(dateString)
+                                        },
+                                        to: {
+                                            dateOnly: new Date(dateString),
+                                            hour: new Date(dateString),
+                                            fulltime: new Date(dateString)
+                                        }
+                                    }
+                                }
+                            )
                         )
                     )
                 }
@@ -250,6 +323,12 @@ function Form() {
     catch (error) {
         console.log("Error");
     }
+
+    // const [time, setTime] = useState('');
+    const handleChangeHour = (ques: number) => (e) => {
+        // console.log(e)
+        formResponses[ques].content.date.single.hour = e.$d;
+    };
 
     const [value, setValue] = useState('');
     const handleChangeDropdown = (ques: number) => (e) => {
@@ -292,7 +371,8 @@ function Form() {
 
     //Lưu giá trị cho các field dạng Date
     const handleChangeDate = (ques: number) => (e) => {
-        formResponses[ques].content.date = e.$d;
+        // console.log(e);l
+        formResponses[ques].content.date.single.dateOnly = e.$d;
     };
 
     const [submit, setSubmit] = useState(false);
@@ -414,7 +494,7 @@ function Form() {
                                                     <MenuItem
                                                         key={index}
                                                         value={index}>
-                                                            {item}
+                                                        {item}
                                                     </MenuItem>
                                                 ))}
                                             </Select>
@@ -447,9 +527,21 @@ function Form() {
                                             variant="outlined" />
                                         : null
                                     }
-                                    {formDetail.Questions[ques].Type === 'datePicker' ?
+                                    {formDetail.Questions[ques].Type === 'date-single' && formDetail.Questions[ques].Content.Date === 0 ?
                                         <LocalizationProvider dateAdapter={AdapterDayjs}>
                                             <DatePicker onChange={handleChangeDate(ques)} />
+                                        </LocalizationProvider>
+                                        : null
+                                    }
+                                    {formDetail.Questions[ques].Type === 'date-single' && formDetail.Questions[ques].Content.Date === 1 ?
+                                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                            <DemoContainer components={['TimePicker']}>
+                                                <TimePicker
+                                                    label="Chọn giờ"
+                                                    // value={time}
+                                                    onChange={handleChangeHour(ques)}
+                                                />
+                                            </DemoContainer>
                                         </LocalizationProvider>
                                         : null
                                     }

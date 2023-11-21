@@ -21,7 +21,7 @@ export interface ShortText {
 
 // Content for date TYPE
 export interface Date {
-    date: string
+    date: number
 }
 
 // Content for linked data TYPE

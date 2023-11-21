@@ -15,6 +15,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import AddIcon from '@mui/icons-material/Add';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
+import DateRangeIcon from '@mui/icons-material/DateRange';
 
 import TextField from '@mui/material/TextField';
 import InputLabel from '@mui/material/InputLabel';
@@ -109,9 +110,9 @@ export function MainModal(props) {
 
             Object.assign(props.formDetail.Questions[newIndex].Content, updateShortText);
         }
-        else if (props.type === "datePicker") {
+        else if (props.type === "date-single" || props.type === "date-range") {
             const updateDate: Date = {
-                date: ''
+                date: dateNum
             };
 
             Object.assign(props.formDetail.Questions[newIndex].Content, updateDate);
@@ -255,6 +256,12 @@ export function MainModal(props) {
     };
     const [typeError, setTypeError] = useState<string>(); //Display error when upload invalid file
 
+    //number: 0-5 with 6 type
+    const [dateNum, setDateNum] = useState<number>(-1)
+    const handleDateNum = (e) => {
+        setDateNum(e.target.value);
+    }
+
     return (
         <div>
             <Modal
@@ -319,11 +326,19 @@ export function MainModal(props) {
                                         </ListItemText>
                                     </div>
                                 </MenuItem>
-                                <MenuItem value={'datePicker'}>
+                                <MenuItem value={'date-single'}>
                                     <div style={{ display: 'flex', alignItems: 'center' }}>
                                         <EventIcon sx={{ marginRight: '10px', color: '#6D7073' }} />
                                         <ListItemText>
-                                            Lịch
+                                            Mốc thời gian
+                                        </ListItemText>
+                                    </div>
+                                </MenuItem>
+                                <MenuItem value={'date-range'}>
+                                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                                        <DateRangeIcon sx={{ marginRight: '10px', color: '#6D7073' }} />
+                                        <ListItemText>
+                                            Khoảng thời gian
                                         </ListItemText>
                                     </div>
                                 </MenuItem>
@@ -359,7 +374,7 @@ export function MainModal(props) {
                                         />}
                                         {props.type === 'dropdown' &&
                                             <Typography sx={{ color: 'gray', marginRight: '10px' }}>
-                                                {index+1}.
+                                                {index + 1}.
                                             </Typography>
                                         }
                                         <TextField
@@ -407,6 +422,38 @@ export function MainModal(props) {
                     }
                     {props.type === 'shortText' ?
                         <TextField disabled sx={{ width: '100%' }} id="standard-basic" label="Nhập câu trả lời" variant="standard" />
+                        : null
+                    }
+                    {props.type === 'date-single' ?
+                        <Box sx={{ margin: '5px' }}>
+                            <Typography sx={{ width: '100%', marginY: '10px', color: 'gray' }}><b>Chọn định dạng</b></Typography>
+                            <FormControl sx={{ width: '50%' }}>
+                                <Select
+                                    value={dateNum}
+                                    onChange={handleDateNum}
+                                >
+                                    <MenuItem value={0}> Ngày </MenuItem>
+                                    <MenuItem value={1}> Giờ </MenuItem>
+                                    <MenuItem value={2}> Ngày + Giờ </MenuItem>
+                                </Select>
+                            </FormControl>
+                        </Box>
+                        : null
+                    }
+                    {props.type === 'date-range' ?
+                        <Box sx={{ margin: '5px' }}>
+                            <Typography sx={{ width: '100%', marginY: '10px', color: 'gray' }}><b>Chọn định dạng</b></Typography>
+                            <FormControl sx={{ width: '50%' }}>
+                                <Select
+                                    value={dateNum}
+                                    onChange={handleDateNum}
+                                >
+                                    <MenuItem value={3}> Ngày </MenuItem>
+                                    <MenuItem value={4}> Giờ </MenuItem>
+                                    <MenuItem value={5}> Ngày + Giờ </MenuItem>
+                                </Select>
+                            </FormControl>
+                        </Box>
                         : null
                     }
                     {props.type === 'linkedData' ?
