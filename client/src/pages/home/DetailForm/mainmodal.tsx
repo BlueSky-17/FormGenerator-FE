@@ -209,6 +209,16 @@ export function MainModal(props) {
     // Thêm option trống 
     const handleOption = () => props.setOptionList([...props.optionList, ''])
 
+    const [totalOption, setTotalOption] = useState<string>()
+    const handleTotalOption = (e) => {
+        setTotalOption(e.target.value);
+    }
+
+    const [numOption, setNumOption] = useState<number>()
+    const handleNumOption = (e) => {
+        setNumOption(e.target.value);
+    }
+
     // Process file -> linkedData
     const [file, setFile] = useState<string>('');
     const handleFileChange = (e) => {
@@ -417,6 +427,32 @@ export function MainModal(props) {
                                     Thêm nhiều lựa chọn
                                 </Button>
                             </Box>
+                            {props.type === 'checkbox' ?
+                                <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', paddingBottom: '15px' }}>
+                                    <Typography sx={{ paddingRight: '10px', fontWeight: 'bold' }}>Chọn tổng số lựa chọn:</Typography>
+                                    <FormControl sx={{ width: '30%', paddingRight: '10px' }}>
+                                        <Select
+                                            value={totalOption}
+                                            onChange={handleTotalOption}
+                                        >
+                                            <MenuItem value={'no-limit'}> Không giới hạn </MenuItem>
+                                            <MenuItem value={'equal-to'}> Ngang bằng với </MenuItem>
+                                            <MenuItem value={'at-most'}> Tối đa </MenuItem>
+                                        </Select>
+                                    </FormControl>
+                                    {totalOption === 'equal-to' || totalOption === 'at-most' ? <FormControl sx={{ width: '10%' }}>
+                                        <Select
+                                            value={numOption}
+                                            onChange={handleNumOption}
+                                        >
+                                            <MenuItem value={2}> 2 </MenuItem>
+                                            <MenuItem value={3}> 3 </MenuItem>
+                                            <MenuItem value={4}> 4 </MenuItem>
+                                        </Select>
+                                    </FormControl>
+                                        : null}
+                                </Box>
+                                : null}
                         </Box >
                         : null
                     }

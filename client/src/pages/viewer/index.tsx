@@ -28,7 +28,6 @@ import FormLabel from '@mui/material/FormLabel';
 import Checkbox from '@mui/material/Checkbox';
 import Alert, { AlertProps } from '@mui/material/Alert';
 
-
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -40,89 +39,38 @@ import Autocomplete from '@mui/material/Autocomplete';
 import { useParams } from 'react-router-dom';
 import { stringify } from 'querystring';
 
-async function getNewToken(refreshToken, user) {
-    const refreshTokenEndpoint = 'http://localhost:8080/refresh';
+import { Response, ResultMultiChoice, ResultShortText, ResultDate, ResultLinkedData } from './interface';
+import Responses from '../home/Responses';
 
-    try {
-        const response = await fetch(refreshTokenEndpoint, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                refreshToken: refreshToken,
-            }),
-        });
+// async function getNewToken(refreshToken, user) {
+//     const refreshTokenEndpoint = 'http://localhost:8080/refresh';
 
-        // Kiểm tra xem yêu cầu có thành công hay không
-        if (response.ok) {
-            // Đọc nội dung của Response và chuyển đổi thành JSON
-            const data = await response.json();
-            data.user = user;
-            return data;
-        } else {
-            console.error('Failed to refresh access token');
-            return null;
-        }
-    } catch (error) {
-        console.error('Error refreshing access token:', error);
-        return null;
-    }
-}
+//     try {
+//         const response = await fetch(refreshTokenEndpoint, {
+//             method: 'POST',
+//             headers: {
+//                 'Content-Type': 'application/json',
+//             },
+//             body: JSON.stringify({
+//                 refreshToken: refreshToken,
+//             }),
+//         });
 
-function Responses(
-    questionName: string,
-    type: string,
-    required: boolean,
-    content: {}
-) {
-    return { questionName, type, required, content };
-}
-
-function addResultMultiChoice(
-    multiChoice: {
-        options: string[],
-        result: boolean[]
-    }
-) {
-    return { multiChoice }
-}
-
-function addResultShortText(
-    shortText: string
-) {
-    return { shortText }
-}
-
-function addResultLinkedData(
-    linkedData: string[]
-) {
-    return { linkedData }
-}
-
-function addResultDate(
-    date: {
-        single: {
-            dateOnly: Date,
-            hour: Date,
-            fulltime: Date
-        }
-        range: {
-            from: {
-                dateOnly: Date,
-                hour: Date,
-                fulltime: Date
-            }
-            to: {
-                dateOnly: Date,
-                hour: Date,
-                fulltime: Date
-            }
-        }
-    }
-) {
-    return { date }
-}
+//         // Kiểm tra xem yêu cầu có thành công hay không
+//         if (response.ok) {
+//             // Đọc nội dung của Response và chuyển đổi thành JSON
+//             const data = await response.json();
+//             data.user = user;
+//             return data;
+//         } else {
+//             console.error('Failed to refresh access token');
+//             return null;
+//         }
+//     } catch (error) {
+//         console.error('Error refreshing access token:', error);
+//         return null;
+//     }
+// }
 
 function Form() {
     // render: use to re-render after create or delete form
@@ -224,105 +172,68 @@ function Form() {
         // Tránh push thêm khi re-render component 
         if (formDetail.QuestionOrder.length !== formResponses.length) {
             while (i < formDetail.QuestionOrder.length) {
+                const newResponse: Response = {
+                    questionName: formDetail.Questions[i].Question,
+                    type: formDetail.Questions[i].Type,
+                    required: formDetail.Questions[i].Required,
+                    content: {}
+                };
+
                 if (formDetail.Questions[i].Type === "multi-choice" || formDetail.Questions[i].Type === "checkbox" || formDetail.Questions[i].Type === "dropdown") {
                     let res = new Array(formDetail.Questions[i].Content.MultiChoice.Options.length).fill(false);
-                    formResponses.push(
-                        Responses(
-                            formDetail.Questions[i].Question,
-                            formDetail.Questions[i].Type,
-                            formDetail.Questions[i].Required,
-                            addResultMultiChoice({
-                                options: formDetail.Questions[i].Content.MultiChoice.Options,
-                                result: res
-                            })
-                        )
-                    )
+
+                    const result: ResultMultiChoice = {
+                        multiChoice: {
+                            options: formDetail.Questions[i].Content.MultiChoice.Options,
+                            result: res
+                        }
+                    };
+
+                    Object.assign(newResponse.content, result)
                 }
                 else if (formDetail.Questions[i].Type === "shortText") {
-                    formResponses.push(
-                        Responses(
-                            formDetail.Questions[i].Question,
-                            formDetail.Questions[i].Type,
-                            formDetail.Questions[i].Required,
-                            addResultShortText("")
-                        )
-                    )
+                    const result: ResultShortText = {
+                        shortText: ""
+                    };
+
+                    Object.assign(newResponse.content, result)
                 }
-                else if (formDetail.Questions[i].Type === "date-single") {
+                else if (formDetail.Questions[i].Type === "date-single" || formDetail.Questions[i].Type === "date-range") {
                     let dateString: string = "2023-11-16";
 
-                    formResponses.push(
-                        Responses(
-                            formDetail.Questions[i].Question,
-                            formDetail.Questions[i].Type,
-                            formDetail.Questions[i].Required,
-                            addResultDate(
-                                {
-                                    single: {
-                                        dateOnly: new Date(dateString),
-                                        hour: new Date(dateString),
-                                        fulltime: new Date(dateString)
-                                    },
-                                    range: {
-                                        from: {
-                                            dateOnly: new Date(dateString),
-                                            hour: new Date(dateString),
-                                            fulltime: new Date(dateString)
-                                        },
-                                        to: {
-                                            dateOnly: new Date(dateString),
-                                            hour: new Date(dateString),
-                                            fulltime: new Date(dateString)
-                                        }
-                                    }
+                    const result: ResultDate = {
+                        date: {
+                            single: {
+                                dateOnly: new Date(dateString),
+                                hour: new Date(dateString),
+                                fulltime: new Date(dateString)
+                            },
+                            range: {
+                                from: {
+                                    dateOnly: new Date(dateString),
+                                    hour: new Date(dateString),
+                                    fulltime: new Date(dateString)
+                                },
+                                to: {
+                                    dateOnly: new Date(dateString),
+                                    hour: new Date(dateString),
+                                    fulltime: new Date(dateString)
                                 }
-                            )
-                        )
-                    )
-                }
-                else if (formDetail.Questions[i].Type === "date-range") {
-                    let dateString: string = "2023-11-16";
+                            }
+                        }
+                    };
 
-                    formResponses.push(
-                        Responses(
-                            formDetail.Questions[i].Question,
-                            formDetail.Questions[i].Type,
-                            formDetail.Questions[i].Required,
-                            addResultDate(
-                                {
-                                    single: {
-                                        dateOnly: new Date(dateString),
-                                        hour: new Date(dateString),
-                                        fulltime: new Date(dateString)
-                                    },
-                                    range: {
-                                        from: {
-                                            dateOnly: new Date(dateString),
-                                            hour: new Date(dateString),
-                                            fulltime: new Date(dateString)
-                                        },
-                                        to: {
-                                            dateOnly: new Date(dateString),
-                                            hour: new Date(dateString),
-                                            fulltime: new Date(dateString)
-                                        }
-                                    }
-                                }
-                            )
-                        )
-                    )
+                    Object.assign(newResponse.content, result)
                 }
                 else if (formDetail.Questions[i].Type === "linkedData") {
-                    formResponses.push(
-                        Responses(
-                            formDetail.Questions[i].Question,
-                            formDetail.Questions[i].Type,
-                            formDetail.Questions[i].Required,
-                            addResultLinkedData([])
-                        )
-                    )
+                    const result: ResultLinkedData = {
+                        linkedData: []
+                    };
+
+                    Object.assign(newResponse.content, result)
                 }
                 // setFormResponse(formResponses);
+                formResponses.push(newResponse);
                 i++;
             }
         }
