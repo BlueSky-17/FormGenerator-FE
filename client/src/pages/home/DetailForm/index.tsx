@@ -146,9 +146,22 @@ function DetailForm() {
     const [titleQuestion, setTitleQuestion] = useState('');
     const [required, setRequired] = useState(false);
 
+    //Set constraint & maxOptions for checkbox question
+    const [constraint, setConstraint] = useState<string>('no-limit')
+    const handleConstraint = (e) => {
+        setConstraint(e.target.value);
+    }
+    const [maxOptions, setMaxOptions] = useState<number>(2)
+    const handleMaxOptions = (e) => {
+        setMaxOptions(e.target.value);
+    }
+
     // Close/Open Main Modal 
     const [open, setOpen] = useState(false);
-    const handleOpen = () => setOpen(true);
+    const handleOpen = () => {
+        setQuesEdit('-1')
+        setOpen(true);
+    }
 
     // Close/Open Sub Modal
     const [subopen, setSubOpen] = React.useState('');
@@ -367,6 +380,11 @@ function DetailForm() {
 
         if (formDetail.Questions[ques].Type === 'multi-choice' || formDetail.Questions[ques].Type === 'checkbox' || formDetail.Questions[ques].Type === 'dropdown')
             setOptionList(formDetail.Questions[ques].Content.MultiChoice.Options)
+
+        if (formDetail.Questions[ques].Type === 'checkbox'){
+            setConstraint(formDetail.Questions[ques].Content.MultiChoice.Constraint)
+            setMaxOptions(formDetail.Questions[ques].Content.MultiChoice.MaxOptions)
+        }
 
         setQuesEdit(ques);
     }
@@ -613,6 +631,13 @@ function DetailForm() {
                 setTitleQuestion={setTitleQuestion}
                 required={required}
                 setRequired={setRequired}
+
+                constraint={constraint}
+                handleConstraint={handleConstraint}
+                setConstraint={setConstraint}
+                maxOptions={maxOptions}
+                handleMaxOptions={handleMaxOptions}
+                setMaxOptions={setMaxOptions}
 
                 excelData={excelData}
                 setExcelData={setExcelData}

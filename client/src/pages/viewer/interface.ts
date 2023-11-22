@@ -9,7 +9,10 @@ export interface Response {
 export interface ResultMultiChoice {
     multiChoice: {
         options: string[],
-        result: boolean[]
+        result: boolean[],
+        constraint: string,
+        maxOptions: number
+        disabled: boolean
     }
 }
 

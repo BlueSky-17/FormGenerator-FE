@@ -97,7 +97,9 @@ export function MainModal(props) {
         if (props.type === "multi-choice" || props.type === "checkbox" || props.type === "dropdown") {
             const updateMultiChoice: MultiChoice = {
                 MultiChoice: {
-                    Options: props.optionList
+                    Options: props.optionList,
+                    Constraint: props.constraint,
+                    MaxOptions: props.maxOptions
                 }
             };
 
@@ -144,6 +146,12 @@ export function MainModal(props) {
 
         if (props.type === "multi-choice" || props.type === "checkbox" || props.type === "dropdown") {
             props.formDetail.Questions[props.quesEdit].Content.MultiChoice.Options = props.optionList;
+
+            if (props.type === "checkbox") {
+                props.formDetail.Questions[props.quesEdit].Content.MultiChoice.Constraint = props.constraint;
+                if (props.constraint === 'equal-to' || props.constraint === 'at-most')
+                    props.formDetail.Questions[props.quesEdit].Content.MultiChoice.MaxOptions = props.maxOptions;
+            }
         }
 
         // console.log(props.formDetail.Questions[props.quesEdit].Content)
@@ -168,6 +176,10 @@ export function MainModal(props) {
         if (props.type === "multi-choice" || props.type === "checkbox" || props.type === "dropdown") {
             props.setOptionList(['']);
             setActive(-1);
+            if (props.type === "checkbox") {
+                props.setConstraint('no-limit')
+                props.setMaxOptions(2)
+            }
         }
         else if (props.type === "linkedData") {
             setFile('');
@@ -208,16 +220,6 @@ export function MainModal(props) {
 
     // Thêm option trống 
     const handleOption = () => props.setOptionList([...props.optionList, ''])
-
-    const [totalOption, setTotalOption] = useState<string>()
-    const handleTotalOption = (e) => {
-        setTotalOption(e.target.value);
-    }
-
-    const [numOption, setNumOption] = useState<number>()
-    const handleNumOption = (e) => {
-        setNumOption(e.target.value);
-    }
 
     // Process file -> linkedData
     const [file, setFile] = useState<string>('');
@@ -432,22 +434,23 @@ export function MainModal(props) {
                                     <Typography sx={{ paddingRight: '10px', fontWeight: 'bold' }}>Chọn tổng số lựa chọn:</Typography>
                                     <FormControl sx={{ width: '30%', paddingRight: '10px' }}>
                                         <Select
-                                            value={totalOption}
-                                            onChange={handleTotalOption}
+                                            value={props.constraint}
+                                            onChange={props.handleConstraint}
                                         >
-                                            <MenuItem value={'no-limit'}> Không giới hạn </MenuItem>
-                                            <MenuItem value={'equal-to'}> Ngang bằng với </MenuItem>
-                                            <MenuItem value={'at-most'}> Tối đa </MenuItem>
+                                            <MenuItem disabled={props.optionList < 2} value={'no-limit'}> Không giới hạn </MenuItem>
+                                            <MenuItem disabled={props.optionList < 2} value={'equal-to'}> Ngang bằng với </MenuItem>
+                                            <MenuItem disabled={props.optionList < 2} value={'at-most'}> Tối đa </MenuItem>
                                         </Select>
                                     </FormControl>
-                                    {totalOption === 'equal-to' || totalOption === 'at-most' ? <FormControl sx={{ width: '10%' }}>
+                                    {props.constraint === 'equal-to' || props.constraint === 'at-most' ? <FormControl sx={{ width: '10%' }}>
                                         <Select
-                                            value={numOption}
-                                            onChange={handleNumOption}
+                                            value={props.maxOptions}
+                                            onChange={props.handleMaxOptions}
                                         >
-                                            <MenuItem value={2}> 2 </MenuItem>
-                                            <MenuItem value={3}> 3 </MenuItem>
-                                            <MenuItem value={4}> 4 </MenuItem>
+                                            {props.optionList.slice(1).map((item, index) => (
+                                                <MenuItem key={index} value={index + 2}> {index + 2} </MenuItem>
+                                            ))
+                                            }
                                         </Select>
                                     </FormControl>
                                         : null}
@@ -574,7 +577,7 @@ export function MainModal(props) {
                                     backgroundColor: '#2E4155', // Màu nền thay đổi khi hover
                                 },
                             }}>
-                            Lưu
+                            Thêm
                         </Button> :
                             <Button
                                 onClick={saveQuestion}

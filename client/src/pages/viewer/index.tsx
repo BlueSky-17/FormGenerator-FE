@@ -1,15 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { Box, Typography, Drawer, Avatar, IconButton, Toolbar, List, Divider, Icon, Grid } from '@mui/material'
-import { styled, useTheme, alpha } from '@mui/material/styles';
 import Button from '@mui/material/Button';
-
-import SearchIcon from '@mui/icons-material/Search';
-
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
-import InputBase from '@mui/material/InputBase';
 
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -24,9 +19,8 @@ import Input from '@mui/material/Input';
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
-import FormLabel from '@mui/material/FormLabel';
 import Checkbox from '@mui/material/Checkbox';
-import Alert, { AlertProps } from '@mui/material/Alert';
+import Alert from '@mui/material/Alert';
 
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -35,42 +29,9 @@ import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 import TextField from '@mui/material/TextField';
-import Autocomplete from '@mui/material/Autocomplete';
 import { useParams } from 'react-router-dom';
-import { stringify } from 'querystring';
 
 import { Response, ResultMultiChoice, ResultShortText, ResultDate, ResultLinkedData } from './interface';
-import Responses from '../home/Responses';
-
-// async function getNewToken(refreshToken, user) {
-//     const refreshTokenEndpoint = 'http://localhost:8080/refresh';
-
-//     try {
-//         const response = await fetch(refreshTokenEndpoint, {
-//             method: 'POST',
-//             headers: {
-//                 'Content-Type': 'application/json',
-//             },
-//             body: JSON.stringify({
-//                 refreshToken: refreshToken,
-//             }),
-//         });
-
-//         // Kiểm tra xem yêu cầu có thành công hay không
-//         if (response.ok) {
-//             // Đọc nội dung của Response và chuyển đổi thành JSON
-//             const data = await response.json();
-//             data.user = user;
-//             return data;
-//         } else {
-//             console.error('Failed to refresh access token');
-//             return null;
-//         }
-//     } catch (error) {
-//         console.error('Error refreshing access token:', error);
-//         return null;
-//     }
-// }
 
 function Form() {
     // render: use to re-render after create or delete form
@@ -95,49 +56,6 @@ function Form() {
                 setFormDetail(formDetail);
             })
     }, [])
-
-    // API GET: Get detail of form
-    // useEffect(() => {
-    //     const fetchData = async () => {
-    //         try {
-    //             const response = await fetch(FormDetailAPI_URL, {
-    //                 method: 'GET',
-    //                 headers: {
-    //                     'Content-Type': 'application/json',
-    //                     'Authorization': 'Bearer ' + JSON.parse(sessionStorage.getItem('token') as string)?.accessToken
-    //                 }
-    //             });
-
-    //             if (!response.ok) {
-    //                 // Handle non-OK responses (e.g., 401 Unauthorized)
-    //                 if (response.status === 401) {
-    //                     const refreshToken = getToken().refreshToken;
-    //                     const user = getToken().user;
-    //                     console.log(refreshToken, user);
-    //                     const newToken = await getNewToken(refreshToken, user);
-    //                     console.log(newToken);
-    //                     sessionStorage.setItem('token', JSON.stringify(newToken));
-    //                     // You might want to trigger the useEffect again to retry the fetch
-    //                     setRender(prev => !prev);
-    //                 } else {
-    //                     // Handle other non-OK responses
-    //                     console.error(`HTTP error! Status: ${response.status}`);
-    //                 }
-    //                 return;
-    //             }
-
-    //             const formDetail = await response.json();
-    //             // console.log(forms);
-    //             setFormDetail(formDetail);
-    //         } catch (error) {
-    //             // Handle fetch errors (e.g., network issues)
-    //             console.error('Error fetching data:', error);
-    //         }
-    //     };
-
-    //     fetchData();
-    //     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // },[render]);
 
     //API POST: create a new response
     const addResponsetoDatabase = async (data) => {
@@ -185,7 +103,10 @@ function Form() {
                     const result: ResultMultiChoice = {
                         multiChoice: {
                             options: formDetail.Questions[i].Content.MultiChoice.Options,
-                            result: res
+                            result: res,
+                            constraint: formDetail.Questions[i].Content.MultiChoice.Constraint,
+                            maxOptions: formDetail.Questions[i].Content.MultiChoice.MaxOptions,
+                            disabled: false
                         }
                     };
 
@@ -242,23 +163,6 @@ function Form() {
         console.log("Error");
     }
 
-    // const [time, setTime] = useState('');
-    const handleChangeHour = (ques: number) => (e) => {
-        // console.log(e)
-        formResponses[ques].content.date.single.hour = e.$d;
-    };
-
-    const [value, setValue] = useState('');
-    const handleChangeDropdown = (ques: number) => (e) => {
-        setValue(e.target.value as string);
-        //set all options to result 0
-        formResponses[ques].content.multiChoice.result.fill(false);
-
-        //set select options to result 1
-        formResponses[ques].content.multiChoice.result[e.target.value] = true;
-        console.log(formResponses[ques].content.multiChoice.result)
-    };
-
     // Lưu giá trị cho các field dạng multi-choice
     const handleChange = (ques: number, index: number) => (e) => {
         //set all options to result 0
@@ -269,13 +173,23 @@ function Form() {
         console.log(formResponses[ques].content.multiChoice.result)
     };
 
+    const shouldDisableCheckbox = (ques: number, index: number): boolean => {
+        const maxAllowed = formResponses[ques].content.multiChoice.maxOptions; // Set your maximum number of allowed checked boxes
+        const phanTuTrue = formResponses[ques].content.multiChoice.result.filter((giaTri) => giaTri === true); //Return array have true value
+        return phanTuTrue.length >= maxAllowed;
+    }
+
     // Lưu giá trị cho các field dạng checkbox
     const handleChangeCheckbox = (ques: number, index: number) => (e) => {
         //set select options to result 1
         if (formResponses[ques].content.multiChoice.result[index] === false)
             formResponses[ques].content.multiChoice.result[index] = true;
         else formResponses[ques].content.multiChoice.result[index] = false
-        console.log(formResponses[ques].content.multiChoice.result)
+
+        if (formResponses[ques].content.multiChoice.constraint === 'at-most' || formResponses[ques].content.multiChoice.constraint === 'equal-to') {
+            formResponses[ques].content.multiChoice.disabled = shouldDisableCheckbox(ques, index)
+            setRender(!render);
+        }
     };
 
     //Lưu giá trị cho các field dạng shortText
@@ -289,20 +203,41 @@ function Form() {
 
     //Lưu giá trị cho các field dạng Date
     const handleChangeDate = (ques: number) => (e) => {
-        // console.log(e);l
         formResponses[ques].content.date.single.dateOnly = e.$d;
     };
+    const handleChangeHour = (ques: number) => (e) => {
+        formResponses[ques].content.date.single.hour = e.$d;
+    };
 
+    //Lưu giá trị cho các field dạng dropdown
+    const [value, setValue] = useState('');
+    const handleChangeDropdown = (ques: number) => (e) => {
+        setValue(e.target.value as string);
+        //set all options to result 0
+        formResponses[ques].content.multiChoice.result.fill(false);
+
+        //set select options to result 1
+        formResponses[ques].content.multiChoice.result[e.target.value] = true;
+        console.log(formResponses[ques].content.multiChoice.result)
+    };
+
+    //Handle submit form
+    const [error, setError] = useState<string>('')
     const [submit, setSubmit] = useState<boolean>();
     const handleSubmitForm = () => {
         let checkRequired = true;
+        let checkEqualTo = true;
 
         formResponses.forEach(item => {
-            // Gọi hàm callback với mỗi phần tử và chỉ số tương ứng
-            console.log(item)
-            if (item.required === true) {
+            //Check equal-to maxOptions
+            if (item.type === 'checkbox') {
+                if (item.content.multiChoice.constraint === 'equal-to' && item.content.multiChoice.disabled !== true)
+                    checkEqualTo = false
+            }
+            else if (item.required === true) {
                 if (item.type === 'multi-choice' || item.type === 'checkbox' || item.type === 'dropdown') {
-                    //có 1 giá trị true => true; không có giá trị true nào => false
+                    //Check required
+                    //some function: has >=1 true value => true; has no true value => false
                     let checkSelect = item.content.multiChoice.result.some((giaTri) => giaTri === true);
                     if (!checkSelect) checkRequired = false;
                 }
@@ -312,9 +247,8 @@ function Form() {
             }
         });
 
-        console.log(checkRequired);
-
-        if (checkRequired) {
+        //Success: Fill correctly required questions and checkbox questions (which have equal-to n choice)
+        if (checkRequired && checkEqualTo) {
             addResponsetoDatabase({
                 "id": "6526518a6b149bcb2510172f",
                 "formID": "651dbc9d49502243191371e3",
@@ -323,16 +257,22 @@ function Form() {
                 "submitTime": "2023-10-11T07:40:58.1078101Z",
                 "responses": formResponses
             });
-
             setSubmit(true)
             setHeight('100vh')
         }
-        else {
+        //Failed: Fill incorrectly checkbox question (which have equal-to n choice)
+        else if (!checkEqualTo) {
             setSubmit(false)
+            setError('Vui lòng điền đúng số lượng lựa chọn')
         }
-
+        //Failed: Not fill required questions
+        else if (!checkRequired && checkEqualTo) {
+            setSubmit(false)
+            setError('Vui lòng điền những câu hỏi bắt buộc')
+        }
     }
 
+    //Lưu giá trị cho các field dạng linkedData
     const [firstField, setFirstField] = useState('');
     const handleFirstFieldChange = (ques: number) => (e) => {
         setFirstField(e.target.value);
@@ -387,7 +327,6 @@ function Form() {
                     {/* Body of Form | In case: Unsubmit form */}
                     {!submit && <Box sx={{ margin: '60px' }}>
                         {formDetail.Questions !== undefined ? formDetail.QuestionOrder.map((ques, index) => (
-
                             <Box
                                 key={index}
                                 sx={{ marginY: '15px' }}
@@ -395,7 +334,7 @@ function Form() {
                                 {/* Câu hỏi */}
                                 <Box sx={{ display: 'flex' }}>
                                     <Typography
-                                        sx={{ color: '#008272', justifySelft: 'left', paddingY: '10px', fontWeight: 500 }} variant='h5' noWrap component="div">
+                                        sx={{ color: '#008272', justifySelft: 'left', paddingTop: '10px', fontWeight: 500 }} variant='h5' noWrap component="div">
                                         {index + 1}. {formDetail.Questions[ques].Question}
                                     </Typography>
                                     {
@@ -417,7 +356,6 @@ function Form() {
                                                 {formDetail.Questions[ques].Content.MultiChoice.Options.map((item, index) => (
                                                     <FormControlLabel
                                                         key={index}
-                                                        // checked={selectedValue === item}
                                                         onChange={handleChange(ques, index)}
                                                         value={item}
                                                         control={<Radio />}
@@ -446,18 +384,29 @@ function Form() {
                                         : null
                                     }
                                     {formDetail.Questions[ques].Type === 'checkbox' ?
-                                        <FormControl sx={{ marginLeft: '15px' }}>
-                                            {formDetail.Questions[ques].Content.MultiChoice.Options.map((item, index) => (
-                                                <FormControlLabel
-                                                    key={index}
-                                                    // checked={selectedValue === item}
-                                                    onChange={handleChangeCheckbox(ques, index)}
-                                                    value={item}
-                                                    control={<Checkbox />}
-                                                    label={item}
-                                                />
-                                            ))}
-                                        </FormControl>
+                                        <Box>
+                                            {formResponses[ques].content.multiChoice.constraint === 'at-most' ?
+                                                <Typography sx={{ color: 'gray', paddingBottom: '10px' }}>Vui lòng chọn tối đa {formResponses[ques].content.multiChoice.maxOptions} phương án.</Typography>
+                                                : null
+                                            }
+                                            {formResponses[ques].content.multiChoice.constraint === 'equal-to' ?
+                                                <Typography sx={{ color: 'gray', paddingBottom: '10px' }}>Vui lòng chọn {formResponses[ques].content.multiChoice.maxOptions} phương án.</Typography>
+                                                : null
+                                            }
+                                            <FormControl sx={{ marginLeft: '15px' }}>
+                                                {formDetail.Questions[ques].Content.MultiChoice.Options.map((item, index) => (
+                                                    <FormControlLabel
+                                                        key={index}
+                                                        onChange={handleChangeCheckbox(ques, index)}
+                                                        value={item}
+                                                        control={<Checkbox
+                                                            disabled={formResponses[ques].content.multiChoice.disabled && (formResponses[ques].content.multiChoice.result[index] !== true)}
+                                                        />}
+                                                        label={item}
+                                                    />
+                                                ))}
+                                            </FormControl>
+                                        </Box>
                                         : null
                                     }
                                     {formDetail.Questions[ques].Type === 'shortText' ?
@@ -540,9 +489,6 @@ function Form() {
                                                                 sx={{ marginTop: '10px' }}
                                                                 onChange={handleThirdFieldChange(ques)}
                                                             >
-                                                                {/* {formDetail.Questions[ques].Content.LinkedData.ListOfOptions[firstField].Value[secondField].Value.map((obj,idx) => (
-                                                                <MenuItem key={obj.Key} value={idx} >{obj.Key}</MenuItem>
-                                                            ))} */}
                                                                 <MenuItem value={formDetail.Questions[ques].Content.LinkedData.ListOfOptions[firstField].Value[secondField].Value}>{formDetail.Questions[ques].Content.LinkedData.ListOfOptions[firstField].Value[secondField].Value}</MenuItem>
                                                             </Select>
                                                         </FormControl>
@@ -567,7 +513,7 @@ function Form() {
                             </Box>
                         ))
                             : null}
-                        {submit === false && <Alert severity="error">Vui lòng điền những câu hỏi đã bắt buộc</Alert>}
+                        {submit === false && <Alert severity="error">{error}</Alert>}
                     </Box>}
 
                     {/* Body of Form | In case: Form submitted */}
