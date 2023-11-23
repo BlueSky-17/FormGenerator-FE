@@ -6,6 +6,9 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 
+import { styled } from '@mui/material/styles';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -31,7 +34,8 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import TextField from '@mui/material/TextField';
 import { useParams } from 'react-router-dom';
 
-import { Response, ResultMultiChoice, ResultShortText, ResultDate, ResultLinkedData } from './interface';
+import { Response, ResultMultiChoice, ResultShortText, ResultDate, ResultLinkedData, ResultFile } from './interface';
+import { stringify } from 'querystring';
 
 function Form() {
     // render: use to re-render after create or delete form
@@ -146,6 +150,13 @@ function Form() {
 
                     Object.assign(newResponse.content, result)
                 }
+                else if (formDetail.Questions[i].Type === "file") {
+                    const result: ResultFile = {
+                        files: []
+                    };
+
+                    Object.assign(newResponse.content, result)
+                }
                 else if (formDetail.Questions[i].Type === "linkedData") {
                     const result: ResultLinkedData = {
                         linkedData: []
@@ -224,11 +235,11 @@ function Form() {
     //Handle submit form
     const [error, setError] = useState<string>('')
     const [submit, setSubmit] = useState<boolean>();
-    const handleSubmitForm = () => {
+    const handleSubmitForm = async () => {
         let checkRequired = true;
         let checkEqualTo = true;
 
-        formResponses.forEach(item => {
+        formResponses.forEach(async item => {
             //Check equal-to maxOptions
             if (item.type === 'checkbox') {
                 if (item.content.multiChoice.constraint === 'equal-to' && item.content.multiChoice.disabled !== true)
@@ -245,11 +256,40 @@ function Form() {
                     if (item.content.shortText === '') checkRequired = false;
                 }
             }
+            else if (item.type === 'file' && item.content.files.length !== 0) {
+                // const response = await uploadFileToS3(item.content.files);
+
+                // const result: ResultFile = {
+                //     files: []
+                // };
+
+                // for (let i = 0; i < response.length; ++i){
+                //     result.files.push(
+                //         {
+                //             // id: "abc",
+                //             fileName: response[i].fileName,
+                //             fileURL: response[i].fileURL,
+                //             type: response[i].type,
+                //             size: response[i].size
+                //         }
+                //     )
+                // }
+
+                // console.log(result)
+
+                // Object.assign(item.content, result)
+
+                // console.log(item)
+            }
         });
+
+        console.log(formResponses)
 
         //Success: Fill correctly required questions and checkbox questions (which have equal-to n choice)
         if (checkRequired && checkEqualTo) {
-            addResponsetoDatabase({
+
+            console.log(formResponses);
+            await addResponsetoDatabase({
                 "id": "6526518a6b149bcb2510172f",
                 "formID": "651dbc9d49502243191371e3",
                 "username": formDetail.owner,
@@ -271,6 +311,51 @@ function Form() {
             setError('Vui lòng điền những câu hỏi bắt buộc')
         }
     }
+
+    const handleFileChange = (ques: number) => async (e) => {
+        let selectedFile = e.target.files[0];
+        
+        const response = await uploadFileToS3(selectedFile);
+
+        formResponses[ques].content.files.push(response[0])
+        // uploadFileToS3(selectedFile);
+
+        console.log(formResponses[ques].content.files);
+        setRender(!render);
+    }
+
+    const uploadFileToS3 = async (files: File) => {
+        const formData = new FormData();
+
+        // files.map((file) => (formData.append('files', file)
+        // ))
+        formData.append('files', files)
+
+        const apiUrl = 'http://localhost:8080/upload-to-s3';
+
+        // console.log(file);
+        console.log(formData)
+
+        // Gửi yêu cầu POST sử dụng fetch
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + JSON.parse(sessionStorage.getItem('token') as string)?.accessToken
+            },
+            body: formData,
+        });
+
+        // Kiểm tra nếu yêu cầu thành công (status code 2xx)
+        if (response.ok) {
+            const responseData = await response.json();
+            console.log('Server Response:', responseData);
+            return responseData;
+        } else {
+            // Xử lý lỗi nếu có
+            const errorData = await response.json();
+            console.error('Server Error:', errorData);
+        }
+    };
 
     //Lưu giá trị cho các field dạng linkedData
     const [firstField, setFirstField] = useState('');
@@ -436,6 +521,32 @@ function Form() {
                                                 />
                                             </DemoContainer>
                                         </LocalizationProvider>
+                                        : null
+                                    }
+                                    {formDetail.Questions[ques].Type === 'file' ?
+                                        <Box>
+                                            <Button
+                                                sx={{
+                                                    backgroundColor: '#008272', color: 'white', fontSize: '16px', padding: '6px',
+                                                    '&:hover': {
+                                                        backgroundColor: '#008272',
+                                                        color: 'white'
+                                                    },
+                                                }}
+                                                component="label"
+                                            >
+                                                Upload file
+                                                <input
+                                                    onChange={handleFileChange(ques)}
+                                                    type="file"
+                                                    hidden
+                                                />
+                                            </Button>
+                                            {formResponses[ques].content.files.map((file) => (
+                                                <Typography key={file.fileName} sx={{marginTop: '3px', padding: '5px', background: '#E9F2F4', borderRadius: '20px' }}>{file.fileName}</Typography>
+                                            ))
+                                            }
+                                        </Box>
                                         : null
                                     }
                                     {formDetail.Questions[ques].Type === 'linkedData' ?

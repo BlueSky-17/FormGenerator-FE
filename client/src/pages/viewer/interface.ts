@@ -44,6 +44,16 @@ export interface ResultDate {
     }
 }
 
+export interface ResultFile {
+    files:{
+        // id: string,
+        fileName: string,
+        fileURL: string,
+        type: string,
+        size: number
+    }[]
+}
+
 // Content for linked data TYPE
 export interface ResultLinkedData {
     linkedData: string[]
