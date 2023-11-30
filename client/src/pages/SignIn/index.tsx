@@ -13,6 +13,7 @@ import Grid from '@mui/material/Grid';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import logo from '../../assets/logo.png';
+import google from '../../assets/google.png';
 
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
@@ -27,19 +28,6 @@ import PropTypes from 'prop-types';
 import { error } from 'console';
 import { Navigate } from 'react-router-dom';
 import { useEffect } from 'react';
-
-function Copyright(props: any) {
-  return (
-    <Typography variant="body2" color="text.secondary" align="center" {...props}>
-      {'Copyright © '}
-      <Link to='/'>
-        Your Website
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
 
 //@ts-ignore
 export default function SignInSide({ setToken }) {
@@ -70,7 +58,7 @@ export default function SignInSide({ setToken }) {
         }
         else if (response.status === 401) {
           //
-        } 
+        }
       })
   }
 
@@ -150,7 +138,7 @@ export default function SignInSide({ setToken }) {
           }} />
           <Box
             sx={{
-              my: 8,
+              my: 4,
               mx: 4,
               display: 'flex',
               flexDirection: 'column',
@@ -163,7 +151,7 @@ export default function SignInSide({ setToken }) {
             <Typography component="h1" variant="h5">
               Đăng Nhập
             </Typography>
-            <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1 }}>
+            <Box component="form" noValidate onSubmit={handleSubmit} sx={{ width: '100%' }}>
               <TextField
                 margin="normal"
                 required
@@ -198,9 +186,36 @@ export default function SignInSide({ setToken }) {
                 type="submit"
                 fullWidth
                 variant="contained"
-                sx={{ mt: 3, mb: 2 }}
+                sx={{ mt: 1, mb: 2 }}
               >
                 Đăng nhập
+              </Button>
+              <Button
+                // type="submit"
+                fullWidth
+                variant="contained"
+                sx={{
+                  mt: 1, 
+                  mb: 2, 
+                  textTransform: 'initial', 
+                  color: 'black', 
+                  backgroundColor: 'white', 
+                  '&:hover': {
+                    backgroundColor: 'white', // Màu nền thay đổi khi hover
+                  },
+                }}
+              >
+                <CardMedia
+                  component="img"
+                  image={google}
+                  alt="google logo"
+                  sx={{
+                    height: '15px',
+                    width: '15px',
+                    paddingRight: '10px'
+                  }}
+                />
+                Đăng nhập bằng Google
               </Button>
               <Grid container>
                 <Grid item xs>
@@ -219,7 +234,6 @@ export default function SignInSide({ setToken }) {
                   </Typography>
                 </Grid>
               </Grid>
-              <Copyright sx={{ mt: 5 }} />
             </Box>
           </Box>
         </Box>

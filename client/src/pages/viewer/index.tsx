@@ -205,12 +205,26 @@ function Form() {
 
     //Lưu giá trị cho các field dạng shortText
     const [inputValue, setInputValue] = React.useState('');
-    const handleChangeInputValue = (ques: number) => (e) => {
+    const handleChangeInputValue = (e) => {
         setInputValue(e.target.value);
     };
     const saveInputValue = (ques: number) => (e) => {
         formResponses[ques].content.shortText = inputValue;
+
+        // if (formResponses[ques].content.shortText === '')
     };
+    const [active, setActive] = useState<number>(-1);
+    const handleActive = (ques: number) => (e) => {
+        //Nếu field trống thì set inputValue vễ rỗng, còn không rỗng thì set về giá trị cũ
+        if (formResponses[ques].content.shortText === '') {
+            setInputValue('')
+        }
+        else {
+            setInputValue(formResponses[ques].content.shortText)
+        }
+        //lưu vị trí field được active
+        setActive(ques);
+    }
 
     //Lưu giá trị cho các field dạng Date
     const handleChangeDate = (ques: number) => (e) => {
@@ -314,7 +328,7 @@ function Form() {
 
     const handleFileChange = (ques: number) => async (e) => {
         let selectedFile = e.target.files[0];
-        
+
         const response = await uploadFileToS3(selectedFile);
 
         formResponses[ques].content.files.push(response[0])
@@ -495,14 +509,19 @@ function Form() {
                                         : null
                                     }
                                     {formDetail.Questions[ques].Type === 'shortText' ?
-                                        <TextField
-                                            value={inputValue}
-                                            onChange={handleChangeInputValue(ques)}
-                                            onBlur={saveInputValue(ques)}
-                                            sx={{ width: '100%' }}
-                                            id="outlined-basic"
-                                            label="Điền ngắn"
-                                            variant="outlined" />
+                                        <Box>
+                                            <TextField
+                                                // value={inputValue}
+                                                value={ques === active ? inputValue : formResponses[ques].content.shortText}
+                                                onChange={handleChangeInputValue}
+                                                onBlur={saveInputValue(ques)}
+                                                onClick={handleActive(ques)}
+                                                sx={{ width: '100%', mb: '1px' }}
+                                                id="outlined-basic"
+                                                label="Điền ngắn"
+                                                variant="outlined" />
+                                            {/* {formResponses[ques].content.shortText === '' ? <Alert sx={{ background: 'transparent' }} severity="error">Vui lòng điền những câu hỏi bắt buộc</Alert> : null} */}
+                                        </Box>
                                         : null
                                     }
                                     {formDetail.Questions[ques].Type === 'date-single' && formDetail.Questions[ques].Content.Date === 0 ?
@@ -527,7 +546,8 @@ function Form() {
                                         <Box>
                                             <Button
                                                 sx={{
-                                                    backgroundColor: '#008272', color: 'white', fontSize: '16px', padding: '6px',
+                                                    backgroundColor: '#008272', color: 'white', fontSize: '16px', py: '6px',
+                                                    textTransform: 'initial', px: '10px',
                                                     '&:hover': {
                                                         backgroundColor: '#008272',
                                                         color: 'white'
@@ -535,7 +555,7 @@ function Form() {
                                                 }}
                                                 component="label"
                                             >
-                                                Upload file
+                                                Thêm file
                                                 <input
                                                     onChange={handleFileChange(ques)}
                                                     type="file"
@@ -543,7 +563,7 @@ function Form() {
                                                 />
                                             </Button>
                                             {formResponses[ques].content.files.map((file) => (
-                                                <Typography key={file.fileName} sx={{marginTop: '3px', padding: '5px', background: '#E9F2F4', borderRadius: '20px' }}>{file.fileName}</Typography>
+                                                <Typography key={file.fileName} sx={{ marginTop: '3px', padding: '5px', background: '#E9F2F4', borderRadius: '20px' }}>{file.fileName}</Typography>
                                             ))
                                             }
                                         </Box>
@@ -624,7 +644,6 @@ function Form() {
                             </Box>
                         ))
                             : null}
-                        {submit === false && <Alert severity="error">{error}</Alert>}
                     </Box>}
 
                     {/* Body of Form | In case: Form submitted */}
