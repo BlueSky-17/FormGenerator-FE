@@ -72,67 +72,75 @@ export function MainModal(props) {
         }
     };
 
+    const [error, setError] = useState<Boolean>(false)
+
     // Add question to a form 
     const addQuestion = async () => {
-        const newQuestion: Question = {
-            Question: props.titleQuestion,
-            Description: "",
-            Required: props.required,
-            ImagePath: "",
-            Type: props.type,
-            Content: {}
-        };
-
-        // Tạo một Question có 5 trường: Question, Description, Required, ImagePath, Type, Content
-        props.formDetail.Questions.push(newQuestion);
-
-        // Push index vào QuestionOrder
-        const newIndex = props.formDetail.Questions.length - 1;
-        props.formDetail.QuestionOrder.push(newIndex);
-
-        // Lấy Object: Options có chứa Option[] và ImportedData
-        if (props.type === "multi-choice" || props.type === "checkbox" || props.type === "dropdown") {
-            const updateMultiChoice: MultiChoice = {
-                MultiChoice: {
-                    Options: props.optionList,
-                    Constraint: props.constraint,
-                    MaxOptions: props.maxOptions
-                }
+        if (props.type === '' || props.titleQuestion === '') {
+            setError(true);
+        }
+        else {
+            const newQuestion: Question = {
+                Question: props.titleQuestion,
+                Description: "",
+                Required: props.required,
+                ImagePath: "",
+                Type: props.type,
+                Content: {}
             };
 
-            Object.assign(props.formDetail.Questions[newIndex].Content, updateMultiChoice);
+            // Tạo một Question có 5 trường: Question, Description, Required, ImagePath, Type, Content
+            props.formDetail.Questions.push(newQuestion);
+
+            // Push index vào QuestionOrder
+            const newIndex = props.formDetail.Questions.length - 1;
+            props.formDetail.QuestionOrder.push(newIndex);
+
+            // Lấy Object: Options có chứa Option[] và ImportedData
+            if (props.type === "multi-choice" || props.type === "checkbox" || props.type === "dropdown") {
+                const updateMultiChoice: MultiChoice = {
+                    MultiChoice: {
+                        Options: props.optionList,
+                        Constraint: props.constraint,
+                        MaxOptions: props.maxOptions
+                    }
+                };
+
+                Object.assign(props.formDetail.Questions[newIndex].Content, updateMultiChoice);
+            }
+            else if (props.type === "shortText") {
+                const updateShortText: ShortText = {
+                    shortText: true
+                };
+
+                Object.assign(props.formDetail.Questions[newIndex].Content, updateShortText);
+            }
+            else if (props.type === "date-single" || props.type === "date-range") {
+                const updateDate: Date = {
+                    date: dateNum
+                };
+
+                Object.assign(props.formDetail.Questions[newIndex].Content, updateDate);
+            }
+            else if (props.type === "linkedData") {
+                const updateLinkedData: LinkedData = {
+                    LinkedData: {
+                        ImportedLink: props.fields,
+                        ListOfOptions: props.myObject,
+                    }
+                };
+
+                Object.assign(props.formDetail.Questions[newIndex].Content, updateLinkedData);
+            }
+
+            updateObjectInDatabase({
+                "questionOrder": props.formDetail.QuestionOrder,
+                "questions": props.formDetail.Questions
+            })
+            
+            setError(false);
+            handleClose();
         }
-        else if (props.type === "shortText") {
-            const updateShortText: ShortText = {
-                shortText: true
-            };
-
-            Object.assign(props.formDetail.Questions[newIndex].Content, updateShortText);
-        }
-        else if (props.type === "date-single" || props.type === "date-range") {
-            const updateDate: Date = {
-                date: dateNum
-            };
-
-            Object.assign(props.formDetail.Questions[newIndex].Content, updateDate);
-        }
-        else if (props.type === "linkedData") {
-            const updateLinkedData: LinkedData = {
-                LinkedData: {
-                    ImportedLink: props.fields,
-                    ListOfOptions: props.myObject,
-                }
-            };
-
-            Object.assign(props.formDetail.Questions[newIndex].Content, updateLinkedData);
-        }
-
-        updateObjectInDatabase({
-            "questionOrder": props.formDetail.QuestionOrder,
-            "questions": props.formDetail.Questions
-        })
-
-        handleClose();
     };
 
     // Save question after Edit
@@ -168,6 +176,7 @@ export function MainModal(props) {
         // return default value when open modal: type and title
         props.setType('');
         props.setTitleQuestion('');
+        setError(false);
 
         // return default value when open modal: multi-choice TYPE
         if (props.type === "multi-choice" || props.type === "checkbox" || props.type === "dropdown") {
@@ -185,10 +194,16 @@ export function MainModal(props) {
     }
 
     // Get Type of question
-    const handleChangeType = (event: SelectChangeEvent) => props.setType(event.target.value as string);
+    const handleChangeType = (event: SelectChangeEvent) => {
+        props.setType(event.target.value as string);
+        if(props.titleQuestion !== '') setError(false);
+    }
 
     // Get Title of question 
-    const handleTitleQuestion = (e) => props.setTitleQuestion(e.target.value);
+    const handleTitleQuestion = (e) => {
+        props.setTitleQuestion(e.target.value);
+        if(props.type !== '') setError(false);
+    }
 
     // Get question isRequired or not
     const handleChangeRequired = (e) => props.setRequired(!props.required);
@@ -558,7 +573,7 @@ export function MainModal(props) {
                             </FormGroup>
                         </Box>
                     }
-
+                    {error && <Alert sx={{ background: 'transparent', p: '0' }} severity="error">Vui lòng điền tiêu đề và lựa chọn dạng câu hỏi</Alert>}
                     <Box sx={{ display: 'flex', flexDirection: 'row-reverse' }} >
                         {props.quesEdit === '-1' ? <Button
                             onClick={addQuestion}

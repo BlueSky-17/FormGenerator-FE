@@ -281,7 +281,6 @@ function DetailForm() {
         setSubOpen('')
     }
 
-
     // Delete Question 
     const [deleted, setDelete] = React.useState(false);
     const deleteQuestion = (index: string) => (event: any) => {
