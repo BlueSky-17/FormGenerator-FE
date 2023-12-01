@@ -129,7 +129,6 @@ function MyForms() {
                 body: JSON.stringify(data)
             });
 
-            console.log(response);
 
             if (!response.ok) {
                 throw new Error(`HTTP Error! Status: ${response.status}`);
@@ -137,7 +136,6 @@ function MyForms() {
 
             const dataFromServer = await response.json();
             // Xử lý dữ liệu từ máy chủ (nếu cần)
-            console.log(dataFromServer);
         } catch (error) {
             console.error('Lỗi khi gửi yêu cầu:', error);
         }
@@ -184,13 +182,11 @@ function MyForms() {
                 }
             });
 
-            console.log(response);
 
             if (!response.ok) {
                 throw new Error(`HTTP Error! Status: ${response.status}`);
             }
 
-            console.log('Object deleted successfully');
         } catch (error) {
             console.error('Lỗi khi gửi yêu cầu DELETE:', error);
         }

@@ -61,15 +61,12 @@ export function MainModal(props) {
                 body: JSON.stringify(updateData),
             });
 
-            console.log(response);
-
             if (!response.ok) {
                 throw new Error(`HTTP Error! Status: ${response.status}`);
             }
 
             const dataFromServer = await response.json();
             // Xử lý dữ liệu từ máy chủ (nếu cần)
-            console.log(dataFromServer);
         } catch (error) {
             console.error('Lỗi khi gửi yêu cầu:', error);
         }
@@ -226,10 +223,8 @@ export function MainModal(props) {
     const handleFileChange = (e) => {
         let fileType = ['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'text/csv'];
         let selectedFile = e.target.files[0];
-        console.log(e.target.files[0]);
 
         if (selectedFile) {
-            console.log(selectedFile.type);
             if (selectedFile && fileType.includes(selectedFile.type)) {
                 setTypeError('');
                 setFile(e.target.files[0]);
@@ -251,7 +246,6 @@ export function MainModal(props) {
 
                         props.setExcelData(rows);
                         // setRows(rows); //có id
-                        console.log(data);
                     }
                 };
                 reader.readAsArrayBuffer(selectedFile);
