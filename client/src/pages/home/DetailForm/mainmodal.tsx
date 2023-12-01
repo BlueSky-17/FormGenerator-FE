@@ -369,44 +369,46 @@ export function MainModal(props) {
                     </Box>
                     {props.type === 'multi-choice' || props.type === 'checkbox' || props.type === 'dropdown' ?
                         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                            {
-                                props.optionList.map((item, index) => (
-                                    <Box key={index} sx={{ display: 'flex', alignItems: 'center' }}>
-                                        {props.type === 'multi-choice' && <RadioButtonUncheckedIcon
-                                            sx={{ color: 'gray', marginRight: '10px' }}
-                                        />}
-                                        {props.type === 'checkbox' && <CheckBoxOutlineBlankIcon
-                                            sx={{ color: 'gray', marginRight: '10px' }}
-                                        />}
-                                        {props.type === 'dropdown' &&
-                                            <Typography sx={{ color: 'gray', marginRight: '10px' }}>
-                                                {index + 1}.
-                                            </Typography>
-                                        }
-                                        <TextField
-                                            value={index === active ? optionValue : props.optionList[index]}
-                                            onChange={handleOptionChange}
-                                            onBlur={saveOption(index)}
-                                            onClick={handleActive(index)}
-                                            sx={{ marginRight: '10px', width: '100%' }}
-                                            // id={index.toString()}
-                                            variant="standard"
-                                        />
-                                        <IconButton
-                                            // onClick={deleteQuestion(ques)}
-                                            sx={{
-                                                backgroundColor: '#white',
-                                                color: '#7B7B7B',
-                                                margin: '5px',
-                                                '&:hover': {
-                                                    backgroundColor: '#EBEBEB', // Màu nền thay đổi khi hover
-                                                },
-                                            }}>
-                                            <ClearIcon />
-                                        </IconButton>
-                                    </Box>
-                                ))
-                            }
+                            <Box sx={{ maxHeight: '200px', overflowY: 'scroll' }}>
+                                {
+                                    props.optionList.map((item, index) => (
+                                        <Box key={index} sx={{ display: 'flex', alignItems: 'center' }}>
+                                            {props.type === 'multi-choice' && <RadioButtonUncheckedIcon
+                                                sx={{ color: 'gray', marginRight: '10px' }}
+                                            />}
+                                            {props.type === 'checkbox' && <CheckBoxOutlineBlankIcon
+                                                sx={{ color: 'gray', marginRight: '10px' }}
+                                            />}
+                                            {props.type === 'dropdown' &&
+                                                <Typography sx={{ color: 'gray', marginRight: '10px' }}>
+                                                    {index + 1}.
+                                                </Typography>
+                                            }
+                                            <TextField
+                                                value={index === active ? optionValue : props.optionList[index]}
+                                                onChange={handleOptionChange}
+                                                onBlur={saveOption(index)}
+                                                onClick={handleActive(index)}
+                                                sx={{ marginRight: '10px', width: '100%' }}
+                                                // id={index.toString()}
+                                                variant="standard"
+                                            />
+                                            <IconButton
+                                                // onClick={deleteQuestion(ques)}
+                                                sx={{
+                                                    backgroundColor: '#white',
+                                                    color: '#7B7B7B',
+                                                    margin: '5px',
+                                                    '&:hover': {
+                                                        backgroundColor: '#EBEBEB', // Màu nền thay đổi khi hover
+                                                    },
+                                                }}>
+                                                <ClearIcon />
+                                            </IconButton>
+                                        </Box>
+                                    ))
+                                }
+                            </Box>
                             <Box>
                                 <Button
                                     sx={{ width: '30%', fontSize: '1.1rem', color: '#364F6B', paddingY: '10px', marginBottom: '10px', textTransform: 'initial', borderRadius: '20px' }}

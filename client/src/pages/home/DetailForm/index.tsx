@@ -392,7 +392,7 @@ function DetailForm() {
     return (
         <Box>
             <DrawerHeader />
-            <Box sx={{ backgroundColor: 'white', borderRadius: '15px' }}>
+            <Box sx={{ backgroundColor: 'white', borderRadius: '15px'}}>
 
                 {/*Header of Form: Title & Settings*/}
                 <Box sx={{ display: 'flex' }}>
@@ -490,9 +490,7 @@ function DetailForm() {
                             {Object.keys(formDetail).length !== 0 ? formDetail.header.Description : null}
                         </Typography>
 
-                        <Divider />
-
-                        <TableContainer component={Paper} sx={{ marginTop: '10px' }}>
+                        <TableContainer component={Paper} sx={{ marginTop: '10px', height: '50vh', overflowY:'scroll' }}>
                             <Table sx={{ minWidth: 650 }} aria-label="simple table">
                                 <TableHead>
                                     <TableRow>
