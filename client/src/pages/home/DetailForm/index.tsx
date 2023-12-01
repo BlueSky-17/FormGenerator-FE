@@ -116,15 +116,12 @@ function DetailForm() {
                 body: JSON.stringify(updateData),
             });
 
-            console.log(response);
-
             if (!response.ok) {
                 throw new Error(`HTTP Error! Status: ${response.status}`);
             }
 
             const dataFromServer = await response.json();
             // Xử lý dữ liệu từ máy chủ (nếu cần)
-            console.log(dataFromServer);
         } catch (error) {
             console.error('Lỗi khi gửi yêu cầu:', error);
         }
@@ -172,8 +169,6 @@ function DetailForm() {
             // Lấy mảng các field (keys) 
             const rest = Object.keys(excelData[0])
             const lastElement = rest.pop(); //Xóa property id ở cuối mảng
-            console.log(rest.length)
-
             for (let i = 0; i < rest.length; ++i) {
                 columns.push({
                     field: rest[i],
@@ -212,7 +207,6 @@ function DetailForm() {
             return accumulator;
         }, []);
 
-        console.log(uniqueValues); //['Nghệ An', 'Hà Tĩnh', 'TP.HCM']
 
         const tempObject = {};
 
@@ -230,7 +224,6 @@ function DetailForm() {
             return accumulator;
         }, []);
 
-        console.log(uniqueValues2); //['Thanh Chương', 'Nghi Lộc', 'Can Lộc', 'Quận 7']
 
         uniqueValues2.forEach(item => {
             excelData.forEach(item2 => {
@@ -249,7 +242,6 @@ function DetailForm() {
             return accumulator;
         }, []);
 
-        console.log(uniqueValues3); //['Thị Trấn', 'Thanh Đồng', 'Ngọc Sơn', 'Đông Tây']
 
         uniqueValues3.forEach(item => {
             excelData.forEach(item3 => {
@@ -289,7 +281,6 @@ function DetailForm() {
         setSubOpen('')
     }
 
-    console.log(formDetail);
 
     // Delete Question 
     const [deleted, setDelete] = React.useState(false);
@@ -359,9 +350,7 @@ function DetailForm() {
         })
     }
     const handleSwapUp = (ques: string, index: number) => (event: any) => {
-        console.log(formDetail.QuestionOrder)
         formDetail.QuestionOrder = swapElements(formDetail.QuestionOrder, index - 1);
-        console.log(formDetail.QuestionOrder)
         if (swaped === true) setSwap(false);
         else setSwap(true);
         updateObjectInDatabase({
@@ -399,7 +388,6 @@ function DetailForm() {
     };
     const open_settings = Boolean(anchorEl);
 
-    console.log(formDetail.Questions);
 
     return (
         <Box>

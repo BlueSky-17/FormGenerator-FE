@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useParams } from 'react-router-dom';
-
+import * as ExcelJS from 'exceljs';
 import { Box, Typography, TextField, Drawer, Avatar, IconButton, Toolbar, List, Divider, Icon, Modal, Grid, Switch } from '@mui/material'
 import { styled, useTheme, alpha } from '@mui/material/styles';
 import Button from '@mui/material/Button';
@@ -12,9 +12,10 @@ import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 
 import Summary from './summary';
-import Question from './question';
+import ResponseByQuestion from './question';
 import Detail from './detail';
 import { Answer } from './interface';
+import { Question } from '../DetailForm/interface';
 
 const DrawerHeader = styled('div')(({ theme }) => ({
     display: 'flex',
@@ -36,7 +37,9 @@ function Responses() {
     };
 
     const [responses, setFormResponse] = useState<Answer[]>([])
+    const [formDetail, setFormDetail] = useState<any>({})
 
+    const FormDetailAPI_URL = `http://localhost:8080/form/${useParams()?.formID}`;
     const ResponsesAPI_URL = `http://localhost:8080/get-response/${useParams()?.formID}`;
 
     // API GET: Get responses
@@ -56,6 +59,21 @@ function Responses() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
+    useEffect(() => {
+        fetch(FormDetailAPI_URL, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + JSON.parse(sessionStorage.getItem('token') as string)?.accessToken
+            }
+        })
+            .then(data => data.json())
+            .then(formDetail => {
+                setFormDetail(formDetail);
+            })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
+    console.log(responses);
 
     const [detail, setDetail] = useState(false);
 
@@ -77,12 +95,92 @@ function Responses() {
         }
     }
 
+    //handle create excel File
+    const ExcelGenerator = () => {
+        const generateExcelFile = async () => {
+          // Create a new workbook and add a worksheet
+          const workbook = new ExcelJS.Workbook();
+          const worksheet = workbook.addWorksheet('Sheet 1');
+      
+          // Add data to the worksheet
+          let columns: {
+            header: string;
+            key: string;
+            width: number;}[] = []
+
+           columns.push({
+            header: "Thời gian",
+            key: "time",
+            width: 20 
+        }) 
+           columns.push({
+            header: "Người dùng",
+            key: "username",
+            width: 20 
+        }) 
+          for(let i in formDetail.QuestionOrder){
+            let question: any = formDetail.Questions[i];
+            columns.push({
+                header: question.Question,
+                key: question.Question,
+                width: 20
+            })
+          }
+
+        worksheet.columns = columns
+        // Add rows based on responses
+        for(let response of responses) {
+            const rowData = {
+            SubmitTime: response.SubmitTime, // Assuming SubmitTime is a Date range, update accordingly
+            Username: response.Username,
+            ...response.Responses.reduce((acc, curr) => {
+                const questionKey = `${curr.QuestionName}`;
+                if(curr.Type == 'shortText'){
+                    acc[questionKey] =  `${curr.Content.ShortText}`
+                } else if(curr.Type === 'multi-choice' || curr.Type === 'checkbox'){
+                    let s : string = ''
+                    let flag: boolean = true
+                    for(let j = 0; j < curr.Content.MultiChoice.Result.length; j++) {
+                        if (curr.Content.MultiChoice.Result[j] === true) {
+                            console.log(curr.Content.MultiChoice.Options[j])
+                            if(flag){
+                                s += `${curr.Content.MultiChoice.Options[j]}`
+                                flag = false
+                            } else s += `;${curr.Content.MultiChoice.Options[j]}`
+                        }
+                    }
+                    acc[questionKey] =  s
+                }
+                return acc;
+            }, {})
+            };
+            worksheet.addRow(rowData);
+        }
+      
+          const buffer = await workbook.xlsx.writeBuffer();
+      
+          // Create a Blob from the buffer
+          const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      
+          // Create a download link and trigger a click event
+          const link = document.createElement('a');
+          link.href = window.URL.createObjectURL(blob);
+          link.download = 'responses.xlsx';
+          link.click();
+        };
+        generateExcelFile();
+    };
+
+
+
     return (
         <div>
             <Box sx={{ backgroundColor: 'white', borderRadius: '15px', marginTop: '15px' }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                     <Typography sx={{ color: '#364F6B', padding: '20px', fontWeight: 500 }} variant="h5" noWrap component="div">{responses === null ? 0 : responses.length} câu trả lời</Typography>
-                    <Button sx={{ margin: '20px', fontWeight: 500, textTransform: 'initial', fontSize: '15px' }}>Liên kết với trang tính</Button>
+                    <Button sx={{ margin: '20px', fontWeight: 500, textTransform: 'initial', fontSize: '15px' }}
+                            onClick={ExcelGenerator}
+                    >Liên kết với trang tính</Button>
                 </Box>
                 <Tabs value={tab} onChange={handleChangeTabs} centered>
                     <Tab sx={{ textTransform: 'initial', fontSize: '17px' }} label="Thống kê" />
@@ -117,7 +215,7 @@ function Responses() {
             }
 
             {tab === 1 &&
-                <Question responses={responses} />
+                <ResponseByQuestion responses={responses} />
             }
 
             {tab === 2 &&

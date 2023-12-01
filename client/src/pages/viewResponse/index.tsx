@@ -98,15 +98,12 @@ function ViewForm() {
                 body: JSON.stringify(data)
             });
 
-            console.log(response);
-
             if (!response.ok) {
                 throw new Error(`HTTP Error! Status: ${response.status}`);
             }
 
             const dataFromServer = await response.json();
             // Xử lý dữ liệu từ máy chủ (nếu cần)
-            console.log(dataFromServer);
         } catch (error) {
             console.error('Lỗi khi gửi yêu cầu:', error);
         }
@@ -158,7 +155,6 @@ function ViewForm() {
     // Lưu giá trị cho các field dạng multi-choice
     const handleChange = (ques: number, index: number) => (e) => {
         formResponses[ques].content.multiChoice = formDetail.Questions[ques].Content.MultiChoice.Options[index];
-        console.log(formResponses[ques].content.multiChoice)
     };
 
     //Lưu giá trị cho các field dạng shortText
@@ -188,8 +184,6 @@ function ViewForm() {
 
         setSubmit(true);
     }
-
-    console.log(formResponses);
 
     return (
         <div>

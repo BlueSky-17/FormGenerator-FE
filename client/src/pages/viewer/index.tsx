@@ -73,7 +73,7 @@ function Form() {
                 body: JSON.stringify(data)
             });
 
-            console.log(response);
+            //console.log(response);
 
             if (!response.ok) {
                 throw new Error(`HTTP Error! Status: ${response.status}`);
@@ -81,7 +81,6 @@ function Form() {
 
             const dataFromServer = await response.json();
             // Xử lý dữ liệu từ máy chủ (nếu cần)
-            console.log(dataFromServer);
         } catch (error) {
             console.error('Lỗi khi gửi yêu cầu:', error);
         }
@@ -181,7 +180,6 @@ function Form() {
 
         //set select options to result 1
         formResponses[ques].content.multiChoice.result[index] = true;
-        console.log(formResponses[ques].content.multiChoice.result)
     };
 
     const shouldDisableCheckbox = (ques: number, index: number): boolean => {
@@ -243,7 +241,6 @@ function Form() {
 
         //set select options to result 1
         formResponses[ques].content.multiChoice.result[e.target.value] = true;
-        console.log(formResponses[ques].content.multiChoice.result)
     };
 
     //Handle submit form
@@ -371,7 +368,6 @@ function Form() {
         formResponses[ques].content.linkedData.push(firstChoice);
     };
 
-    console.log(firstField)
 
     const [secondField, setSecondField] = useState('');
     const handleSecondFieldChange = (ques: number) => (e) => {
@@ -390,9 +386,6 @@ function Form() {
         formResponses[ques].content.linkedData.push(thirdChoice);
     };
 
-    console.log(formResponses);
-
-    console.log(formDetail);
 
     const [height, setHeight] = useState('100%')
 

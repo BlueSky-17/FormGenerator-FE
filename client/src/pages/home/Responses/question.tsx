@@ -8,7 +8,7 @@ import Button from '@mui/material/Button';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 
-function Question(props) {
+function ResponseByQuestion(props) {
     return (
         <Box sx={{ backgroundColor: 'white', borderRadius: '15px', marginTop: '15px' }}>
             <Typography sx={{ color: '#364F6B', padding: '20px', fontWeight: 500 }} variant="h5" noWrap component="div">Câu hỏi</Typography>
@@ -16,4 +16,4 @@ function Question(props) {
     )
 }
 
-export default Question
+export default ResponseByQuestion

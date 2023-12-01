@@ -22,7 +22,6 @@ export interface Content{
     MultiChoice: MultiChoice
     ShortText: string
     Table: any
-
 }
 
 
