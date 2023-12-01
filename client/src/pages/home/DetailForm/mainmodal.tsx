@@ -149,7 +149,7 @@ export function MainModal(props) {
 
             if (props.type === "checkbox") {
                 props.formDetail.Questions[props.quesEdit].Content.MultiChoice.Constraint = props.constraint;
-                if (props.constraint === 'equal-to' || props.constraint === 'at-most')
+                if (props.constraint === 'at-most')
                     props.formDetail.Questions[props.quesEdit].Content.MultiChoice.MaxOptions = props.maxOptions;
             }
         }
@@ -438,11 +438,10 @@ export function MainModal(props) {
                                             onChange={props.handleConstraint}
                                         >
                                             <MenuItem disabled={props.optionList < 2} value={'no-limit'}> Không giới hạn </MenuItem>
-                                            <MenuItem disabled={props.optionList < 2} value={'equal-to'}> Ngang bằng với </MenuItem>
                                             <MenuItem disabled={props.optionList < 2} value={'at-most'}> Tối đa </MenuItem>
                                         </Select>
                                     </FormControl>
-                                    {props.constraint === 'equal-to' || props.constraint === 'at-most' ? <FormControl sx={{ width: '10%' }}>
+                                    {props.constraint === 'at-most' ? <FormControl sx={{ width: '10%' }}>
                                         <Select
                                             value={props.maxOptions}
                                             onChange={props.handleMaxOptions}

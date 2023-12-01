@@ -197,7 +197,7 @@ function Form() {
             formResponses[ques].content.multiChoice.result[index] = true;
         else formResponses[ques].content.multiChoice.result[index] = false
 
-        if (formResponses[ques].content.multiChoice.constraint === 'at-most' || formResponses[ques].content.multiChoice.constraint === 'equal-to') {
+        if (formResponses[ques].content.multiChoice.constraint === 'at-most') {
             formResponses[ques].content.multiChoice.disabled = shouldDisableCheckbox(ques, index)
             setRender(!render);
         }
@@ -251,15 +251,9 @@ function Form() {
     const [submit, setSubmit] = useState<boolean>();
     const handleSubmitForm = async () => {
         let checkRequired = true;
-        let checkEqualTo = true;
 
         formResponses.forEach(async item => {
-            //Check equal-to maxOptions
-            if (item.type === 'checkbox') {
-                if (item.content.multiChoice.constraint === 'equal-to' && item.content.multiChoice.disabled !== true)
-                    checkEqualTo = false
-            }
-            else if (item.required === true) {
+            if (item.required === true) {
                 if (item.type === 'multi-choice' || item.type === 'checkbox' || item.type === 'dropdown') {
                     //Check required
                     //some function: has >=1 true value => true; has no true value => false
@@ -299,8 +293,8 @@ function Form() {
 
         console.log(formResponses)
 
-        //Success: Fill correctly required questions and checkbox questions (which have equal-to n choice)
-        if (checkRequired && checkEqualTo) {
+        //Success: Fill correctly required questions 
+        if (checkRequired) {
 
             console.log(formResponses);
             await addResponsetoDatabase({
@@ -314,13 +308,8 @@ function Form() {
             setSubmit(true)
             setHeight('100vh')
         }
-        //Failed: Fill incorrectly checkbox question (which have equal-to n choice)
-        else if (!checkEqualTo) {
-            setSubmit(false)
-            setError('Vui lòng điền đúng số lượng lựa chọn')
-        }
         //Failed: Not fill required questions
-        else if (!checkRequired && checkEqualTo) {
+        else if (!checkRequired) {
             setSubmit(false)
             setError('Vui lòng điền những câu hỏi bắt buộc')
         }
@@ -445,7 +434,7 @@ function Form() {
                                 {/* Nội dung | Dạng câu hỏi */}
                                 <Box sx={{ display: 'flex', flexDirection: 'column', marginX: '30px', marginY: '15px' }}>
                                     {formDetail.Questions[ques].Type === 'multi-choice' ?
-                                        <FormControl sx={{ marginLeft: '15px' }}>
+                                        <FormControl>
                                             <RadioGroup
                                                 key={index}
                                                 aria-labelledby="demo-radio-buttons-group-label"
@@ -488,11 +477,7 @@ function Form() {
                                                 <Typography sx={{ color: 'gray', paddingBottom: '10px' }}>Vui lòng chọn tối đa {formResponses[ques].content.multiChoice.maxOptions} phương án.</Typography>
                                                 : null
                                             }
-                                            {formResponses[ques].content.multiChoice.constraint === 'equal-to' ?
-                                                <Typography sx={{ color: 'gray', paddingBottom: '10px' }}>Vui lòng chọn {formResponses[ques].content.multiChoice.maxOptions} phương án.</Typography>
-                                                : null
-                                            }
-                                            <FormControl sx={{ marginLeft: '15px' }}>
+                                            <FormControl>
                                                 {formDetail.Questions[ques].Content.MultiChoice.Options.map((item, index) => (
                                                     <FormControlLabel
                                                         key={index}
