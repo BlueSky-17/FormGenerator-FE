@@ -2,6 +2,7 @@ export interface Response {
     questionName: string,
     type: string,
     required: boolean,
+    error: boolean,
     content: {}
 }
 

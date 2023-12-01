@@ -73,8 +73,6 @@ function Form() {
                 body: JSON.stringify(data)
             });
 
-            //console.log(response);
-
             if (!response.ok) {
                 throw new Error(`HTTP Error! Status: ${response.status}`);
             }
@@ -97,6 +95,7 @@ function Form() {
                     questionName: formDetail.Questions[i].Question,
                     type: formDetail.Questions[i].Type,
                     required: formDetail.Questions[i].Required,
+                    error: false,
                     content: {}
                 };
 
@@ -200,16 +199,33 @@ function Form() {
             setRender(!render);
         }
     };
+    const checkErrCheckbox = (ques: number) => (e) => {
+        let checkSelect = formResponses[ques].content.multiChoice.result.some((giaTri) => giaTri === true);
+        if (!checkSelect) {
+            // checkRequired = false;
+            formResponses[ques].error = true;
+        }
+        else {
+            formResponses[ques].error = false;
+        }
+        setRender(!render);
+    }
 
     //Lưu giá trị cho các field dạng shortText
     const [inputValue, setInputValue] = React.useState('');
     const handleChangeInputValue = (e) => {
         setInputValue(e.target.value);
     };
+    //Get value of textField after onBlur the field
     const saveInputValue = (ques: number) => (e) => {
         formResponses[ques].content.shortText = inputValue;
 
-        // if (formResponses[ques].content.shortText === '')
+        //Return error if active textField but don't fill
+        if (inputValue === '') formResponses[ques].error = true
+        else formResponses[ques].error = false
+
+        //Render update UI
+        setRender(!render)
     };
     const [active, setActive] = useState<number>(-1);
     const handleActive = (ques: number) => (e) => {
@@ -236,7 +252,7 @@ function Form() {
     const [value, setValue] = useState('');
     const handleChangeDropdown = (ques: number) => (e) => {
         setValue(e.target.value as string);
-        //set all options to result 0
+        //Set all options to result 0
         formResponses[ques].content.multiChoice.result.fill(false);
 
         //set select options to result 1
@@ -244,7 +260,6 @@ function Form() {
     };
 
     //Handle submit form
-    const [error, setError] = useState<string>('')
     const [submit, setSubmit] = useState<boolean>();
     const handleSubmitForm = async () => {
         let checkRequired = true;
@@ -255,36 +270,32 @@ function Form() {
                     //Check required
                     //some function: has >=1 true value => true; has no true value => false
                     let checkSelect = item.content.multiChoice.result.some((giaTri) => giaTri === true);
-                    if (!checkSelect) checkRequired = false;
+                    if (!checkSelect) {
+                        checkRequired = false;
+                        item.error = true;
+                    }
+                    else {
+                        item.error = false;
+                    }
                 }
                 else if (item.type === 'shortText') {
-                    if (item.content.shortText === '') checkRequired = false;
+                    if (item.content.shortText === '') {
+                        checkRequired = false;
+                        item.error = true;
+                    }
+                    else {
+                        item.error = false;
+                    }
                 }
-            }
-            else if (item.type === 'file' && item.content.files.length !== 0) {
-                // const response = await uploadFileToS3(item.content.files);
-
-                // const result: ResultFile = {
-                //     files: []
-                // };
-
-                // for (let i = 0; i < response.length; ++i){
-                //     result.files.push(
-                //         {
-                //             // id: "abc",
-                //             fileName: response[i].fileName,
-                //             fileURL: response[i].fileURL,
-                //             type: response[i].type,
-                //             size: response[i].size
-                //         }
-                //     )
-                // }
-
-                // console.log(result)
-
-                // Object.assign(item.content, result)
-
-                // console.log(item)
+                else if (item.type === 'file') {
+                    if (item.content.files.length === 0) {
+                        checkRequired = false;
+                        item.error = true;
+                    }
+                    else {
+                        item.error = false;
+                    }
+                }
             }
         });
 
@@ -292,7 +303,6 @@ function Form() {
 
         //Success: Fill correctly required questions 
         if (checkRequired) {
-
             console.log(formResponses);
             await addResponsetoDatabase({
                 "id": "6526518a6b149bcb2510172f",
@@ -308,7 +318,7 @@ function Form() {
         //Failed: Not fill required questions
         else if (!checkRequired) {
             setSubmit(false)
-            setError('Vui lòng điền những câu hỏi bắt buộc')
+            setRender(!render)
         }
     }
 
@@ -389,6 +399,8 @@ function Form() {
 
     const [height, setHeight] = useState('100%')
 
+    console.log(formResponses);
+
     return (
         <div>
             <Box sx={{ backgroundColor: '#E9F2F4', border: "2px solid #DEDEDE", height: { height }, width: '100vw' }}>
@@ -427,41 +439,47 @@ function Form() {
                                 {/* Nội dung | Dạng câu hỏi */}
                                 <Box sx={{ display: 'flex', flexDirection: 'column', marginX: '30px', marginY: '15px' }}>
                                     {formDetail.Questions[ques].Type === 'multi-choice' ?
-                                        <FormControl>
-                                            <RadioGroup
-                                                key={index}
-                                                aria-labelledby="demo-radio-buttons-group-label"
-                                                defaultValue="female"
-                                                name="radio-buttons-group"
-                                            >
-                                                {formDetail.Questions[ques].Content.MultiChoice.Options.map((item, index) => (
-                                                    <FormControlLabel
-                                                        key={index}
-                                                        onChange={handleChange(ques, index)}
-                                                        value={item}
-                                                        control={<Radio />}
-                                                        label={item}
-                                                    />
-                                                ))}
-                                            </RadioGroup>
-                                        </FormControl>
+                                        <Box>
+                                            <FormControl>
+                                                <RadioGroup
+                                                    key={index}
+                                                    aria-labelledby="demo-radio-buttons-group-label"
+                                                    defaultValue="female"
+                                                    name="radio-buttons-group"
+                                                >
+                                                    {formDetail.Questions[ques].Content.MultiChoice.Options.map((item, index) => (
+                                                        <FormControlLabel
+                                                            key={index}
+                                                            onChange={handleChange(ques, index)}
+                                                            value={item}
+                                                            control={<Radio />}
+                                                            label={item}
+                                                        />
+                                                    ))}
+                                                </RadioGroup>
+                                            </FormControl>
+                                            {formResponses[ques].error ? <Alert sx={{ background: 'transparent', p: '0' }} severity="error">Vui lòng hoàn thành câu hỏi bắt buộc</Alert> : null}
+                                        </Box>
                                         : null
                                     }
                                     {formDetail.Questions[ques].Type === 'dropdown' ?
-                                        <FormControl fullWidth>
-                                            <Select
-                                                value={value}
-                                                onChange={handleChangeDropdown(ques)}
-                                            >
-                                                {formDetail.Questions[ques].Content.MultiChoice.Options.map((item, index) => (
-                                                    <MenuItem
-                                                        key={index}
-                                                        value={index}>
-                                                        {item}
-                                                    </MenuItem>
-                                                ))}
-                                            </Select>
-                                        </FormControl>
+                                        <Box>
+                                            <FormControl fullWidth>
+                                                <Select
+                                                    value={value}
+                                                    onChange={handleChangeDropdown(ques)}
+                                                >
+                                                    {formDetail.Questions[ques].Content.MultiChoice.Options.map((item, index) => (
+                                                        <MenuItem
+                                                            key={index}
+                                                            value={index}>
+                                                            {item}
+                                                        </MenuItem>
+                                                    ))}
+                                                </Select>
+                                            </FormControl>
+                                            {formResponses[ques].error ? <Alert sx={{ background: 'transparent', p: '0' }} severity="error">Vui lòng hoàn thành câu hỏi bắt buộc</Alert> : null}
+                                        </Box>
                                         : null
                                     }
                                     {formDetail.Questions[ques].Type === 'checkbox' ?
@@ -475,6 +493,7 @@ function Form() {
                                                     <FormControlLabel
                                                         key={index}
                                                         onChange={handleChangeCheckbox(ques, index)}
+                                                        onBlur={checkErrCheckbox(ques)}
                                                         value={item}
                                                         control={<Checkbox
                                                             disabled={formResponses[ques].content.multiChoice.disabled && (formResponses[ques].content.multiChoice.result[index] !== true)}
@@ -483,6 +502,7 @@ function Form() {
                                                     />
                                                 ))}
                                             </FormControl>
+                                            {formResponses[ques].error ? <Alert sx={{ background: 'transparent', p: '0' }} severity="error">Vui lòng hoàn thành câu hỏi bắt buộc</Alert> : null}
                                         </Box>
                                         : null
                                     }
@@ -498,7 +518,7 @@ function Form() {
                                                 id="outlined-basic"
                                                 label="Điền ngắn"
                                                 variant="outlined" />
-                                            {/* {formResponses[ques].content.shortText === '' ? <Alert sx={{ background: 'transparent' }} severity="error">Vui lòng điền những câu hỏi bắt buộc</Alert> : null} */}
+                                            {formResponses[ques].error ? <Alert sx={{ background: 'transparent', p: '0' }} severity="error">Vui lòng hoàn thành câu hỏi bắt buộc</Alert> : null}
                                         </Box>
                                         : null
                                     }
@@ -525,7 +545,7 @@ function Form() {
                                             <Button
                                                 sx={{
                                                     backgroundColor: '#008272', color: 'white', fontSize: '16px', py: '6px',
-                                                    textTransform: 'initial', px: '10px',
+                                                    textTransform: 'initial', px: '20px',
                                                     '&:hover': {
                                                         backgroundColor: '#008272',
                                                         color: 'white'
@@ -544,6 +564,7 @@ function Form() {
                                                 <Typography key={file.fileName} sx={{ marginTop: '3px', padding: '5px', background: '#E9F2F4', borderRadius: '20px' }}>{file.fileName}</Typography>
                                             ))
                                             }
+                                            {formResponses[ques].error ? <Alert sx={{ background: 'transparent', p: '0' }} severity="error">Vui lòng hoàn thành câu hỏi bắt buộc</Alert> : null}
                                         </Box>
                                         : null
                                     }
