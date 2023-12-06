@@ -73,7 +73,7 @@ function Responses() {
             })
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
-    console.log(responses);
+    console.log(formDetail);
 
     const [detail, setDetail] = useState(false);
 
@@ -101,61 +101,85 @@ function Responses() {
           // Create a new workbook and add a worksheet
           const workbook = new ExcelJS.Workbook();
           const worksheet = workbook.addWorksheet('Sheet 1');
-      
+    
+            let count = 2
+            let containTable: boolean = false
+            for(let i in formDetail.QuestionOrder){
+                // if(formDetail.)
+            }
+
           // Add data to the worksheet
           let columns: {
             header: string;
             key: string;
             width: number;}[] = []
 
-           columns.push({
-            header: "Thời gian",
-            key: "time",
-            width: 20 
-        }) 
-           columns.push({
-            header: "Người dùng",
-            key: "username",
-            width: 20 
-        }) 
-          for(let i in formDetail.QuestionOrder){
-            let question: any = formDetail.Questions[i];
             columns.push({
-                header: question.Question,
-                key: question.Question,
-                width: 20
-            })
-          }
-
-        worksheet.columns = columns
-        // Add rows based on responses
-        for(let response of responses) {
-            const rowData = {
-            SubmitTime: response.SubmitTime, // Assuming SubmitTime is a Date range, update accordingly
-            Username: response.Username,
-            ...response.Responses.reduce((acc, curr) => {
-                const questionKey = `${curr.QuestionName}`;
-                if(curr.Type == 'shortText'){
-                    acc[questionKey] =  `${curr.Content.ShortText}`
-                } else if(curr.Type === 'multi-choice' || curr.Type === 'checkbox'){
-                    let s : string = ''
-                    let flag: boolean = true
-                    for(let j = 0; j < curr.Content.MultiChoice.Result.length; j++) {
-                        if (curr.Content.MultiChoice.Result[j] === true) {
-                            console.log(curr.Content.MultiChoice.Options[j])
-                            if(flag){
-                                s += `${curr.Content.MultiChoice.Options[j]}`
-                                flag = false
-                            } else s += `;${curr.Content.MultiChoice.Options[j]}`
-                        }
+                header: "Thời gian",
+                key: "time",
+                width: 20 
+            }) 
+            columns.push({
+                header: "Người dùng",
+                key: "username",
+                width: 20 
+            }) 
+            if(containTable){
+                worksheet.mergeCells('A1:A2')
+                worksheet.mergeCells('B1:B2')
+            }
+            worksheet.getCell('A1').value = 'Thời gian'
+            worksheet.getCell('B1').value = 'Người dùng'
+            
+            for(let i in formDetail.QuestionOrder){
+                let question: any = formDetail.Questions[i];
+                if(question.Type === 'table'){
+                    let tables = ["Năm", "Việc", "Thành tích"];
+                    worksheet.mergeCells(1, count + 1, 1, count + tables.length)
+                    worksheet.getCell(1, count + 1).value = "Danh sách công tác";
+                    for (let i = 0; i < tables.length; i++) {
+                        worksheet.getCell(2, count + i + 1).value = tables[i];
                     }
-                    acc[questionKey] =  s
+                    count += tables.length;
                 }
-                return acc;
-            }, {})
+                else{
+                    count += 1;
+                    worksheet.getCell(1,count).value = question.Question;
+                    if(containTable){
+                        worksheet.mergeCells(1,count,2,count)
+                    }
+                }
+            }
+
+            // Add rows based on responses
+            for(let response of responses) {
+                let rowData: any = []
+                let countR: number = 2
+                rowData.push(response.SubmitTime, response.Username)
+                for(let curr of response.Responses){
+                    if(curr.Type == 'shortText'){
+                        rowData[curr.Index] =  `${curr.Content.ShortText}`
+                    } else if(curr.Type === 'multi-choice' || curr.Type === 'checkbox'){
+                        let s : string = ''
+                        let flag: boolean = true
+                        for(let j = 0; j < curr.Content.MultiChoice.Result.length; j++) {
+                            if (curr.Content.MultiChoice.Result[j] === true) {
+                                if(flag){
+                                    s += `${curr.Content.MultiChoice.Options[j]}`
+                                    flag = false
+                                } else s += `;${curr.Content.MultiChoice.Options[j]}`
+                            }
+                        }
+                        rowData[curr.Index] =  s
+                    }
+                    else if(curr.Type === "table"){
+                        
+                    }
+                } 
+                worksheet.addRow(rowData);
             };
-            worksheet.addRow(rowData);
-        }
+        
+
       
           const buffer = await workbook.xlsx.writeBuffer();
       

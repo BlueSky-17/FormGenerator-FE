@@ -28,7 +28,7 @@ import PropTypes from 'prop-types';
 import { error } from 'console';
 import { Navigate } from 'react-router-dom';
 import { useEffect } from 'react';
-
+import { getAuth, signInWithPopup, GoogleAuthProvider } from "@firebase/auth";
 //@ts-ignore
 export default function SignInSide({ setToken }) {
 
@@ -61,6 +61,60 @@ export default function SignInSide({ setToken }) {
         }
       })
   }
+  async function googleLoginHandle(credentials) {
+    return fetch('http://localhost:8080/login/google', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(credentials)
+    })
+      .then((response) => {
+        if (response.status === 200) {
+          console.log(response.body)
+          return response.json();
+        }
+        else if (response.status === 404) {
+          setLoginState(false)
+        }
+        else if (response.status === 401) {
+          //
+        }
+      })
+  }
+
+  async function loginWithGoogle() {
+    // TO DO
+    // debugger
+    const auth = getAuth();
+    const provider = new GoogleAuthProvider();
+  
+    try {
+      const result = await signInWithPopup(auth, provider);
+  
+      // Get user information from the result
+      const googleUser = result.user;
+  
+      // Call googleLoginHandle with user information
+      const token = await googleLoginHandle({
+          Email: googleUser.email,
+          FirstName: googleUser.displayName,
+          AvatarPath: googleUser.photoURL,
+          Role: 'user'
+      });
+      console.log(googleUser)
+       
+      // Set the token
+      setToken(token);
+      if (token !== undefined) nav('/home');
+    } catch (error) {
+      // Handle Errors here.
+      console.log(error);
+    }
+  }
+  
+
+  
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -204,6 +258,7 @@ export default function SignInSide({ setToken }) {
                     backgroundColor: 'white', // Màu nền thay đổi khi hover
                   },
                 }}
+                onClick={loginWithGoogle}
               >
                 <CardMedia
                   component="img"

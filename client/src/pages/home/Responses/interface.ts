@@ -29,6 +29,9 @@ export interface Response{
     QuestionName: string
     Type: string
     Content: Content
+    Index: number
+    Error: boolean
+    Required: boolean
 }
 
 export interface Answer{

@@ -280,7 +280,7 @@ function MyForms() {
                                 </TableRow >
                             </TableHead>
                             <TableBody>
-                                {forms.map((form, index) => (
+                                {forms && forms.map((form, index) => (
                                     <TableRow
                                         key={index}
                                         sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
