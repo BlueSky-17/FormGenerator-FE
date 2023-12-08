@@ -207,8 +207,7 @@ function Responses() {
                     >Liên kết với trang tính</Button>
                 </Box>
                 <Tabs value={tab} onChange={handleChangeTabs} centered>
-                    <Tab sx={{ textTransform: 'initial', fontSize: '17px' }} label="Bản tóm tắt" />
-                    <Tab sx={{ textTransform: 'initial', fontSize: '17px' }} label="Câu hỏi" />
+                    <Tab sx={{ textTransform: 'initial', fontSize: '17px' }} label="Thống kê" />
                     <Tab sx={{ textTransform: 'initial', fontSize: '17px' }} label="Cá nhân" />
                 </Tabs>
                 {detail &&

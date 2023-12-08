@@ -58,51 +58,8 @@ function DetailForm() {
             .then(formDetail => {
                 setFormDetail(formDetail);
             })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
-
-    // API GET: Get detail of form
-    // useEffect(() => {
-    //     const fetchData = async () => {
-    //         try {
-    //             const response = await fetch(FormDetailAPI_URL, {
-    //                 method: 'GET',
-    //                 headers: {
-    //                     'Content-Type': 'application/json',
-    //                     'Authorization': 'Bearer ' + JSON.parse(sessionStorage.getItem('token') as string)?.accessToken
-    //                 }
-    //             });
-
-    //             if (!response.ok) {
-    //                 // Handle non-OK responses (e.g., 401 Unauthorized)
-    //                 if (response.status === 401) {
-    //                     const refreshToken = getToken().refreshToken;
-    //                     const user = getToken().user;
-    //                     console.log(refreshToken, user);
-    //                     const newToken = await getNewToken(refreshToken, user);
-    //                     console.log(newToken);
-    //                     sessionStorage.setItem('token', JSON.stringify(newToken));
-    //                     // You might want to trigger the useEffect again to retry the fetch
-    //                     setRender(prev => !prev);
-    //                 } else {
-    //                     // Handle other non-OK responses
-    //                     console.error(`HTTP error! Status: ${response.status}`);
-    //                 }
-    //                 return;
-    //             }
-
-    //             const formDetail = await response.json();
-    //             // console.log(forms);
-    //             setFormDetail(formDetail);
-    //         } catch (error) {
-    //             // Handle fetch errors (e.g., network issues)
-    //             console.error('Error fetching data:', error);
-    //         }
-    //     };
-
-    //     fetchData();
-    //     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // },[render]);
 
     // API PUT: Update form 
     const updateObjectInDatabase = async (updateData) => {
@@ -140,6 +97,7 @@ function DetailForm() {
 
     // Set type, title, required of question
     const [type, setType] = React.useState('');
+    const [tempType, setTempType] = React.useState('');
     const [titleQuestion, setTitleQuestion] = useState('');
     const [required, setRequired] = useState(false);
 
@@ -156,7 +114,7 @@ function DetailForm() {
     // Close/Open Main Modal 
     const [open, setOpen] = useState(false);
     const handleOpen = () => {
-        setQuesEdit('-1')
+        setQuesEdit(-1)
         setOpen(true);
     }
 
@@ -281,6 +239,18 @@ function DetailForm() {
         setSubOpen('')
     }
 
+    //Xử lý file
+    const [maxFileAmount, setMaxFileAmount] = useState(1);
+    const [maxFileSize, setMaxFileSize] = useState(10240);
+    const handleMaxFileAmount = (event: SelectChangeEvent) => {
+        // console.log(event)
+        const intValue: number = parseInt(event.target.value as string, 10);
+        setMaxFileAmount(intValue);
+    }
+    const handleMaxFileSize = (event: SelectChangeEvent) => {
+        setMaxFileSize(parseInt(event.target.value as string, 10));
+    }
+    const [fileType, setFileType] = useState([]);
 
     // Delete Question 
     const [deleted, setDelete] = React.useState(false);
@@ -360,17 +330,23 @@ function DetailForm() {
     }
 
     // Edit Question
-    const [quesEdit, setQuesEdit] = React.useState('-1');
-    const editQuestion = (ques: string, index: string) => (event: any) => {
+    const [quesEdit, setQuesEdit] = React.useState(-1);
+    const editQuestion = (ques: number, index: string) => (event: any) => {
         setOpen(true);
         setType(formDetail.Questions[ques].Type);
+        setTempType(formDetail.Questions[ques].Type);
         setTitleQuestion(formDetail.Questions[ques].Question)
         setRequired(formDetail.Questions[ques].Required);
 
         if (formDetail.Questions[ques].Type === 'multi-choice' || formDetail.Questions[ques].Type === 'checkbox' || formDetail.Questions[ques].Type === 'dropdown')
             setOptionList(formDetail.Questions[ques].Content.MultiChoice.Options)
+        else if (formDetail.Questions[ques].Type === 'file') {
+            setMaxFileAmount(formDetail.Questions[ques].Content.File.MaxFileAmount);
+            setMaxFileSize(formDetail.Questions[ques].Content.File.MaxFileSize);
+            setFileType(formDetail.Questions[ques].Content.File.FileType)
+        }
 
-        if (formDetail.Questions[ques].Type === 'checkbox'){
+        if (formDetail.Questions[ques].Type === 'checkbox') {
             setConstraint(formDetail.Questions[ques].Content.MultiChoice.Constraint)
             setMaxOptions(formDetail.Questions[ques].Content.MultiChoice.MaxOptions)
         }
@@ -387,7 +363,6 @@ function DetailForm() {
         setAnchorEl(null);
     };
     const open_settings = Boolean(anchorEl);
-
 
     return (
         <Box>
@@ -490,9 +465,7 @@ function DetailForm() {
                             {Object.keys(formDetail).length !== 0 ? formDetail.header.Description : null}
                         </Typography>
 
-                        <Divider />
-
-                        <TableContainer component={Paper} sx={{ marginTop: '10px' }}>
+                        <TableContainer component={Paper} sx={{ marginTop: '10px', height: '50vh', overflowY: 'scroll' }}>
                             <Table sx={{ minWidth: 650 }} aria-label="simple table">
                                 <TableHead>
                                     <TableRow>
@@ -615,6 +588,8 @@ function DetailForm() {
                 formDetail={formDetail}
                 type={type}
                 setType={setType}
+                tempType={tempType}
+                setTempType={setTempType}
                 titleQuestion={titleQuestion}
                 setTitleQuestion={setTitleQuestion}
                 required={required}
@@ -627,6 +602,15 @@ function DetailForm() {
                 handleMaxOptions={handleMaxOptions}
                 setMaxOptions={setMaxOptions}
 
+                maxFileAmount={maxFileAmount}
+                setMaxFileAmount={setMaxFileAmount}
+                handleMaxFileAmount={handleMaxFileAmount}
+                maxFileSize={maxFileSize}
+                setMaxFileSize={setMaxFileSize}
+                handleMaxFileSize={handleMaxFileSize}
+                fileType={fileType}
+                setFileType={setFileType}
+
                 excelData={excelData}
                 setExcelData={setExcelData}
                 fields={fields}
@@ -635,6 +619,7 @@ function DetailForm() {
                 optionList={optionList}
                 setOptionList={setOptionList}
                 quesEdit={quesEdit}
+                setQuesEdit={setQuesEdit}
             />
 
             <SubModal

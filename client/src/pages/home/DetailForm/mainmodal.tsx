@@ -26,10 +26,11 @@ import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
+import Checkbox from '@mui/material/Checkbox';
 import { useParams } from 'react-router-dom';
 import Alert, { AlertProps } from '@mui/material/Alert';
 
-import { Question, ShortText, MultiChoice, Date, LinkedData } from './interface';
+import { Question, ShortText, MultiChoice, Date, LinkedData, File } from './interface';
 import * as XLSX from 'xlsx'
 
 // Style cho modal edit
@@ -44,6 +45,16 @@ const style = {
     borderRadius: '15px',
     boxShadow: 24,
     p: 4,
+};
+
+const typeOfFile = ['Tài liệu', 'Bảng tính', 'PDF', 'Hình ảnh', 'Video'];
+
+const myRecordType: Record<string, string> = {
+    "Tài liệu": 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    "Bảng tính": 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    "PDF": 'application/pdf',
+    "Hình ảnh": 'image/png',
+    "Video": 'video/mp4',
 };
 
 export function MainModal(props) {
@@ -72,67 +83,99 @@ export function MainModal(props) {
         }
     };
 
+    const [error, setError] = useState<Boolean>(false)
+
     // Add question to a form 
+    // addQuestion(editQues): nếu editQues = -1 => tạo ques mới
+    // nếu editQues >= 0 thì: ghi đè content lên ques cũ (vì đổi type)
     const addQuestion = async () => {
-        const newQuestion: Question = {
-            Question: props.titleQuestion,
-            Description: "",
-            Required: props.required,
-            ImagePath: "",
-            Type: props.type,
-            Content: {}
-        };
-
-        // Tạo một Question có 5 trường: Question, Description, Required, ImagePath, Type, Content
-        props.formDetail.Questions.push(newQuestion);
-
-        // Push index vào QuestionOrder
-        const newIndex = props.formDetail.Questions.length - 1;
-        props.formDetail.QuestionOrder.push(newIndex);
-
-        // Lấy Object: Options có chứa Option[] và ImportedData
-        if (props.type === "multi-choice" || props.type === "checkbox" || props.type === "dropdown") {
-            const updateMultiChoice: MultiChoice = {
-                MultiChoice: {
-                    Options: props.optionList,
-                    Constraint: props.constraint,
-                    MaxOptions: props.maxOptions
-                }
+        if (props.type === '' || props.titleQuestion === '') {
+            setError(true);
+        }
+        else {
+            const newQuestion: Question = {
+                Question: props.titleQuestion,
+                Description: "",
+                Required: props.required,
+                ImagePath: "",
+                Type: props.type,
+                Content: {}
             };
 
-            Object.assign(props.formDetail.Questions[newIndex].Content, updateMultiChoice);
+            let ques = props.quesEdit;
+
+            if (props.quesEdit === -1) {
+                // Tạo một Question có 5 trường: Question, Description, Required, ImagePath, Type, Content
+                props.formDetail.Questions.push(newQuestion);
+
+                // Push index vào QuestionOrder
+                const newIndex = props.formDetail.Questions.length - 1;
+                props.formDetail.QuestionOrder.push(newIndex);
+
+                ques = newIndex;
+            }
+
+            // Lấy Object: Options có chứa Option[] và ImportedData
+            if (props.type === "multi-choice" || props.type === "checkbox" || props.type === "dropdown") {
+                const updateMultiChoice: MultiChoice = {
+                    MultiChoice: {
+                        Options: props.optionList,
+                        Constraint: props.constraint,
+                        MaxOptions: props.maxOptions
+                    }
+                };
+
+                props.formDetail.Questions[ques].Content = {};
+                Object.assign(props.formDetail.Questions[ques].Content, updateMultiChoice);
+            }
+            else if (props.type === "shortText") {
+                const updateShortText: ShortText = {
+                    shortText: true
+                };
+
+                props.formDetail.Questions[ques].Content = {};
+                Object.assign(props.formDetail.Questions[ques].Content, updateShortText);
+            }
+            else if (props.type === "date-single" || props.type === "date-range") {
+                const updateDate: Date = {
+                    date: dateNum
+                };
+
+                props.formDetail.Questions[ques].Content = {};
+                Object.assign(props.formDetail.Questions[ques].Content, updateDate);
+            }
+            else if (props.type === "file") {
+                const updateFile: File = {
+                    File: {
+                        MaxFileSize: props.maxFileSize,
+                        FileType: props.fileType,
+                        MaxFileAmount: props.maxFileAmount,
+                    }
+                };
+
+                props.formDetail.Questions[ques].Content = {};
+                Object.assign(props.formDetail.Questions[ques].Content, updateFile);
+            }
+            else if (props.type === "linkedData") {
+                const updateLinkedData: LinkedData = {
+                    LinkedData: {
+                        ImportedLink: props.fields,
+                        ListOfOptions: props.myObject,
+                    }
+                };
+
+                props.formDetail.Questions[ques].Content = {};
+                Object.assign(props.formDetail.Questions[ques].Content, updateLinkedData);
+            }
+
+            updateObjectInDatabase({
+                "questionOrder": props.formDetail.QuestionOrder,
+                "questions": props.formDetail.Questions
+            })
+
+            setError(false);
+            handleClose();
         }
-        else if (props.type === "shortText") {
-            const updateShortText: ShortText = {
-                shortText: true
-            };
-
-            Object.assign(props.formDetail.Questions[newIndex].Content, updateShortText);
-        }
-        else if (props.type === "date-single" || props.type === "date-range") {
-            const updateDate: Date = {
-                date: dateNum
-            };
-
-            Object.assign(props.formDetail.Questions[newIndex].Content, updateDate);
-        }
-        else if (props.type === "linkedData") {
-            const updateLinkedData: LinkedData = {
-                LinkedData: {
-                    ImportedLink: props.fields,
-                    ListOfOptions: props.myObject,
-                }
-            };
-
-            Object.assign(props.formDetail.Questions[newIndex].Content, updateLinkedData);
-        }
-
-        updateObjectInDatabase({
-            "questionOrder": props.formDetail.QuestionOrder,
-            "questions": props.formDetail.Questions
-        })
-
-        handleClose();
     };
 
     // Save question after Edit
@@ -141,24 +184,32 @@ export function MainModal(props) {
         props.formDetail.Questions[props.quesEdit].Question = props.titleQuestion;
         props.formDetail.Questions[props.quesEdit].Required = props.required;
 
-        if (props.type === "multi-choice" || props.type === "checkbox" || props.type === "dropdown") {
-            props.formDetail.Questions[props.quesEdit].Content.MultiChoice.Options = props.optionList;
+        // Nếu có đổi type => gọi addQuestion
+        if (props.tempType === props.type) {
+            if (props.type === "multi-choice" || props.type === "checkbox" || props.type === "dropdown") {
+                props.formDetail.Questions[props.quesEdit].Content.MultiChoice.Options = props.optionList;
 
-            if (props.type === "checkbox") {
-                props.formDetail.Questions[props.quesEdit].Content.MultiChoice.Constraint = props.constraint;
-                if (props.constraint === 'equal-to' || props.constraint === 'at-most')
-                    props.formDetail.Questions[props.quesEdit].Content.MultiChoice.MaxOptions = props.maxOptions;
+                if (props.type === "checkbox") {
+                    props.formDetail.Questions[props.quesEdit].Content.MultiChoice.Constraint = props.constraint;
+                    if (props.constraint === 'at-most')
+                        props.formDetail.Questions[props.quesEdit].Content.MultiChoice.MaxOptions = props.maxOptions;
+                }
             }
+            else if (props.type === 'file') {
+                props.formDetail.Questions[props.quesEdit].Content.File.MaxFileSize = props.maxFileSize;
+                props.formDetail.Questions[props.quesEdit].Content.File.FileType = props.fileType;
+                props.formDetail.Questions[props.quesEdit].Content.File.MaxFileAmount = props.maxFileAmount;
+            }
+
+            updateObjectInDatabase({
+                "questionOrder": props.formDetail.QuestionOrder,
+                "questions": props.formDetail.Questions
+            })
+
+            handleClose();
+        } else {
+            addQuestion();
         }
-
-        // console.log(props.formDetail.Questions[props.quesEdit].Content)
-
-        updateObjectInDatabase({
-            "questionOrder": props.formDetail.QuestionOrder,
-            "questions": props.formDetail.Questions
-        })
-
-        handleClose();
     }
 
     // Close MainModal Edit
@@ -168,6 +219,7 @@ export function MainModal(props) {
         // return default value when open modal: type and title
         props.setType('');
         props.setTitleQuestion('');
+        setError(false);
 
         // return default value when open modal: multi-choice TYPE
         if (props.type === "multi-choice" || props.type === "checkbox" || props.type === "dropdown") {
@@ -178,17 +230,29 @@ export function MainModal(props) {
                 props.setMaxOptions(2)
             }
         }
+        else if (props.type === "file") {
+            props.setMaxFileSize(10240);
+            props.setFileType([]);
+            props.setMaxFileAmount(1);
+        }
         else if (props.type === "linkedData") {
             setFile('');
             props.setExcelData([]);
         }
+        props.setQuesEdit(-1)
     }
 
     // Get Type of question
-    const handleChangeType = (event: SelectChangeEvent) => props.setType(event.target.value as string);
+    const handleChangeType = (event: SelectChangeEvent) => {
+        props.setType(event.target.value as string);
+        if (props.titleQuestion !== '') setError(false);
+    }
 
     // Get Title of question 
-    const handleTitleQuestion = (e) => props.setTitleQuestion(e.target.value);
+    const handleTitleQuestion = (e) => {
+        props.setTitleQuestion(e.target.value);
+        if (props.type !== '') setError(false);
+    }
 
     // Get question isRequired or not
     const handleChangeRequired = (e) => props.setRequired(!props.required);
@@ -217,6 +281,59 @@ export function MainModal(props) {
 
     // Thêm option trống 
     const handleOption = () => props.setOptionList([...props.optionList, ''])
+
+    //Handle type of file
+    const handleChangeCheckbox = (e) => {
+        if (e.target.checked) {
+            switch (e.target.value) {
+                case 'Tài liệu': //File docx
+                    props.setFileType([...props.fileType, 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'])
+                    break;
+                case 'Bảng tính': // File Excel (.xlsx)
+                    props.setFileType([...props.fileType, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']);
+                    break;
+                case 'PDF': //File pdf
+                    props.setFileType([...props.fileType, 'application/pdf']);
+                    break;
+                case 'Hình ảnh': //File jpg và png
+                    props.setFileType([...props.fileType, 'image/png', 'image/jpeg']);
+                    break;
+                case 'Video':
+                    props.setFileType([...props.fileType, 'video/mp4']);
+                    break;
+                default:
+                    break;
+            }
+        }
+        else {
+            switch (e.target.value) {
+                case 'Tài liệu': //File docx
+                    let array = props.fileType.filter(item => item !== 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+                    props.setFileType(array);
+                    break;
+                case 'Bảng tính': // File Excel (.xlsx)
+                    let array2 = props.fileType.filter(item => item !== 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+                    props.setFileType(array2);
+                    break;
+                case 'PDF': //File pdf
+                    let array3 = props.fileType.filter(item => item !== 'application/pdf');
+                    props.setFileType(array3);
+                    break;
+                case 'Hình ảnh': //File jpg và png
+                    let array4 = props.fileType.filter(item => item !== 'image/jpeg');
+                    let array5 = array4.filter(item => item !== 'image/png')
+                    props.setFileType(array5);
+                    break;
+                case 'Video':
+                    let array6 = props.fileType.filter(item => item !== 'video/mp4');
+                    props.setFileType(array6);
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
+    console.log(props.fileType)
 
     // Process file -> linkedData
     const [file, setFile] = useState<string>('');
@@ -268,6 +385,8 @@ export function MainModal(props) {
         setDateNum(e.target.value);
     }
 
+    console.log(props.formDetail)
+
     return (
         <div>
             <Modal
@@ -281,7 +400,7 @@ export function MainModal(props) {
                         Chỉnh sửa câu hỏi
                     </Typography>
 
-                    <Box component="form" sx={{ marginY: '10px', display: 'flex', alignItems: 'center' }}>
+                    <Box component="form" sx={{ mt: '10px', mb: '5px', display: 'flex', alignItems: 'center' }}>
                         <TextField
                             required
                             value={props.titleQuestion}
@@ -369,44 +488,46 @@ export function MainModal(props) {
                     </Box>
                     {props.type === 'multi-choice' || props.type === 'checkbox' || props.type === 'dropdown' ?
                         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                            {
-                                props.optionList.map((item, index) => (
-                                    <Box key={index} sx={{ display: 'flex', alignItems: 'center' }}>
-                                        {props.type === 'multi-choice' && <RadioButtonUncheckedIcon
-                                            sx={{ color: 'gray', marginRight: '10px' }}
-                                        />}
-                                        {props.type === 'checkbox' && <CheckBoxOutlineBlankIcon
-                                            sx={{ color: 'gray', marginRight: '10px' }}
-                                        />}
-                                        {props.type === 'dropdown' &&
-                                            <Typography sx={{ color: 'gray', marginRight: '10px' }}>
-                                                {index + 1}.
-                                            </Typography>
-                                        }
-                                        <TextField
-                                            value={index === active ? optionValue : props.optionList[index]}
-                                            onChange={handleOptionChange}
-                                            onBlur={saveOption(index)}
-                                            onClick={handleActive(index)}
-                                            sx={{ marginRight: '10px', width: '100%' }}
-                                            // id={index.toString()}
-                                            variant="standard"
-                                        />
-                                        <IconButton
-                                            // onClick={deleteQuestion(ques)}
-                                            sx={{
-                                                backgroundColor: '#white',
-                                                color: '#7B7B7B',
-                                                margin: '5px',
-                                                '&:hover': {
-                                                    backgroundColor: '#EBEBEB', // Màu nền thay đổi khi hover
-                                                },
-                                            }}>
-                                            <ClearIcon />
-                                        </IconButton>
-                                    </Box>
-                                ))
-                            }
+                            <Box sx={{ maxHeight: '200px', overflowY: 'scroll' }}>
+                                {
+                                    props.optionList.map((item, index) => (
+                                        <Box key={index} sx={{ display: 'flex', alignItems: 'center' }}>
+                                            {props.type === 'multi-choice' && <RadioButtonUncheckedIcon
+                                                sx={{ color: 'gray', marginRight: '10px' }}
+                                            />}
+                                            {props.type === 'checkbox' && <CheckBoxOutlineBlankIcon
+                                                sx={{ color: 'gray', marginRight: '10px' }}
+                                            />}
+                                            {props.type === 'dropdown' &&
+                                                <Typography sx={{ color: 'gray', marginRight: '10px' }}>
+                                                    {index + 1}.
+                                                </Typography>
+                                            }
+                                            <TextField
+                                                value={index === active ? optionValue : props.optionList[index]}
+                                                onChange={handleOptionChange}
+                                                onBlur={saveOption(index)}
+                                                onClick={handleActive(index)}
+                                                sx={{ marginRight: '10px', width: '100%' }}
+                                                // id={index.toString()}
+                                                variant="standard"
+                                            />
+                                            <IconButton
+                                                // onClick={deleteQuestion(ques)}
+                                                sx={{
+                                                    backgroundColor: '#white',
+                                                    color: '#7B7B7B',
+                                                    margin: '5px',
+                                                    '&:hover': {
+                                                        backgroundColor: '#EBEBEB', // Màu nền thay đổi khi hover
+                                                    },
+                                                }}>
+                                                <ClearIcon />
+                                            </IconButton>
+                                        </Box>
+                                    ))
+                                }
+                            </Box>
                             <Box>
                                 <Button
                                     sx={{ width: '30%', fontSize: '1.1rem', color: '#364F6B', paddingY: '10px', marginBottom: '10px', textTransform: 'initial', borderRadius: '20px' }}
@@ -432,11 +553,10 @@ export function MainModal(props) {
                                             onChange={props.handleConstraint}
                                         >
                                             <MenuItem disabled={props.optionList < 2} value={'no-limit'}> Không giới hạn </MenuItem>
-                                            <MenuItem disabled={props.optionList < 2} value={'equal-to'}> Ngang bằng với </MenuItem>
                                             <MenuItem disabled={props.optionList < 2} value={'at-most'}> Tối đa </MenuItem>
                                         </Select>
                                     </FormControl>
-                                    {props.constraint === 'equal-to' || props.constraint === 'at-most' ? <FormControl sx={{ width: '10%' }}>
+                                    {props.constraint === 'at-most' ? <FormControl sx={{ width: '10%' }}>
                                         <Select
                                             value={props.maxOptions}
                                             onChange={props.handleMaxOptions}
@@ -487,6 +607,59 @@ export function MainModal(props) {
                                 </Select>
                             </FormControl>
                         </Box>
+                        : null
+                    }
+                    {props.type === 'file' ?
+                        <Grid container spacing={1}>
+                            <Grid item xs={6} sx={{ marginBottom: '5px' }}>
+                                <Typography sx={{ marginY: '10px', color: 'gray' }}>Số lượng tệp tối đa</Typography>
+                                <FormControl sx={{ width: '100%' }}>
+                                    <Select
+                                        value={props.maxFileAmount}
+                                        onChange={props.handleMaxFileAmount}
+                                    >
+                                        <MenuItem value={1}> 1 </MenuItem>
+                                        <MenuItem value={5}> 5 </MenuItem>
+                                        <MenuItem value={10}> 10 </MenuItem>
+                                    </Select>
+                                </FormControl>
+                            </Grid>
+                            <Grid item xs={6}>
+                                <Typography sx={{ marginY: '10px', color: 'gray' }}>Kích thước tệp tối đa</Typography>
+                                <FormControl sx={{ width: '100%' }}>
+                                    <Select
+                                        value={props.maxFileSize}
+                                        onChange={props.handleMaxFileSize}
+                                    >
+                                        <MenuItem value={1024}> 1 MB</MenuItem>
+                                        <MenuItem value={10240}> 10 MB</MenuItem>
+                                        <MenuItem value={100000}> 100 MB</MenuItem>
+                                        <MenuItem value={1048576}> 1 GB</MenuItem>
+                                        <MenuItem value={10240000}> 10 GB</MenuItem>
+                                    </Select>
+                                </FormControl>
+                            </Grid>
+                            <Grid item xs={12}>
+                                <Typography sx={{ color: 'gray', paddingBottom: '10px' }}>Vui lòng chọn các loại file cụ thể</Typography>
+                                <FormGroup>
+                                    <Grid container spacing={1}>
+                                        <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                            {typeOfFile.map((item, index) => (
+                                                <FormControlLabel
+                                                    key={index}
+                                                    onChange={handleChangeCheckbox}
+                                                    // onBlur={checkErrCheckbox(ques)}
+                                                    checked={props.fileType.includes(myRecordType[item])}
+                                                    value={item}
+                                                    control={<Checkbox />}
+                                                    label={item}
+                                                />
+                                            ))}
+                                        </Grid>
+                                    </Grid>
+                                </FormGroup>
+                            </Grid>
+                        </Grid>
                         : null
                     }
                     {props.type === 'linkedData' ?
@@ -557,9 +730,9 @@ export function MainModal(props) {
                             </FormGroup>
                         </Box>
                     }
-
+                    {error && <Alert sx={{ background: 'transparent', p: '0' }} severity="error">Vui lòng điền tiêu đề và lựa chọn dạng câu hỏi</Alert>}
                     <Box sx={{ display: 'flex', flexDirection: 'row-reverse' }} >
-                        {props.quesEdit === '-1' ? <Button
+                        {props.quesEdit === -1 ? <Button
                             onClick={addQuestion}
                             sx={{
                                 color: 'white',
@@ -604,7 +777,7 @@ export function MainModal(props) {
                     </Box>
                 </Box>
             </Modal>
-        </div>
+        </div >
     )
 }
 

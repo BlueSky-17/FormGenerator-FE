@@ -266,7 +266,7 @@ function MyForms() {
                 </Box>
 
                 <Divider />
-                <Box sx={{ margin: '15px', minHeight: 480 }}>
+                <Box sx={{ margin: '15px', minHeight: 400 }}>
                     <TableContainer component={Paper}>
                         <Table sx={{ minWidth: 650 }} aria-label="simple table">
                             <TableHead>
