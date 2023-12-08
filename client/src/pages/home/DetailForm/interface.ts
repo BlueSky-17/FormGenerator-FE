@@ -26,6 +26,14 @@ export interface Date {
     date: number
 }
 
+export interface File {
+    File: {
+        MaxFileSize: number,
+        FileType: string[],
+        MaxFileAmount: number
+    }
+}
+
 // Content for linked data TYPE
 export interface LinkedData {
     LinkedData: {

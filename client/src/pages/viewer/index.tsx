@@ -328,7 +328,6 @@ function Form() {
         const response = await uploadFileToS3(selectedFile);
 
         formResponses[ques].content.files.push(response[0])
-        // uploadFileToS3(selectedFile);
 
         console.log(formResponses[ques].content.files);
         setRender(!render);
@@ -400,6 +399,7 @@ function Form() {
     const [height, setHeight] = useState('100%')
 
     console.log(formResponses);
+    console.log(formDetail);
 
     return (
         <div>

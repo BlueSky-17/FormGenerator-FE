@@ -26,10 +26,11 @@ import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
+import Checkbox from '@mui/material/Checkbox';
 import { useParams } from 'react-router-dom';
 import Alert, { AlertProps } from '@mui/material/Alert';
 
-import { Question, ShortText, MultiChoice, Date, LinkedData } from './interface';
+import { Question, ShortText, MultiChoice, Date, LinkedData, File } from './interface';
 import * as XLSX from 'xlsx'
 
 // Style cho modal edit
@@ -45,6 +46,16 @@ const style = {
     boxShadow: 24,
     p: 4,
 };
+
+const typeOfFile = ['Tài liệu', 'Bảng tính', 'PDF', 'Hình ảnh', 'Video'];
+
+const myRecordType: Record<string, string> = {
+    "Tài liệu": 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    "Bảng tính": 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    "PDF": 'application/pdf',
+    "Hình ảnh": 'image/png',
+    "Video": 'video/mp4',
+  };
 
 export function MainModal(props) {
     const UpdateFormAPI_URL = `http://localhost:8080/update-form/${useParams()?.formID}`;
@@ -122,6 +133,17 @@ export function MainModal(props) {
 
                 Object.assign(props.formDetail.Questions[newIndex].Content, updateDate);
             }
+            else if (props.type === "file") {
+                const updateFile: File = {
+                    File: {
+                        MaxFileSize: props.maxFileSize,
+                        FileType: props.fileType,
+                        MaxFileAmount: props.maxFileAmount,
+                    }
+                };
+
+                Object.assign(props.formDetail.Questions[newIndex].Content, updateFile);
+            }
             else if (props.type === "linkedData") {
                 const updateLinkedData: LinkedData = {
                     LinkedData: {
@@ -137,7 +159,7 @@ export function MainModal(props) {
                 "questionOrder": props.formDetail.QuestionOrder,
                 "questions": props.formDetail.Questions
             })
-            
+
             setError(false);
             handleClose();
         }
@@ -157,6 +179,11 @@ export function MainModal(props) {
                 if (props.constraint === 'at-most')
                     props.formDetail.Questions[props.quesEdit].Content.MultiChoice.MaxOptions = props.maxOptions;
             }
+        }
+        else if (props.type === 'file'){
+            props.formDetail.Questions[props.quesEdit].Content.File.MaxFileSize = props.maxFileSize;
+            props.formDetail.Questions[props.quesEdit].Content.File.FileType = props.fileType;
+            props.formDetail.Questions[props.quesEdit].Content.File.MaxFileAmount = props.maxFileAmount;
         }
 
         // console.log(props.formDetail.Questions[props.quesEdit].Content)
@@ -187,6 +214,11 @@ export function MainModal(props) {
                 props.setMaxOptions(2)
             }
         }
+        else if (props.type === "file") {
+            props.setMaxFileSize(10240);
+            props.setFileType([]);
+            props.setMaxFileAmount(1);
+        }
         else if (props.type === "linkedData") {
             setFile('');
             props.setExcelData([]);
@@ -196,13 +228,13 @@ export function MainModal(props) {
     // Get Type of question
     const handleChangeType = (event: SelectChangeEvent) => {
         props.setType(event.target.value as string);
-        if(props.titleQuestion !== '') setError(false);
+        if (props.titleQuestion !== '') setError(false);
     }
 
     // Get Title of question 
     const handleTitleQuestion = (e) => {
         props.setTitleQuestion(e.target.value);
-        if(props.type !== '') setError(false);
+        if (props.type !== '') setError(false);
     }
 
     // Get question isRequired or not
@@ -232,6 +264,59 @@ export function MainModal(props) {
 
     // Thêm option trống 
     const handleOption = () => props.setOptionList([...props.optionList, ''])
+
+    //Handle type of file
+    const handleChangeCheckbox = (e) => {
+        if (e.target.checked) {
+            switch (e.target.value) {
+                case 'Tài liệu': //File docx
+                    props.setFileType([...props.fileType, 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'])
+                    break;
+                case 'Bảng tính': // File Excel (.xlsx)
+                    props.setFileType([...props.fileType, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']);
+                    break;
+                case 'PDF': //File pdf
+                    props.setFileType([...props.fileType, 'application/pdf']);
+                    break;
+                case 'Hình ảnh': //File jpg và png
+                    props.setFileType([...props.fileType, 'image/png', 'image/jpeg']);
+                    break;
+                case 'Video':
+                    props.setFileType([...props.fileType, 'video/mp4']);
+                    break;
+                default:
+                    break;
+            }
+        }
+        else {
+            switch (e.target.value) {
+                case 'Tài liệu': //File docx
+                    let array = props.fileType.filter(item => item !== 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+                    props.setFileType(array);
+                    break;
+                case 'Bảng tính': // File Excel (.xlsx)
+                    let array2 = props.fileType.filter(item => item !== 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+                    props.setFileType(array2);
+                    break;
+                case 'PDF': //File pdf
+                    let array3 = props.fileType.filter(item => item !== 'application/pdf');
+                    props.setFileType(array3);
+                    break;
+                case 'Hình ảnh': //File jpg và png
+                    let array4 = props.fileType.filter(item => item !== 'image/jpeg');
+                    let array5 = array4.filter(item => item !== 'image/png')
+                    props.setFileType(array5);
+                    break;
+                case 'Video':
+                    let array6 = props.fileType.filter(item => item !== 'video/mp4');
+                    props.setFileType(array6);
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
+    console.log(props.fileType)
 
     // Process file -> linkedData
     const [file, setFile] = useState<string>('');
@@ -283,6 +368,8 @@ export function MainModal(props) {
         setDateNum(e.target.value);
     }
 
+    console.log(props.formDetail)
+
     return (
         <div>
             <Modal
@@ -296,7 +383,7 @@ export function MainModal(props) {
                         Chỉnh sửa câu hỏi
                     </Typography>
 
-                    <Box component="form" sx={{ marginY: '10px', display: 'flex', alignItems: 'center' }}>
+                    <Box component="form" sx={{ mt: '10px', mb: '5px', display: 'flex', alignItems: 'center' }}>
                         <TextField
                             required
                             value={props.titleQuestion}
@@ -505,6 +592,59 @@ export function MainModal(props) {
                         </Box>
                         : null
                     }
+                    {props.type === 'file' ?
+                        <Grid container spacing={1}>
+                            <Grid item xs={6} sx={{ marginBottom: '5px' }}>
+                                <Typography sx={{ marginY: '10px', color: 'gray' }}>Số lượng tệp tối đa</Typography>
+                                <FormControl sx={{ width: '100%' }}>
+                                    <Select
+                                        value={props.maxFileAmount}
+                                        onChange={props.handleMaxFileAmount}
+                                    >
+                                        <MenuItem value={1}> 1 </MenuItem>
+                                        <MenuItem value={5}> 5 </MenuItem>
+                                        <MenuItem value={10}> 10 </MenuItem>
+                                    </Select>
+                                </FormControl>
+                            </Grid>
+                            <Grid item xs={6}>
+                                <Typography sx={{ marginY: '10px', color: 'gray' }}>Kích thước tệp tối đa</Typography>
+                                <FormControl sx={{ width: '100%' }}>
+                                    <Select
+                                        value={props.maxFileSize}
+                                        onChange={props.handleMaxFileSize}
+                                    >
+                                        <MenuItem value={1024}> 1 MB</MenuItem>
+                                        <MenuItem value={10240}> 10 MB</MenuItem>
+                                        <MenuItem value={100000}> 100 MB</MenuItem>
+                                        <MenuItem value={1048576}> 1 GB</MenuItem>
+                                        <MenuItem value={10240000}> 10 GB</MenuItem>
+                                    </Select>
+                                </FormControl>
+                            </Grid>
+                            <Grid item xs={12}>
+                                <Typography sx={{ color: 'gray', paddingBottom: '10px' }}>Vui lòng chọn các loại file cụ thể</Typography>
+                                <FormGroup>
+                                    <Grid container spacing={1}>
+                                        <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                            {typeOfFile.map((item, index) => (
+                                                <FormControlLabel
+                                                    key={index}
+                                                    onChange={handleChangeCheckbox}
+                                                    // onBlur={checkErrCheckbox(ques)}
+                                                    checked={props.fileType.includes(myRecordType[item])}
+                                                    value={item}
+                                                    control={<Checkbox />}
+                                                    label={item}
+                                                />
+                                            ))}
+                                        </Grid>
+                                    </Grid>
+                                </FormGroup>
+                            </Grid>
+                        </Grid>
+                        : null
+                    }
                     {props.type === 'linkedData' ?
                         <Box>
                             <Box sx={{ color: '#6D7073', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -620,7 +760,7 @@ export function MainModal(props) {
                     </Box>
                 </Box>
             </Modal>
-        </div>
+        </div >
     )
 }
 

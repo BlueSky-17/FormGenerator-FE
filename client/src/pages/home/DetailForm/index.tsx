@@ -58,7 +58,7 @@ function DetailForm() {
             .then(formDetail => {
                 setFormDetail(formDetail);
             })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     // API GET: Get detail of form
@@ -281,6 +281,19 @@ function DetailForm() {
         setSubOpen('')
     }
 
+    //Xử lý file
+    const [maxFileAmount, setMaxFileAmount] = useState(1);
+    const [maxFileSize, setMaxFileSize] = useState(10240);
+    const handleMaxFileAmount = (event: SelectChangeEvent) => {
+        // console.log(event)
+        const intValue: number = parseInt(event.target.value as string, 10);
+        setMaxFileAmount(intValue);
+    }
+    const handleMaxFileSize = (event: SelectChangeEvent) => {
+        setMaxFileSize(parseInt(event.target.value as string, 10));
+    }
+    const [fileType, setFileType] = useState([]);
+
     // Delete Question 
     const [deleted, setDelete] = React.useState(false);
     const deleteQuestion = (index: string) => (event: any) => {
@@ -368,8 +381,13 @@ function DetailForm() {
 
         if (formDetail.Questions[ques].Type === 'multi-choice' || formDetail.Questions[ques].Type === 'checkbox' || formDetail.Questions[ques].Type === 'dropdown')
             setOptionList(formDetail.Questions[ques].Content.MultiChoice.Options)
+        else if (formDetail.Questions[ques].Type === 'file') {
+            setMaxFileAmount(formDetail.Questions[ques].Content.File.MaxFileAmount);
+            setMaxFileSize(formDetail.Questions[ques].Content.File.MaxFileSize);
+            setFileType(formDetail.Questions[ques].Content.File.FileType)
+        }
 
-        if (formDetail.Questions[ques].Type === 'checkbox'){
+        if (formDetail.Questions[ques].Type === 'checkbox') {
             setConstraint(formDetail.Questions[ques].Content.MultiChoice.Constraint)
             setMaxOptions(formDetail.Questions[ques].Content.MultiChoice.MaxOptions)
         }
@@ -387,11 +405,10 @@ function DetailForm() {
     };
     const open_settings = Boolean(anchorEl);
 
-
     return (
         <Box>
             <DrawerHeader />
-            <Box sx={{ backgroundColor: 'white', borderRadius: '15px'}}>
+            <Box sx={{ backgroundColor: 'white', borderRadius: '15px' }}>
 
                 {/*Header of Form: Title & Settings*/}
                 <Box sx={{ display: 'flex' }}>
@@ -489,7 +506,7 @@ function DetailForm() {
                             {Object.keys(formDetail).length !== 0 ? formDetail.header.Description : null}
                         </Typography>
 
-                        <TableContainer component={Paper} sx={{ marginTop: '10px', height: '50vh', overflowY:'scroll' }}>
+                        <TableContainer component={Paper} sx={{ marginTop: '10px', height: '50vh', overflowY: 'scroll' }}>
                             <Table sx={{ minWidth: 650 }} aria-label="simple table">
                                 <TableHead>
                                     <TableRow>
@@ -623,6 +640,15 @@ function DetailForm() {
                 maxOptions={maxOptions}
                 handleMaxOptions={handleMaxOptions}
                 setMaxOptions={setMaxOptions}
+
+                maxFileAmount={maxFileAmount}
+                setMaxFileAmount={setMaxFileAmount}
+                handleMaxFileAmount={handleMaxFileAmount}
+                maxFileSize={maxFileSize}
+                setMaxFileSize={setMaxFileSize}
+                handleMaxFileSize={handleMaxFileSize}
+                fileType={fileType}
+                setFileType={setFileType}
 
                 excelData={excelData}
                 setExcelData={setExcelData}
