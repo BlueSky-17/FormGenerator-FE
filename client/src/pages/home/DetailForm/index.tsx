@@ -61,49 +61,6 @@ function DetailForm() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
-    // API GET: Get detail of form
-    // useEffect(() => {
-    //     const fetchData = async () => {
-    //         try {
-    //             const response = await fetch(FormDetailAPI_URL, {
-    //                 method: 'GET',
-    //                 headers: {
-    //                     'Content-Type': 'application/json',
-    //                     'Authorization': 'Bearer ' + JSON.parse(sessionStorage.getItem('token') as string)?.accessToken
-    //                 }
-    //             });
-
-    //             if (!response.ok) {
-    //                 // Handle non-OK responses (e.g., 401 Unauthorized)
-    //                 if (response.status === 401) {
-    //                     const refreshToken = getToken().refreshToken;
-    //                     const user = getToken().user;
-    //                     console.log(refreshToken, user);
-    //                     const newToken = await getNewToken(refreshToken, user);
-    //                     console.log(newToken);
-    //                     sessionStorage.setItem('token', JSON.stringify(newToken));
-    //                     // You might want to trigger the useEffect again to retry the fetch
-    //                     setRender(prev => !prev);
-    //                 } else {
-    //                     // Handle other non-OK responses
-    //                     console.error(`HTTP error! Status: ${response.status}`);
-    //                 }
-    //                 return;
-    //             }
-
-    //             const formDetail = await response.json();
-    //             // console.log(forms);
-    //             setFormDetail(formDetail);
-    //         } catch (error) {
-    //             // Handle fetch errors (e.g., network issues)
-    //             console.error('Error fetching data:', error);
-    //         }
-    //     };
-
-    //     fetchData();
-    //     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // },[render]);
-
     // API PUT: Update form 
     const updateObjectInDatabase = async (updateData) => {
         try {
@@ -140,6 +97,7 @@ function DetailForm() {
 
     // Set type, title, required of question
     const [type, setType] = React.useState('');
+    const [tempType, setTempType] = React.useState('');
     const [titleQuestion, setTitleQuestion] = useState('');
     const [required, setRequired] = useState(false);
 
@@ -156,7 +114,7 @@ function DetailForm() {
     // Close/Open Main Modal 
     const [open, setOpen] = useState(false);
     const handleOpen = () => {
-        setQuesEdit('-1')
+        setQuesEdit(-1)
         setOpen(true);
     }
 
@@ -372,10 +330,11 @@ function DetailForm() {
     }
 
     // Edit Question
-    const [quesEdit, setQuesEdit] = React.useState('-1');
-    const editQuestion = (ques: string, index: string) => (event: any) => {
+    const [quesEdit, setQuesEdit] = React.useState(-1);
+    const editQuestion = (ques: number, index: string) => (event: any) => {
         setOpen(true);
         setType(formDetail.Questions[ques].Type);
+        setTempType(formDetail.Questions[ques].Type);
         setTitleQuestion(formDetail.Questions[ques].Question)
         setRequired(formDetail.Questions[ques].Required);
 
@@ -629,6 +588,8 @@ function DetailForm() {
                 formDetail={formDetail}
                 type={type}
                 setType={setType}
+                tempType={tempType}
+                setTempType={setTempType}
                 titleQuestion={titleQuestion}
                 setTitleQuestion={setTitleQuestion}
                 required={required}
@@ -658,6 +619,7 @@ function DetailForm() {
                 optionList={optionList}
                 setOptionList={setOptionList}
                 quesEdit={quesEdit}
+                setQuesEdit={setQuesEdit}
             />
 
             <SubModal

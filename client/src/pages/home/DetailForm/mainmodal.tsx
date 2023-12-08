@@ -55,7 +55,7 @@ const myRecordType: Record<string, string> = {
     "PDF": 'application/pdf',
     "Hình ảnh": 'image/png',
     "Video": 'video/mp4',
-  };
+};
 
 export function MainModal(props) {
     const UpdateFormAPI_URL = `http://localhost:8080/update-form/${useParams()?.formID}`;
@@ -86,6 +86,8 @@ export function MainModal(props) {
     const [error, setError] = useState<Boolean>(false)
 
     // Add question to a form 
+    // addQuestion(editQues): nếu editQues = -1 => tạo ques mới
+    // nếu editQues >= 0 thì: ghi đè content lên ques cũ (vì đổi type)
     const addQuestion = async () => {
         if (props.type === '' || props.titleQuestion === '') {
             setError(true);
@@ -100,12 +102,18 @@ export function MainModal(props) {
                 Content: {}
             };
 
-            // Tạo một Question có 5 trường: Question, Description, Required, ImagePath, Type, Content
-            props.formDetail.Questions.push(newQuestion);
+            let ques = props.quesEdit;
 
-            // Push index vào QuestionOrder
-            const newIndex = props.formDetail.Questions.length - 1;
-            props.formDetail.QuestionOrder.push(newIndex);
+            if (props.quesEdit === -1) {
+                // Tạo một Question có 5 trường: Question, Description, Required, ImagePath, Type, Content
+                props.formDetail.Questions.push(newQuestion);
+
+                // Push index vào QuestionOrder
+                const newIndex = props.formDetail.Questions.length - 1;
+                props.formDetail.QuestionOrder.push(newIndex);
+
+                ques = newIndex;
+            }
 
             // Lấy Object: Options có chứa Option[] và ImportedData
             if (props.type === "multi-choice" || props.type === "checkbox" || props.type === "dropdown") {
@@ -117,21 +125,24 @@ export function MainModal(props) {
                     }
                 };
 
-                Object.assign(props.formDetail.Questions[newIndex].Content, updateMultiChoice);
+                props.formDetail.Questions[ques].Content = {};
+                Object.assign(props.formDetail.Questions[ques].Content, updateMultiChoice);
             }
             else if (props.type === "shortText") {
                 const updateShortText: ShortText = {
                     shortText: true
                 };
 
-                Object.assign(props.formDetail.Questions[newIndex].Content, updateShortText);
+                props.formDetail.Questions[ques].Content = {};
+                Object.assign(props.formDetail.Questions[ques].Content, updateShortText);
             }
             else if (props.type === "date-single" || props.type === "date-range") {
                 const updateDate: Date = {
                     date: dateNum
                 };
 
-                Object.assign(props.formDetail.Questions[newIndex].Content, updateDate);
+                props.formDetail.Questions[ques].Content = {};
+                Object.assign(props.formDetail.Questions[ques].Content, updateDate);
             }
             else if (props.type === "file") {
                 const updateFile: File = {
@@ -142,7 +153,8 @@ export function MainModal(props) {
                     }
                 };
 
-                Object.assign(props.formDetail.Questions[newIndex].Content, updateFile);
+                props.formDetail.Questions[ques].Content = {};
+                Object.assign(props.formDetail.Questions[ques].Content, updateFile);
             }
             else if (props.type === "linkedData") {
                 const updateLinkedData: LinkedData = {
@@ -152,7 +164,8 @@ export function MainModal(props) {
                     }
                 };
 
-                Object.assign(props.formDetail.Questions[newIndex].Content, updateLinkedData);
+                props.formDetail.Questions[ques].Content = {};
+                Object.assign(props.formDetail.Questions[ques].Content, updateLinkedData);
             }
 
             updateObjectInDatabase({
@@ -171,29 +184,32 @@ export function MainModal(props) {
         props.formDetail.Questions[props.quesEdit].Question = props.titleQuestion;
         props.formDetail.Questions[props.quesEdit].Required = props.required;
 
-        if (props.type === "multi-choice" || props.type === "checkbox" || props.type === "dropdown") {
-            props.formDetail.Questions[props.quesEdit].Content.MultiChoice.Options = props.optionList;
+        // Nếu có đổi type => gọi addQuestion
+        if (props.tempType === props.type) {
+            if (props.type === "multi-choice" || props.type === "checkbox" || props.type === "dropdown") {
+                props.formDetail.Questions[props.quesEdit].Content.MultiChoice.Options = props.optionList;
 
-            if (props.type === "checkbox") {
-                props.formDetail.Questions[props.quesEdit].Content.MultiChoice.Constraint = props.constraint;
-                if (props.constraint === 'at-most')
-                    props.formDetail.Questions[props.quesEdit].Content.MultiChoice.MaxOptions = props.maxOptions;
+                if (props.type === "checkbox") {
+                    props.formDetail.Questions[props.quesEdit].Content.MultiChoice.Constraint = props.constraint;
+                    if (props.constraint === 'at-most')
+                        props.formDetail.Questions[props.quesEdit].Content.MultiChoice.MaxOptions = props.maxOptions;
+                }
             }
+            else if (props.type === 'file') {
+                props.formDetail.Questions[props.quesEdit].Content.File.MaxFileSize = props.maxFileSize;
+                props.formDetail.Questions[props.quesEdit].Content.File.FileType = props.fileType;
+                props.formDetail.Questions[props.quesEdit].Content.File.MaxFileAmount = props.maxFileAmount;
+            }
+
+            updateObjectInDatabase({
+                "questionOrder": props.formDetail.QuestionOrder,
+                "questions": props.formDetail.Questions
+            })
+
+            handleClose();
+        } else {
+            addQuestion();
         }
-        else if (props.type === 'file'){
-            props.formDetail.Questions[props.quesEdit].Content.File.MaxFileSize = props.maxFileSize;
-            props.formDetail.Questions[props.quesEdit].Content.File.FileType = props.fileType;
-            props.formDetail.Questions[props.quesEdit].Content.File.MaxFileAmount = props.maxFileAmount;
-        }
-
-        // console.log(props.formDetail.Questions[props.quesEdit].Content)
-
-        updateObjectInDatabase({
-            "questionOrder": props.formDetail.QuestionOrder,
-            "questions": props.formDetail.Questions
-        })
-
-        handleClose();
     }
 
     // Close MainModal Edit
@@ -223,6 +239,7 @@ export function MainModal(props) {
             setFile('');
             props.setExcelData([]);
         }
+        props.setQuesEdit(-1)
     }
 
     // Get Type of question
@@ -715,7 +732,7 @@ export function MainModal(props) {
                     }
                     {error && <Alert sx={{ background: 'transparent', p: '0' }} severity="error">Vui lòng điền tiêu đề và lựa chọn dạng câu hỏi</Alert>}
                     <Box sx={{ display: 'flex', flexDirection: 'row-reverse' }} >
-                        {props.quesEdit === '-1' ? <Button
+                        {props.quesEdit === -1 ? <Button
                             onClick={addQuestion}
                             sx={{
                                 color: 'white',
