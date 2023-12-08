@@ -8,6 +8,7 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 
 import { styled } from '@mui/material/styles';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import ClearIcon from '@mui/icons-material/Clear';
 
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -83,6 +84,44 @@ function Form() {
             console.error('Lỗi khi gửi yêu cầu:', error);
         }
     };
+
+    // API DELETE: delete file by fileName
+    const deleteFile = async (fileName) => {
+        try {
+            const response = await fetch('http://localhost:8080/delete-from-s3' + `/${fileName}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + JSON.parse(sessionStorage.getItem('token') as string)?.accessToken
+                }
+            });
+
+            // Kiểm tra nếu yêu cầu thành công (status code 2xx)
+            if (response.ok) {
+                const responseData = await response.json();
+                console.log('Server Response:', responseData);
+                return responseData;
+            } else {
+                // Xử lý lỗi nếu có
+                const errorData = await response.json();
+                console.error('Server Error:', errorData);
+            }
+        } catch (error) {
+            console.error('Lỗi khi gửi yêu cầu DELETE:', error);
+        }
+    };
+
+    const handleDeleteFile = (fileName: any, ques: number, index: number) => (e) => {
+        deleteFile(fileName);
+
+        console.log(index, ques)
+
+        formResponses[ques].content.files.splice(index, 1);
+
+        console.log(formResponses[ques].content.files)
+
+        setRender(!render);
+    }
 
     // Initial mảng FormResponses tương ứng với các Question trong Form
     // Vì render lần đâu lấy length bị lỗi -> nên dùng try catch 
@@ -302,7 +341,7 @@ function Form() {
         console.log(formResponses)
 
         //Success: Fill correctly required questions 
-        if (checkRequired) {
+        if (checkRequired && fileError === '') {
             console.log(formResponses);
             await addResponsetoDatabase({
                 "id": "6526518a6b149bcb2510172f",
@@ -322,15 +361,39 @@ function Form() {
         }
     }
 
+    const [fileError, setFileError] = useState('')
     const handleFileChange = (ques: number) => async (e) => {
-        let selectedFile = e.target.files[0];
+        setFileError('')
+        let selectedFile = e.target.files[0]
+        if (selectedFile) {
+            let fileSize = selectedFile.size / 1024;
 
-        const response = await uploadFileToS3(selectedFile);
+            let numOfFile = formResponses[ques].content.files.length;
 
-        formResponses[ques].content.files.push(response[0])
+            let totalFileSize =  formResponses[ques].content.files.reduce((total, obj) => total + obj.size, 0)/24;
 
-        console.log(formResponses[ques].content.files);
-        setRender(!render);
+            //Kiểu file không đúng
+            if (!formDetail.Questions[ques].Content.File.FileType.includes(selectedFile.type)) {
+                setFileError('Sai định dạng File cho phép')
+            }
+            //fileSize vượt giới hạn
+            else if (totalFileSize + fileSize >= formDetail.Questions[ques].Content.File.MaxFileSize) {
+                setFileError('Vượt quá dung lượng File cho phép')
+            }
+            //Số lượng file vượt giới hạnf
+            else if (numOfFile >= formDetail.Questions[ques].Content.File.MaxFileAmount) {
+                setFileError('Vượt quá số lượng File cho phép')
+            }
+            //Thêm được bình thường
+            else {
+                const response = await uploadFileToS3(selectedFile);
+
+                formResponses[ques].content.files.push(response[0])
+
+                console.log(formResponses[ques].content.files);
+            }
+            setRender(!render);
+        }
     }
 
     const uploadFileToS3 = async (files: File) => {
@@ -377,7 +440,6 @@ function Form() {
         formResponses[ques].content.linkedData.push(firstChoice);
     };
 
-
     const [secondField, setSecondField] = useState('');
     const handleSecondFieldChange = (ques: number) => (e) => {
         setSecondField(e.target.value);
@@ -394,7 +456,6 @@ function Form() {
         const thirdChoice = formDetail.Questions[ques].Content.LinkedData.ListOfOptions[firstField].Value[secondField].Value;
         formResponses[ques].content.linkedData.push(thirdChoice);
     };
-
 
     const [height, setHeight] = useState('100%')
 
@@ -560,10 +621,29 @@ function Form() {
                                                     hidden
                                                 />
                                             </Button>
-                                            {formResponses[ques].content.files.map((file) => (
-                                                <Typography key={file.fileName} sx={{ marginTop: '3px', padding: '5px', background: '#E9F2F4', borderRadius: '20px' }}>{file.fileName}</Typography>
+                                            {formResponses[ques].content.files.map((file, index) => (
+                                                <Grid container xs={12} sx={{ marginTop: '10px' }}>
+                                                    <Grid item xs={11} sx={{overflow:'hidden'}}>
+                                                        <Typography key={file.fileName} sx={{ padding: '10px', background: '#E9F2F4', borderRadius: '20px', textOverflow: 'ellipsis' }}>{file.fileName}</Typography>
+                                                    </Grid>
+                                                    <Grid item xs={1}>
+                                                        <IconButton
+                                                            onClick={handleDeleteFile(file.fileName, ques, index)}
+                                                            sx={{
+                                                                backgroundColor: '#white',
+                                                                color: '#7B7B7B',
+                                                                margin: '5px',
+                                                                '&:hover': {
+                                                                    backgroundColor: '#EBEBEB', // Màu nền thay đổi khi hover
+                                                                },
+                                                            }}>
+                                                            <ClearIcon />
+                                                        </IconButton>
+                                                    </Grid>
+                                                </Grid>
                                             ))
                                             }
+                                            {fileError !== '' ? <Alert sx={{ background: 'transparent', p: '0' }} severity="error">{fileError}</Alert> : null}
                                             {formResponses[ques].error ? <Alert sx={{ background: 'transparent', p: '0' }} severity="error">Vui lòng hoàn thành câu hỏi bắt buộc</Alert> : null}
                                         </Box>
                                         : null
@@ -664,7 +744,7 @@ function Form() {
                     </Button>
                 </Box>}
             </Box>
-        </div>
+        </div >
     )
 }
 
