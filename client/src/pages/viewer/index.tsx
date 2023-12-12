@@ -134,6 +134,7 @@ function Form() {
                     questionName: formDetail.Questions[i].Question,
                     type: formDetail.Questions[i].Type,
                     required: formDetail.Questions[i].Required,
+                    index: formDetail.QuestionOrder[i],
                     error: false,
                     content: {}
                 };

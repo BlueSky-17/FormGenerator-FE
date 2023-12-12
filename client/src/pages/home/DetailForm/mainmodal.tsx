@@ -50,10 +50,15 @@ const style = {
 const typeOfFile = ['Tài liệu', 'Bảng tính', 'PDF', 'Hình ảnh', 'Video'];
 
 const myRecordType: Record<string, string> = {
+    //Đuôi docx
     "Tài liệu": 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    //Đuôi .xlsx
     "Bảng tính": 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    //Đuôi .pdf
     "PDF": 'application/pdf',
+    //Đuối .png và .jpg
     "Hình ảnh": 'image/png',
+    //Đuôi .mp4
     "Video": 'video/mp4',
 };
 
@@ -91,6 +96,9 @@ export function MainModal(props) {
     const addQuestion = async () => {
         if (props.type === '' || props.titleQuestion === '') {
             setError(true);
+        }
+        else if (props.fileType.length === 0) {
+            setTypeError('Vui lòng chọn loại file được cho phép')
         }
         else {
             const newQuestion: Question = {
@@ -304,6 +312,7 @@ export function MainModal(props) {
                 default:
                     break;
             }
+            setTypeError('');
         }
         else {
             switch (e.target.value) {
@@ -331,6 +340,7 @@ export function MainModal(props) {
                 default:
                     break;
             }
+            // if (props.fileType.length === 0) setTypeError('Vui lòng chọn loại file được cho phép');
         }
     };
     console.log(props.fileType)
@@ -377,7 +387,7 @@ export function MainModal(props) {
         }
 
     };
-    const [typeError, setTypeError] = useState<string>(); //Display error when upload invalid file
+    const [typeError, setTypeError] = useState<string>(''); //Display error when upload invalid file
 
     //number: 0-5 with 6 type
     const [dateNum, setDateNum] = useState<number>(-1)
@@ -658,6 +668,7 @@ export function MainModal(props) {
                                         </Grid>
                                     </Grid>
                                 </FormGroup>
+                                {typeError !== '' ? <Alert severity="error">{typeError}</Alert> : null}
                             </Grid>
                         </Grid>
                         : null
@@ -681,7 +692,7 @@ export function MainModal(props) {
                                     <Typography>để thêm trường dữ liệu</Typography>
                                 </Box>
                                 <Box>
-                                    {typeError && <Alert severity="error">{typeError}</Alert>}
+                                    {typeError !== '' ? <Alert severity="error">{typeError}</Alert> : null}
                                     {file !== '' && <Alert severity="success">Chọn file thành công!</Alert>}
                                 </Box>
                                 {/* để thêm trường dữ liệu liên kết */}

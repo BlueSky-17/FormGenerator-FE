@@ -3,6 +3,7 @@ export interface Response {
     type: string,
     required: boolean,
     error: boolean,
+    index: number,
     content: {}
 }
 
