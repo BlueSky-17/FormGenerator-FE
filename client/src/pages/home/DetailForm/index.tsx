@@ -140,6 +140,10 @@ function DetailForm() {
             // setColumn(rest);
         }
         else if (type === 'multi-choice' || type === 'checkbox' || type === 'dropdown') setSubOpen('multi-choice')
+        //When no type => delete question
+        else {
+            setSubOpen('delete')
+        }
     }
     const handleSubClose = () => {
         setSubOpen('');
@@ -253,9 +257,13 @@ function DetailForm() {
     const [fileType, setFileType] = useState([]);
 
     // Delete Question 
-    const [deleted, setDelete] = React.useState(false);
-    const deleteQuestion = (index: string) => (event: any) => {
-        // Xóa 1 phần tử ở vị trí index
+    const [deleted, setDelete] = React.useState<number>();
+    const confirmDeleteQuestion = (index: number) => (event: any) => {
+        setSubOpen('delete');
+        setDelete(index);
+    };
+    const handleDeleteQuestion = (index: number) => (event: any) => {
+        //Xóa 1 phần tử ở vị trí index
         formDetail.Questions.splice(index, 1)
 
         // Lọc mảng các num mà khác index, chỉnh lại cho các num
@@ -267,13 +275,12 @@ function DetailForm() {
                 return num;
         })
 
-        if (deleted === true) setDelete(false);
-        else setDelete(true);
         updateObjectInDatabase({
             "questionOrder": formDetail.QuestionOrder,
             "questions": formDetail.Questions
         })
-    };
+        setSubOpen('');
+    }
 
     // Duplicate Question
     const [duplicated, setDuplicate] = React.useState(true);
@@ -539,7 +546,7 @@ function DetailForm() {
                                                 </IconButton>
 
                                                 <IconButton
-                                                    onClick={deleteQuestion(ques)}
+                                                    onClick={confirmDeleteQuestion(ques)}
                                                     sx={{
                                                         backgroundColor: '#364F6B',
                                                         color: 'white',
@@ -634,6 +641,8 @@ function DetailForm() {
                 setInputText={setInputText}
                 handleInputText={handleInputText}
                 convertTextToOptionList={convertTextToOptionList}
+                deleted={deleted}
+                handleDeleteQuestion={handleDeleteQuestion}
             />
 
         </Box >

@@ -106,15 +106,12 @@ export default function SignInSide({ setToken }) {
        
       // Set the token
       setToken(token);
-      if (token !== undefined) nav('/home');
+      if (token !== undefined) nav('/myforms');
     } catch (error) {
       // Handle Errors here.
       console.log(error);
     }
   }
-  
-
-  
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -128,7 +125,7 @@ export default function SignInSide({ setToken }) {
       setToken(token); //token là accessToken, refreshToken và userInfo
 
       // if has token, nav to HomePage
-      if (token !== undefined) nav('/home');
+      if (token !== undefined) nav('/myforms');
     }
     catch (error) {
       console.log(error)

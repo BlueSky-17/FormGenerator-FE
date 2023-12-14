@@ -10,11 +10,11 @@ import { DataGrid, GridColDef, GridValueGetterParams, GridRowModel, } from '@mui
 
 // Style cho modal edit
 const style = {
-    position: 'fixed',
-    top: '15%',
+    position: 'absolute' as 'absolute',
+    top: '35%',
     left: '50%',
-    marginLeft: '-400px',
-    width: 800,
+    transform: 'translate(-50%, -50%)',
+    width: 700,
     bgcolor: 'background.paper',
     border: '1px solid #000',
     borderRadius: '15px',
@@ -153,6 +153,43 @@ export function SubModal(props) {
                             </Box>
                         </Box>
                         : null}
+                    {props.subopen === 'delete' ?
+                        <Box>
+                            <Typography variant='h5'><b>Xác nhận xóa câu hỏi?</b></Typography>
+
+                            <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'right' }} >
+                                <Button
+                                    onClick={props.handleDeleteQuestion(props.deleted)}
+                                    sx={{
+                                        color: 'white',
+                                        backgroundColor: '#364F6B',
+                                        borderRadius: '10px',
+                                        marginY: '10px',
+                                        marginX: '5px',
+                                        '&:hover': {
+                                            backgroundColor: '#2E4155', // Màu nền thay đổi khi hover
+                                        },
+                                    }}>
+                                    Xác nhận
+                                </Button>
+                                <Button
+                                    onClick={props.handleSubClose}
+                                    sx={{
+                                        color: '#000000',
+                                        backgroundColor: '#E7E7E8',
+                                        borderRadius: '10px',
+                                        marginY: '10px',
+                                        marginX: '5px',
+                                        '&:hover': {
+                                            backgroundColor: '#E7E7E7', // Màu nền thay đổi khi hover
+                                        },
+                                    }}>
+                                    Hủy
+                                </Button>
+                            </Box>
+                        </Box>
+                        : null
+                    }
                 </Box>
             </Modal>
         </div>

@@ -371,7 +371,7 @@ function Form() {
 
             let numOfFile = formResponses[ques].content.files.length;
 
-            let totalFileSize =  formResponses[ques].content.files.reduce((total, obj) => total + obj.size, 0)/24;
+            let totalFileSize = formResponses[ques].content.files.reduce((total, obj) => total + obj.size, 0) / 24;
 
             //Kiểu file không đúng
             if (!formDetail.Questions[ques].Content.File.FileType.includes(selectedFile.type)) {
@@ -624,8 +624,23 @@ function Form() {
                                             </Button>
                                             {formResponses[ques].content.files.map((file, index) => (
                                                 <Grid container xs={12} sx={{ marginTop: '10px' }}>
-                                                    <Grid item xs={11} sx={{overflow:'hidden'}}>
-                                                        <Typography key={file.fileName} sx={{ padding: '10px', background: '#E9F2F4', borderRadius: '20px', textOverflow: 'ellipsis' }}>{file.fileName}</Typography>
+                                                    <Grid item xs={11} sx={{ overflow: 'hidden' }}>
+                                                        <Button fullWidth href={file.fileURL} key={file.fileName}
+                                                            sx={{
+                                                                color: '#737373',
+                                                                padding: '10px',
+                                                                background: '#E9F2F4',
+                                                                borderRadius: '20px',
+                                                                textOverflow: 'ellipsis',
+                                                                textAlign:'left',
+                                                                textTransform: 'initial',
+                                                                '&:hover': {
+                                                                    backgroundColor: '#E9F2F4',
+                                                                    color: '#737373'
+                                                                },
+                                                            }}>
+                                                            {file.fileName}
+                                                        </Button>
                                                     </Grid>
                                                     <Grid item xs={1}>
                                                         <IconButton

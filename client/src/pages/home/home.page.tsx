@@ -85,9 +85,22 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 }));
 interface LayoutProps {
     children: ReactNode;
-  }
+}
 
 function HomePage({ children }: LayoutProps) {
+
+    const tokenString = sessionStorage.getItem('token')
+    const userToken = JSON.parse(tokenString as string);
+
+    // if (sessionStorage.getItem('token')) {
+    //     const tokenString = sessionStorage.getItem('token')
+
+    //     if (tokenString) {
+    //         const userToken = JSON.parse(tokenString as string);
+    //         console.log(userToken)
+    //     }
+    // }
+    // JSON.parse(sessionStorage.getItem('token'))
 
     const theme = useTheme();
     const [open, setOpen] = React.useState(true);
@@ -112,8 +125,12 @@ function HomePage({ children }: LayoutProps) {
         navigate('/signin');
     }
 
+    const navSideBar = (path: string) => (e) => {
+        navigate(path);
+    }
+
     return (
-        <Box sx={{ display: 'flex', witdh:'100vw' }}>
+        <Box sx={{ display: 'flex', witdh: '100vw' }}>
             <CssBaseline />
             <AppBar position="fixed" open={open}>
                 <Toolbar sx={{ backgroundColor: 'white' }}>
@@ -128,23 +145,16 @@ function HomePage({ children }: LayoutProps) {
 
                     <Box sx={{ flexGrow: 1 }} />
 
-                    <Box sx={{ display: 'flex', flexDirection: 'column', marginRight: '5px' }}>
-                        <Typography sx={{ fontWeight: 500 }} variant="subtitle1" color="black" noWrap component="div">
-                            Thành Đặng
-                        </Typography>
-                        <Typography sx={{ fontWeight: 'bold', color: '#364F6B' }} variant="body2" noWrap component="div">
-                            Khoa Khoa học và Kỹ thuật Máy tính
+                    <Box sx={{ marginRight: '15px' }}>
+                        <Typography sx={{ fontWeight: 700, color: '#364F6B' }} variant="subtitle1" color="black" noWrap component="div">
+                            {userToken.user.FirstName} {userToken.user.LastName}
                         </Typography>
                     </Box>
 
-                    <IconButton sx={{ paddingRight: '15px' }}>
-                        <Badge badgeContent={4} color="error">
-                            <NotificationsIcon />
-                        </Badge>
-                    </IconButton>
-
-                    <IconButton aria-describedby={id} onClick={handleClick}>
-                        <Avatar src={avatarimage} />
+                    <IconButton size='small' aria-describedby={id} onClick={handleClick}>
+                        {userToken.user.AvatarPath ?
+                            <img style={{ borderRadius: '100%', height: '45px' }} alt='Avatar' src={userToken.user.AvatarPath} referrerPolicy="no-referrer" /> :
+                            <img style={{ borderRadius: '100%', height: '45px' }} alt='Avatar' src={avatarimage} referrerPolicy="no-referrer" />}
                     </IconButton>
                     <Popover
                         id={id}
@@ -157,7 +167,7 @@ function HomePage({ children }: LayoutProps) {
                         }}
                     >
                         <Button
-                        sx={{ p: 2, fontWeight: 500, color: 'black' }}
+                            sx={{ p: 2, fontWeight: 500, color: 'black' }}
                         >
                             Thông tin cá nhân
                         </Button>
@@ -201,50 +211,27 @@ function HomePage({ children }: LayoutProps) {
                     </DrawerHeader>
                     <Divider />
                     <List>
-                        {[{ id: 1, text: 'Trang chủ', path: '/' }, { id: 2, text: 'Thông tin cá nhân', path: '/' }, { id: 3, text: 'Forms của tôi', path: '/' }].map((item) => (
-                            <Link key={item.text} to={item.path}>
-                                <ListItem sx={{ paddingY: '5px' }} disablePadding>
-                                    <ListItemButton>
-                                        <ListItemIcon sx={{ marginLeft: '25px' }}>
-                                            {item.id === 1 ? <HomeIcon sx={{ color: 'white' }} /> : ''}
-                                            {item.id === 2 ? <InfoIcon sx={{ color: 'white' }} /> : ''}
-                                            {item.id === 3 ? <ArticleIcon sx={{ color: 'white' }} /> : ''}
-                                        </ListItemIcon>
-                                        <ListItemText>
-                                            <Typography sx={{ fontWeight: 400, fontSize: '1.1rem', color: 'white' }}>
-                                                {item.text}
-                                            </Typography>
-                                        </ListItemText>
-                                    </ListItemButton>
-                                </ListItem>
-                            </Link>
+                        {[{ id: 1, text: 'Thông tin cá nhân', path: '/profile' }, { id: 2, text: 'Forms của tôi', path: '/myforms' }].map((item) => (
+                            <ListItem onClick={navSideBar(item.path)} sx={{ paddingY: '5px' }} disablePadding>
+                                <ListItemButton>
+                                    <ListItemIcon sx={{ marginLeft: '25px' }}>
+                                        {item.id === 1 ? <InfoIcon sx={{ color: 'white' }} /> : ''}
+                                        {item.id === 2 ? <ArticleIcon sx={{ color: 'white' }} /> : ''}
+                                    </ListItemIcon>
+                                    <ListItemText>
+                                        <Typography sx={{ fontWeight: 400, fontSize: '1.1rem', color: 'white' }}>
+                                            {item.text}
+                                        </Typography>
+                                    </ListItemText>
+                                </ListItemButton>
+                            </ListItem>
                         ))}
                     </List>
                     <Divider />
-
-                    <Box sx={{ flexGrow: 1 }} />
-
-                    <List sx={{ backgroundColor: '#364F6B', alignItems: 'center', display: 'flex', justifyContent: 'center' }} >
-                        <Button sx={{
-                            color: '#364F6B',
-                            backgroundColor: 'white',
-                            border: '2px solid #364F6B',
-                            borderRadius: '10px',
-                            margin: '20px',
-                            paddingX: '45px',
-                            '&:hover': {
-                                backgroundColor: 'white', // Màu nền thay đổi khi hover
-                                color: '#364F6B'
-                            },
-                        }}>
-                            <LogoutIcon sx={{ paddingRight: '5px' }} />
-                            Đăng xuất
-                        </Button>
-                    </List>
                 </Box>
             </Drawer >
 
-            <Main sx={{ backgroundColor: '#EBEBEB', height:'100vh'}} open={open}>
+            <Main sx={{ backgroundColor: '#EBEBEB', height: '100vh' }} open={open}>
                 {children}
             </Main>
         </Box >

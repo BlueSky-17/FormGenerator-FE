@@ -71,7 +71,7 @@ function App() {
           <Route path="/signin" element={<SignInSide setToken={setToken} />} />
           <Route path="/" element={<SignInSide setToken={setToken} />} />
           <Route
-            path="/home"
+            path="/myforms"
             element={
               <HomePage>
                 <MyForms />
