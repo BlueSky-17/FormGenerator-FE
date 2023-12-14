@@ -212,7 +212,7 @@ function HomePage({ children }: LayoutProps) {
                     <Divider />
                     <List>
                         {[{ id: 1, text: 'Thông tin cá nhân', path: '/profile' }, { id: 2, text: 'Forms của tôi', path: '/myforms' }].map((item) => (
-                            <ListItem onClick={navSideBar(item.path)} sx={{ paddingY: '5px' }} disablePadding>
+                            <ListItem key={item.id} onClick={navSideBar(item.path)} sx={{ paddingY: '5px' }} disablePadding>
                                 <ListItemButton>
                                     <ListItemIcon sx={{ marginLeft: '25px' }}>
                                         {item.id === 1 ? <InfoIcon sx={{ color: 'white' }} /> : ''}
