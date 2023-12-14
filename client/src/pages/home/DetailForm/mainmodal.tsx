@@ -227,6 +227,7 @@ export function MainModal(props) {
         // return default value when open modal: type and title
         props.setType('');
         props.setTitleQuestion('');
+        props.setRequired(false);
         setError(false);
 
         // return default value when open modal: multi-choice TYPE
