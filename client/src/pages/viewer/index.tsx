@@ -112,14 +112,13 @@ function Form() {
     };
 
     const handleDeleteFile = (fileName: any, ques: number, index: number) => (e) => {
+        //Call API to delete file (in aws s3)
         deleteFile(fileName);
 
-        console.log(index, ques)
-
+        //delete file (in front-end)
         formResponses[ques].content.files.splice(index, 1);
 
-        console.log(formResponses[ques].content.files)
-
+        //re-render UI
         setRender(!render);
     }
 
@@ -135,7 +134,7 @@ function Form() {
                     type: formDetail.Questions[i].Type,
                     required: formDetail.Questions[i].Required,
                     index: formDetail.QuestionOrder[i],
-                    error: false,
+                    error: '',
                     content: {}
                 };
 
@@ -234,22 +233,25 @@ function Form() {
             formResponses[ques].content.multiChoice.result[index] = true;
         else formResponses[ques].content.multiChoice.result[index] = false
 
+        //disabled when select > maxOptions
         if (formResponses[ques].content.multiChoice.constraint === 'at-most') {
             formResponses[ques].content.multiChoice.disabled = shouldDisableCheckbox(ques, index)
             setRender(!render);
         }
+
+        //if required question -> alert error if not fill checkbox
+        if (formResponses[ques].required) {
+            let checkSelect = formResponses[ques].content.multiChoice.result.some((giaTri) => giaTri === true);
+
+            if (!checkSelect) {
+                // checkRequired = false;
+                formResponses[ques].error = 'Vui lòng hoàn thành những câu hỏi bắt buộc';
+            }
+            else {
+                formResponses[ques].error = '';
+            }
+        }
     };
-    const checkErrCheckbox = (ques: number) => (e) => {
-        let checkSelect = formResponses[ques].content.multiChoice.result.some((giaTri) => giaTri === true);
-        if (!checkSelect) {
-            // checkRequired = false;
-            formResponses[ques].error = true;
-        }
-        else {
-            formResponses[ques].error = false;
-        }
-        setRender(!render);
-    }
 
     //Lưu giá trị cho các field dạng shortText
     const [inputValue, setInputValue] = React.useState('');
@@ -298,6 +300,21 @@ function Form() {
         //set select options to result 1
         formResponses[ques].content.multiChoice.result[e.target.value] = true;
     };
+    const checkErrDropdown = (ques: number) => (e) => {
+        if (formResponses[ques].required) {
+            //Check result array is checked or not
+            let checkSelect = formResponses[ques].content.multiChoice.result.some((giaTri) => giaTri === true);
+
+            if (!checkSelect) {
+                // checkRequired = false;
+                formResponses[ques].error = 'Vui lòng điền những câu hỏi bắt buộc';
+            }
+            else {
+                formResponses[ques].error = '';
+            }
+            setRender(!render);
+        }
+    }
 
     //Handle submit form
     const [submit, setSubmit] = useState<boolean>();
@@ -312,28 +329,28 @@ function Form() {
                     let checkSelect = item.content.multiChoice.result.some((giaTri) => giaTri === true);
                     if (!checkSelect) {
                         checkRequired = false;
-                        item.error = true;
+                        item.error = 'Vui lòng hoàn thành những câu hỏi bắt buộc';
                     }
                     else {
-                        item.error = false;
+                        item.error = '';
                     }
                 }
                 else if (item.type === 'shortText') {
                     if (item.content.shortText === '') {
                         checkRequired = false;
-                        item.error = true;
+                        item.error = 'Vui lòng hoàn thành những câu hỏi bắt buộc';
                     }
                     else {
-                        item.error = false;
+                        item.error = '';
                     }
                 }
                 else if (item.type === 'file') {
                     if (item.content.files.length === 0) {
                         checkRequired = false;
-                        item.error = true;
+                        item.error = 'Vui lòng hoàn thành những câu hỏi bắt buộc';
                     }
                     else {
-                        item.error = false;
+                        item.error = '';
                     }
                 }
             }
@@ -342,7 +359,7 @@ function Form() {
         console.log(formResponses)
 
         //Success: Fill correctly required questions 
-        if (checkRequired && fileError === '') {
+        if (checkRequired) {
             console.log(formResponses);
             await addResponsetoDatabase({
                 "id": "6526518a6b149bcb2510172f",
@@ -362,9 +379,7 @@ function Form() {
         }
     }
 
-    const [fileError, setFileError] = useState('')
     const handleFileChange = (ques: number) => async (e) => {
-        setFileError('')
         let selectedFile = e.target.files[0]
         if (selectedFile) {
             let fileSize = selectedFile.size / 1024;
@@ -375,21 +390,24 @@ function Form() {
 
             //Kiểu file không đúng
             if (!formDetail.Questions[ques].Content.File.FileType.includes(selectedFile.type)) {
-                setFileError('Sai định dạng File cho phép')
-            }
-            //fileSize vượt giới hạn
-            else if (totalFileSize + fileSize >= formDetail.Questions[ques].Content.File.MaxFileSize) {
-                setFileError('Vượt quá dung lượng File cho phép')
+                formResponses[ques].error = 'Sai định dạng File cho phép';
             }
             //Số lượng file vượt giới hạnf
             else if (numOfFile >= formDetail.Questions[ques].Content.File.MaxFileAmount) {
-                setFileError('Vượt quá số lượng File cho phép')
+                formResponses[ques].error = 'Vượt quá số lượng File cho phép';
+            }
+            //fileSize vượt giới hạn
+            else if (totalFileSize + fileSize >= formDetail.Questions[ques].Content.File.MaxFileSize) {
+                formResponses[ques].error = 'Vượt quá dung lượng File cho phép';
             }
             //Thêm được bình thường
             else {
                 const response = await uploadFileToS3(selectedFile);
 
                 formResponses[ques].content.files.push(response[0])
+
+                // Set error to blank
+                formResponses[ques].error = ''
 
                 console.log(formResponses[ques].content.files);
             }
@@ -520,7 +538,7 @@ function Form() {
                                                     ))}
                                                 </RadioGroup>
                                             </FormControl>
-                                            {formResponses[ques].error ? <Alert sx={{ background: 'transparent', p: '0' }} severity="error">Vui lòng hoàn thành câu hỏi bắt buộc</Alert> : null}
+                                            {formResponses[ques].error !== '' ? <Alert sx={{ background: 'transparent', p: '0' }} severity="error">Vui lòng hoàn thành câu hỏi bắt buộc</Alert> : null}
                                         </Box>
                                         : null
                                     }
@@ -530,6 +548,7 @@ function Form() {
                                                 <Select
                                                     value={value}
                                                     onChange={handleChangeDropdown(ques)}
+                                                    onBlur={checkErrDropdown(ques)}
                                                 >
                                                     {formDetail.Questions[ques].Content.MultiChoice.Options.map((item, index) => (
                                                         <MenuItem
@@ -540,7 +559,7 @@ function Form() {
                                                     ))}
                                                 </Select>
                                             </FormControl>
-                                            {formResponses[ques].error ? <Alert sx={{ background: 'transparent', p: '0' }} severity="error">Vui lòng hoàn thành câu hỏi bắt buộc</Alert> : null}
+                                            {formResponses[ques].error !== '' ? <Alert sx={{ background: 'transparent', p: '0' }} severity="error">Vui lòng hoàn thành câu hỏi bắt buộc</Alert> : null}
                                         </Box>
                                         : null
                                     }
@@ -555,7 +574,7 @@ function Form() {
                                                     <FormControlLabel
                                                         key={index}
                                                         onChange={handleChangeCheckbox(ques, index)}
-                                                        onBlur={checkErrCheckbox(ques)}
+                                                        // onBlur={checkErrCheckbox(ques)}
                                                         value={item}
                                                         control={<Checkbox
                                                             disabled={formResponses[ques].content.multiChoice.disabled && (formResponses[ques].content.multiChoice.result[index] !== true)}
@@ -564,7 +583,7 @@ function Form() {
                                                     />
                                                 ))}
                                             </FormControl>
-                                            {formResponses[ques].error ? <Alert sx={{ background: 'transparent', p: '0' }} severity="error">Vui lòng hoàn thành câu hỏi bắt buộc</Alert> : null}
+                                            {formResponses[ques].error !== '' ? <Alert sx={{ background: 'transparent', p: '0' }} severity="error">{formResponses[ques].error}</Alert> : null}
                                         </Box>
                                         : null
                                     }
@@ -580,7 +599,7 @@ function Form() {
                                                 id="outlined-basic"
                                                 label="Điền ngắn"
                                                 variant="outlined" />
-                                            {formResponses[ques].error ? <Alert sx={{ background: 'transparent', p: '0' }} severity="error">Vui lòng hoàn thành câu hỏi bắt buộc</Alert> : null}
+                                            {formResponses[ques].error !== '' ? <Alert sx={{ background: 'transparent', p: '0' }} severity="error">Vui lòng hoàn thành câu hỏi bắt buộc</Alert> : null}
                                         </Box>
                                         : null
                                     }
@@ -632,7 +651,7 @@ function Form() {
                                                                 background: '#E9F2F4',
                                                                 borderRadius: '20px',
                                                                 textOverflow: 'ellipsis',
-                                                                textAlign:'left',
+                                                                textAlign: 'left',
                                                                 textTransform: 'initial',
                                                                 '&:hover': {
                                                                     backgroundColor: '#E9F2F4',
@@ -659,8 +678,8 @@ function Form() {
                                                 </Grid>
                                             ))
                                             }
-                                            {fileError !== '' ? <Alert sx={{ background: 'transparent', p: '0' }} severity="error">{fileError}</Alert> : null}
-                                            {formResponses[ques].error ? <Alert sx={{ background: 'transparent', p: '0' }} severity="error">Vui lòng hoàn thành câu hỏi bắt buộc</Alert> : null}
+                                            {/* {fileError !== '' ? <Alert sx={{ background: 'transparent', p: '0' }} severity="error">{fileError}</Alert> : null} */}
+                                            {formResponses[ques].error !== '' ? <Alert sx={{ background: 'transparent', p: '0' }} severity="error">{formResponses[ques].error}</Alert> : null}
                                         </Box>
                                         : null
                                     }

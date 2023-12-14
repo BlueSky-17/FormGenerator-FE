@@ -97,8 +97,8 @@ export function MainModal(props) {
         if (props.type === '' || props.titleQuestion === '') {
             setError(true);
         }
-        else if (props.fileType.length === 0) {
-            setTypeError('Vui lòng chọn loại file được cho phép')
+        else if (props.type === 'file' && props.fileType.length === 0) {
+            setTypeError('Vui lòng chọn các loại file được cho phép')
         }
         else {
             const newQuestion: Question = {
