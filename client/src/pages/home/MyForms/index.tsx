@@ -135,6 +135,7 @@ function MyForms() {
             }
 
             const dataFromServer = await response.json();
+            navigate('/form/' + dataFromServer.newID);
             // Xử lý dữ liệu từ máy chủ (nếu cần)
         } catch (error) {
             console.error('Lỗi khi gửi yêu cầu:', error);
@@ -166,9 +167,6 @@ function MyForms() {
         // Return default value of Create Modal
         dispatch(setName(''));
         dispatch(setDescription(''));
-
-        // Re-render component
-        setRender(!render)
     }
 
     // API DELETE: delete form by FormId
@@ -191,13 +189,13 @@ function MyForms() {
             console.error('Lỗi khi gửi yêu cầu DELETE:', error);
         }
     };
-    const handleDeleteForm = () => {
+    const handleDeleteForm = async () => {
         // Close modal
         dispatch(setModal({ modal: '', isOpen: false }))
 
         // Call API DELETE form by ID
-        deleteForm(formID);
-        
+        await deleteForm(formID);
+
         // Re-render component
         setRender(!render);
     }

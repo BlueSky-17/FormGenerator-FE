@@ -103,7 +103,7 @@ function HomePage({ children }: LayoutProps) {
     // JSON.parse(sessionStorage.getItem('token'))
 
     const theme = useTheme();
-    const [open, setOpen] = React.useState(true);
+    const [open, setOpen] = React.useState(false);
 
     const handleDrawerOpen = () => setOpen(true);
     const handleDrawerClose = () => setOpen(false);
