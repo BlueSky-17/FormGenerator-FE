@@ -35,8 +35,26 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import TextField from '@mui/material/TextField';
 import { useParams } from 'react-router-dom';
 
-import { Response, ResultMultiChoice, ResultShortText, ResultDate, ResultLinkedData, ResultFile } from './interface';
+import { Response, ResultMultiChoice, ResultShortText, ResultDate, ResultLinkedData, ResultFile, ResultTable } from './interface';
 import { stringify } from 'querystring';
+
+function createData(
+    name: string,
+    calories: number,
+    fat: number,
+    carbs: number,
+    protein: number,
+) {
+    return { name, calories, fat, carbs, protein };
+}
+
+const rows = [
+    createData('Frozen yoghurt', 159, 6.0, 24, 4.0),
+    createData('Ice cream sandwich', 237, 9.0, 37, 4.3),
+    createData('Eclair', 262, 16.0, 24, 6.0),
+    createData('Cupcake', 305, 3.7, 67, 4.3),
+    createData('Gingerbread', 356, 16.0, 49, 3.9),
+];
 
 function Form() {
     // render: use to re-render after create or delete form
@@ -189,6 +207,15 @@ function Form() {
                 else if (formDetail.Questions[i].Type === "linkedData") {
                     const result: ResultLinkedData = {
                         linkedData: []
+                    };
+
+                    Object.assign(newResponse.content, result)
+                }
+                else if (formDetail.Questions[i].Type === "table") {
+                    const result: ResultTable = {
+                        table: {
+                            listOfColumn: []
+                        }
                     };
 
                     Object.assign(newResponse.content, result)
@@ -438,7 +465,7 @@ function Form() {
                 }
             }
 
-            if (item.type === 'date-range' && item.error !== ''){
+            if (item.type === 'date-range' && item.error !== '') {
                 checkFromTo = false;
             }
         });
@@ -957,6 +984,38 @@ function Form() {
                                             }
                                         </Grid>
                                         : null
+                                    }
+                                    {formDetail.Questions[ques].Type === 'table' ?
+                                        <TableContainer component={Paper}>
+                                            <Table aria-label="simple table">
+                                                <TableHead>
+                                                    <TableRow>
+                                                        {formDetail.Questions[ques].Content.Table.ListOfColumn.map((item) => (
+                                                            <TableCell align="left">{item.ColumnName}</TableCell>
+                                                        ))}
+                                                    </TableRow>
+                                                </TableHead>
+                                                <TableBody>
+                                                    {[1,2,3].map((row) => (
+                                                        <TableRow
+                                                            key={row}
+                                                            sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                                                        >
+                                                            {/* <TableCell component="th" scope="row">
+                                                                {row.name}
+                                                            </TableCell> */}
+                                                            {formDetail.Questions[ques].Content.Table.ListOfColumn.map((item) => (
+                                                                <TableCell align="left">
+                                                                    <TextField size="small">
+
+                                                                    </TextField>
+                                                                </TableCell>
+                                                            ))}
+                                                        </TableRow>
+                                                    ))}
+                                                </TableBody>
+                                            </Table>
+                                        </TableContainer> : null
                                     }
                                 </Box>
                             </Box>

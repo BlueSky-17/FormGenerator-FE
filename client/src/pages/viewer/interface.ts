@@ -52,3 +52,13 @@ export interface ResultFile {
 export interface ResultLinkedData {
     linkedData: string[]
 }
+
+export interface ResultTable {
+    table: {
+        listOfColumn: {
+            columnName: string,
+            type: string,
+            content: {}[]
+        }[]
+    }
+}

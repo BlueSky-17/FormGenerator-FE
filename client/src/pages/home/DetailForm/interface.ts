@@ -41,3 +41,14 @@ export interface LinkedData {
         ListOfOptions: {}
     }
 }
+
+// Content for table TYPE
+export interface Table {
+    Table: {
+        listOfColumn: {
+            columnName: string,
+            type: string,
+            content: {}
+        }[]
+    }
+}

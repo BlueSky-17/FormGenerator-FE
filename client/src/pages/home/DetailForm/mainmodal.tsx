@@ -16,6 +16,7 @@ import AddIcon from '@mui/icons-material/Add';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import DateRangeIcon from '@mui/icons-material/DateRange';
+import TableViewIcon from '@mui/icons-material/TableView';
 
 import TextField from '@mui/material/TextField';
 import InputLabel from '@mui/material/InputLabel';
@@ -30,7 +31,7 @@ import Checkbox from '@mui/material/Checkbox';
 import { useParams } from 'react-router-dom';
 import Alert, { AlertProps } from '@mui/material/Alert';
 
-import { Question, ShortText, MultiChoice, Date, LinkedData, File } from './interface';
+import { Question, ShortText, MultiChoice, Date, LinkedData, File, Table } from './interface';
 import * as XLSX from 'xlsx'
 
 // Style cho modal edit
@@ -175,6 +176,16 @@ export function MainModal(props) {
                 props.formDetail.Questions[ques].Content = {};
                 Object.assign(props.formDetail.Questions[ques].Content, updateLinkedData);
             }
+            else if (props.type === "table") {
+                const updateTable: Table = {
+                    Table: {
+                        listOfColumn: props.columnList
+                    }
+                };
+
+                props.formDetail.Questions[ques].Content = {};
+                Object.assign(props.formDetail.Questions[ques].Content, updateTable);
+            }
 
             updateObjectInDatabase({
                 "questionOrder": props.formDetail.QuestionOrder,
@@ -309,18 +320,31 @@ export function MainModal(props) {
         setOptionValue(e.target.value);
     };
 
+    const [columnName, setColumnName] = useState(''); //Lưu value của option
+    const handleColumnName = (e) => {
+        setColumnName(e.target.value);
+    };
+
     // active === index thì value của TextField sẽ thay đổi
     const [active, setActive] = useState<number>(-1);
-    const handleActive = (index: number) => (e) => {
+    const handleActive = (index: number, op: string) => (e) => { //op is handle 'option' or handle 'columnName'
         setActive(index);
-        setOptionValue(props.optionList[index]);
+        if (op === 'option') setOptionValue(props.optionList[index]);
+        else if (op === 'columnName') setColumnName(props.columnList[index].columnName)
     }
 
     // Khi onBlur thì sẽ lưu value vào mảng options[]
     const saveOption = (index: number) => (e) => props.optionList[index] = optionValue;
+    const saveColumnName = (index: number) => (e) => props.columnList[index].columnName = columnName;
 
     // Thêm option trống 
     const handleOption = () => props.setOptionList([...props.optionList, ''])
+
+    const addColumnTable = () => props.setColumnList([...props.columnList, {
+        columnName: '',
+        type: '',
+        content: {}
+    }])
 
     //Handle type of file
     const handleChangeCheckbox = (e) => {
@@ -375,7 +399,6 @@ export function MainModal(props) {
             // if (props.fileType.length === 0) setTypeError('Vui lòng chọn loại file được cho phép');
         }
     };
-    console.log(props.fileType)
 
     // Process file -> linkedData
     const [file, setFile] = useState<string>('');
@@ -525,6 +548,14 @@ export function MainModal(props) {
                                         </ListItemText>
                                     </div>
                                 </MenuItem>
+                                <MenuItem value={'table'}>
+                                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                                        <TableViewIcon sx={{ marginRight: '10px', color: '#6D7073' }} />
+                                        <ListItemText>
+                                            Bảng
+                                        </ListItemText>
+                                    </div>
+                                </MenuItem>
                             </Select>
                         </FormControl>
                     </Box>
@@ -549,7 +580,7 @@ export function MainModal(props) {
                                                 value={index === active ? optionValue : props.optionList[index]}
                                                 onChange={handleOptionChange}
                                                 onBlur={saveOption(index)}
-                                                onClick={handleActive(index)}
+                                                onClick={handleActive(index,'option')}
                                                 sx={{ marginRight: '10px', width: '100%' }}
                                                 // id={index.toString()}
                                                 variant="standard"
@@ -675,7 +706,6 @@ export function MainModal(props) {
                                                 <FormControlLabel
                                                     key={index}
                                                     onChange={handleChangeCheckbox}
-                                                    // onBlur={checkErrCheckbox(ques)}
                                                     checked={props.fileType.includes(myRecordType[item])}
                                                     value={item}
                                                     control={<Checkbox />}
@@ -732,6 +762,66 @@ export function MainModal(props) {
                                 Xem  | Chỉnh sửa
                             </Button>
                             }
+                        </Box>
+                        : null
+                    }
+                    {props.type === 'table' ?
+                        <Box sx={{ display: 'flex', flexDirection: 'column', mt:'10px' }}>
+                            <Box sx={{ maxHeight: '200px', overflowY: 'scroll' }}>
+                                {
+                                    props.columnList.map((item, index) => (
+                                        <Box key={index} sx={{ display: 'flex', alignItems: 'center' }}>
+                                            <Typography sx={{ color: 'gray', marginRight: '10px' }}>
+                                                {index + 1}.
+                                            </Typography>
+                                            <TextField
+                                                value={index === active ? columnName : props.columnList[index].columnName}
+                                                onChange={handleColumnName}
+                                                onBlur={saveColumnName(index)}
+                                                onClick={handleActive(index, 'columnName')}
+                                                sx={{ marginRight: '10px', width: '50%' }}
+                                                placeholder='Nhập tên cột'
+                                                // id={index.toString()}
+                                                variant="standard"
+                                            />
+                                            <FormControl placeholder='Chọn kiểu' sx={{ width: '35%' }}>
+                                                <InputLabel id="demo-simple-select-label">Kiểu</InputLabel>
+                                                <Select
+                                                    value={props.columnType}
+                                                    onChange={props.handleColumnType(index)}
+                                                    size='small'
+                                                    label='Kiểu'
+                                                >
+                                                    <MenuItem value={'shortText'}>Điền ngắn</MenuItem>
+                                                    {/* <MenuItem value={'dropdown'}>Menu thả xuống</MenuItem>
+                                                    <MenuItem value={'file'}>File</MenuItem> */}
+                                                </Select>
+                                            </FormControl>
+                                            <IconButton
+                                                // onClick={deleteQuestion(ques)}
+                                                sx={{
+                                                    backgroundColor: '#white',
+                                                    color: '#7B7B7B',
+                                                    margin: '5px',
+                                                    '&:hover': {
+                                                        backgroundColor: '#EBEBEB', // Màu nền thay đổi khi hover
+                                                    },
+                                                }}>
+                                                <ClearIcon />
+                                            </IconButton>
+                                        </Box>
+                                    ))
+                                }
+                            </Box>
+                            <Box>
+                                <Button
+                                    sx={{ width: '30%', fontSize: '1.1rem', color: '#364F6B', paddingY: '10px', marginBottom: '10px', textTransform: 'initial', borderRadius: '20px' }}
+                                    onClick={addColumnTable}
+                                >
+                                    <AddIcon />
+                                    Thêm cột
+                                </Button>
+                            </Box>
                         </Box>
                         : null
                     }

@@ -29,6 +29,7 @@ import jsonData from '../../../assets/i18n/vi.json'
 import { MainModal } from './mainmodal';
 import { SubModal } from './submodal';
 import Responses from '../Responses';
+import { ShortText } from './interface';
 
 const DrawerHeader = styled('div')(({ theme }) => ({
     display: 'flex',
@@ -109,6 +110,30 @@ function DetailForm() {
     const [maxOptions, setMaxOptions] = useState<number>(2)
     const handleMaxOptions = (e) => {
         setMaxOptions(e.target.value);
+    }
+
+    //columnList (Table type)
+    const [columnList, setColumnList] = useState<{ columnName: string, type: string, content: {} }[]>([
+        {
+            columnName: '',
+            type: '',
+            content: {}
+        }
+    ])
+    const [columnType, setColumnType] = useState();
+    const handleColumnType = (index: number) => (e) => {
+        setColumnType(e.target.value)
+        columnList[index].type = e.target.value
+
+        if (e.target.value === 'shortText') {
+            const updateShortText: ShortText = {
+                shortText: true
+            };
+
+            columnList[index].content = {}
+            Object.assign(columnList[index].content, updateShortText);
+        }
+
     }
 
     // Close/Open Main Modal 
@@ -608,6 +633,11 @@ function DetailForm() {
                 maxOptions={maxOptions}
                 handleMaxOptions={handleMaxOptions}
                 setMaxOptions={setMaxOptions}
+
+                columnList={columnList}
+                setColumnList={setColumnList}
+                columnType={columnType}
+                handleColumnType={handleColumnType}
 
                 maxFileAmount={maxFileAmount}
                 setMaxFileAmount={setMaxFileAmount}
