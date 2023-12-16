@@ -59,20 +59,20 @@ function Responses() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
-    useEffect(() => {
-        fetch(FormDetailAPI_URL, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + JSON.parse(sessionStorage.getItem('token') as string)?.accessToken
-            }
-        })
-            .then(data => data.json())
-            .then(formDetail => {
-                setFormDetail(formDetail);
-            })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
+    // useEffect(() => {
+    //     fetch(FormDetailAPI_URL, {
+    //         method: 'GET',
+    //         headers: {
+    //             'Content-Type': 'application/json',
+    //             'Authorization': 'Bearer ' + JSON.parse(sessionStorage.getItem('token') as string)?.accessToken
+    //         }
+    //     })
+    //         .then(data => data.json())
+    //         .then(formDetail => {
+    //             setFormDetail(formDetail);
+    //         })
+    // // eslint-disable-next-line react-hooks/exhaustive-deps
+    // }, [])
     console.log(formDetail);
 
     const [detail, setDetail] = useState(false);

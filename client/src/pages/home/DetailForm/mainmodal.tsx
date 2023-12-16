@@ -248,13 +248,28 @@ export function MainModal(props) {
             setFile('');
             props.setExcelData([]);
         }
+        else if (props.type === "date-single" || props.type === "date-range") {
+            setDateNum(-1);
+        }
         props.setQuesEdit(-1)
     }
 
     // Get Type of question
     const handleChangeType = (event: SelectChangeEvent) => {
         props.setType(event.target.value as string);
-        if (props.titleQuestion !== '') setError(false);
+
+        if (props.type === 'date-single') {
+            if (dateNum === 1) setDateNum(5);
+            else if (dateNum === 2) setDateNum(6);
+            else if (dateNum === 3) setDateNum(7);
+            else if (dateNum === 4) setDateNum(8);
+        }
+        else if (props.type === 'date-range') {
+            if (dateNum === 5) setDateNum(1);
+            else if (dateNum === 6) setDateNum(2);
+            else if (dateNum === 7) setDateNum(3);
+            else if (dateNum === 8) setDateNum(4);
+        }
     }
 
     // Get Title of question 
@@ -270,6 +285,22 @@ export function MainModal(props) {
     const convertType = (e) => {
         if (props.type === 'multi-choice') props.setType('checkbox');
         else if (props.type === 'checkbox') props.setType('multi-choice');
+        else if (props.type === 'date-single') {
+            props.setType('date-range');
+
+            if (dateNum === 1) setDateNum(5);
+            else if (dateNum === 2) setDateNum(6);
+            else if (dateNum === 3) setDateNum(7);
+            else if (dateNum === 4) setDateNum(8);
+        }
+        else if (props.type === 'date-range') {
+            props.setType('date-single');
+
+            if (dateNum === 5) setDateNum(1);
+            else if (dateNum === 6) setDateNum(2);
+            else if (dateNum === 7) setDateNum(3);
+            else if (dateNum === 8) setDateNum(4);
+        }
     }
 
     // Xử lý câu hỏi multi-choice và checkbox
@@ -588,7 +619,7 @@ export function MainModal(props) {
                         <TextField disabled sx={{ width: '100%' }} id="standard-basic" label="Nhập câu trả lời" variant="standard" />
                         : null
                     }
-                    {props.type === 'date-single' ?
+                    {props.type === 'date-single' || props.type === 'date-range' ?
                         <Box sx={{ margin: '5px' }}>
                             <Typography sx={{ width: '100%', marginY: '10px', color: 'gray' }}><b>Chọn định dạng</b></Typography>
                             <FormControl sx={{ width: '50%' }}>
@@ -596,25 +627,10 @@ export function MainModal(props) {
                                     value={dateNum}
                                     onChange={handleDateNum}
                                 >
-                                    <MenuItem value={0}> Ngày </MenuItem>
-                                    <MenuItem value={1}> Giờ </MenuItem>
-                                    <MenuItem value={2}> Ngày + Giờ </MenuItem>
-                                </Select>
-                            </FormControl>
-                        </Box>
-                        : null
-                    }
-                    {props.type === 'date-range' ?
-                        <Box sx={{ margin: '5px' }}>
-                            <Typography sx={{ width: '100%', marginY: '10px', color: 'gray' }}><b>Chọn định dạng</b></Typography>
-                            <FormControl sx={{ width: '50%' }}>
-                                <Select
-                                    value={dateNum}
-                                    onChange={handleDateNum}
-                                >
-                                    <MenuItem value={3}> Ngày </MenuItem>
-                                    <MenuItem value={4}> Giờ </MenuItem>
-                                    <MenuItem value={5}> Ngày + Giờ </MenuItem>
+                                    <MenuItem value={props.type === 'date-single' ? 1 : 5}> Ngày/Tháng/Năm </MenuItem>
+                                    <MenuItem value={props.type === 'date-single' ? 2 : 6}> Tháng/Năm </MenuItem>
+                                    <MenuItem value={props.type === 'date-single' ? 3 : 7}> Năm </MenuItem>
+                                    <MenuItem value={props.type === 'date-single' ? 4 : 8}> Giờ </MenuItem>
                                 </Select>
                             </FormControl>
                         </Box>
@@ -737,6 +753,18 @@ export function MainModal(props) {
                                     <FormControlLabel control={<Switch defaultChecked={true}
                                         onChange={convertType}
                                     />} label="Nhiều lựa chọn"
+                                    />
+                                }
+                                {props.type === 'date-range' &&
+                                    <FormControlLabel control={<Switch defaultChecked={true}
+                                        onChange={convertType}
+                                    />} label="Khoảng thời gian"
+                                    />
+                                }
+                                {props.type === 'date-single' &&
+                                    <FormControlLabel control={<Switch defaultChecked={false}
+                                        onChange={convertType}
+                                    />} label="Khoảng thời gian"
                                     />
                                 }
                             </FormGroup>

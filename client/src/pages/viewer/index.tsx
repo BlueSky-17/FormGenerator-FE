@@ -161,26 +161,18 @@ function Form() {
                     Object.assign(newResponse.content, result)
                 }
                 else if (formDetail.Questions[i].Type === "date-single" || formDetail.Questions[i].Type === "date-range") {
-                    let dateString: string = "2023-11-16";
+                    let dateString: string = "1000-1-1";
 
                     const result: ResultDate = {
                         date: {
                             single: {
-                                dateOnly: new Date(dateString),
-                                hour: new Date(dateString),
-                                fulltime: new Date(dateString)
+                                time: new Date(dateString),
+                                type: -1
                             },
                             range: {
-                                from: {
-                                    dateOnly: new Date(dateString),
-                                    hour: new Date(dateString),
-                                    fulltime: new Date(dateString)
-                                },
-                                to: {
-                                    dateOnly: new Date(dateString),
-                                    hour: new Date(dateString),
-                                    fulltime: new Date(dateString)
-                                }
+                                from: new Date(dateString),
+                                to: new Date(dateString),
+                                type: -1
                             }
                         }
                     };
@@ -284,12 +276,93 @@ function Form() {
 
     //Lưu giá trị cho các field dạng Date
     const handleChangeDate = (ques: number) => (e) => {
-        formResponses[ques].content.date.single.dateOnly = e.$d;
-    };
-    const handleChangeHour = (ques: number) => (e) => {
-        formResponses[ques].content.date.single.hour = e.$d;
+        formResponses[ques].content.date.single.time = e.$d;
+        formResponses[ques].content.date.single.type = formDetail.Questions[ques].Content.Date;
     };
 
+    const handleChangeDateRange = (ques: number, pos: string) => (e) => {
+        formResponses[ques].content.date.range.type = formDetail.Questions[ques].Content.Date;
+        if (pos === 'start') {
+            formResponses[ques].content.date.range.from = e.$d;
+        }
+        else if (pos === 'end') {
+            formResponses[ques].content.date.range.to = e.$d;
+        };
+
+        console.log(formResponses[ques].content.date.range.from)
+        console.log(formResponses[ques].content.date.range.to)
+        console.log(formResponses[ques].content.date.range.to <= formResponses[ques].content.date.range.from)
+
+        if (formDetail.Questions[ques].Content.Date === 5) {
+            let dateString: string = "1000-1-1";
+            let time = new Date(dateString)
+
+            if ((formResponses[ques].content.date.range.to <= formResponses[ques].content.date.range.from)
+                && (formResponses[ques].content.date.range.to !== time)
+                && (formResponses[ques].content.date.range.from !== time)
+            ) {
+                formResponses[ques].error = 'Thời gian bắt đầu phải trước thời gian kết thúc'
+                setRender(!render)
+            }
+            else {
+                formResponses[ques].error = ''
+                setRender(!render)
+            }
+        }
+        else if (formDetail.Questions[ques].Content.Date === 6) {
+            let dateString: string = "1000-1-1";
+            let time = new Date(dateString)
+
+            if ((formResponses[ques].content.date.range.to <= formResponses[ques].content.date.range.from)
+                && (formResponses[ques].content.date.range.to.getMonth() !== time.getMonth())
+                && (formResponses[ques].content.date.range.to.getFullYear() !== time.getFullYear())
+                && (formResponses[ques].content.date.range.from.getMonth() !== time.getMonth())
+                && (formResponses[ques].content.date.range.from.getFullYear() !== time.getFullYear())
+            ) {
+                formResponses[ques].error = 'Thời gian bắt đầu phải trước thời gian kết thúc'
+                setRender(!render)
+            }
+            else {
+                formResponses[ques].error = ''
+                setRender(!render)
+            }
+        }
+        else if (formDetail.Questions[ques].Content.Date === 7) {
+            let dateString: string = "1000-1-1";
+            let time = new Date(dateString)
+
+            if ((formResponses[ques].content.date.range.to <= formResponses[ques].content.date.range.from)
+                && (formResponses[ques].content.date.range.to.getFullYear() !== time.getFullYear())
+                && (formResponses[ques].content.date.range.from.getFullYear() !== time.getFullYear())
+            ) {
+                formResponses[ques].error = 'Thời gian bắt đầu phải trước thời gian kết thúc'
+                setRender(!render)
+            }
+            else {
+                formResponses[ques].error = ''
+                setRender(!render)
+            }
+        }
+        else if (formDetail.Questions[ques].Content.Date === 8) {
+            let dateString: string = "1000-1-1";
+            let time = new Date(dateString)
+            console.log(time)
+            console.log(formResponses[ques].content.date.range.to === time)
+
+            if ((formResponses[ques].content.date.range.to <= formResponses[ques].content.date.range.from)
+                && (formResponses[ques].content.date.range.to !== time)
+                && (formResponses[ques].content.date.range.from !== time)
+            ) {
+                formResponses[ques].error = 'Thời gian bắt đầu phải trước thời gian kết thúc'
+                setRender(!render)
+            }
+            else {
+                formResponses[ques].error = ''
+                setRender(!render)
+            }
+        }
+
+    }
     //Lưu giá trị cho các field dạng dropdown
     const [value, setValue] = useState('');
     const handleChangeDropdown = (ques: number) => (e) => {
@@ -320,6 +393,7 @@ function Form() {
     const [submit, setSubmit] = useState<boolean>();
     const handleSubmitForm = async () => {
         let checkRequired = true;
+        let checkFromTo = true;
 
         formResponses.forEach(async item => {
             if (item.required === true) {
@@ -353,13 +427,26 @@ function Form() {
                         item.error = '';
                     }
                 }
+                else if (item.type === 'date-range') {
+                    if (item.content.files.length === 0) {
+                        checkRequired = false;
+                        item.error = 'Vui lòng hoàn thành những câu hỏi bắt buộc';
+                    }
+                    else {
+                        item.error = '';
+                    }
+                }
+            }
+
+            if (item.type === 'date-range' && item.error !== ''){
+                checkFromTo = false;
             }
         });
 
         console.log(formResponses)
 
         //Success: Fill correctly required questions 
-        if (checkRequired) {
+        if (checkRequired && checkFromTo) {
             console.log(formResponses);
             await addResponsetoDatabase({
                 "id": "6526518a6b149bcb2510172f",
@@ -603,24 +690,141 @@ function Form() {
                                         </Box>
                                         : null
                                     }
-                                    {formDetail.Questions[ques].Type === 'date-single' && formDetail.Questions[ques].Content.Date === 0 ?
-                                        <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                            <DatePicker onChange={handleChangeDate(ques)} />
-                                        </LocalizationProvider>
+                                    {formDetail.Questions[ques].Type === 'date-single' ?
+                                        <Box>
+                                            {formDetail.Questions[ques].Content.Date === 1 ?
+                                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                                    <DatePicker label={'Ngày - Tháng - Năm'}
+                                                        views={['year', 'month', 'day']}
+                                                        onChange={handleChangeDate(ques)} />
+                                                </LocalizationProvider> : null
+                                            }
+                                            {formDetail.Questions[ques].Content.Date === 2 ?
+                                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                                    <DatePicker label={'Tháng - Năm'}
+                                                        views={['year', 'month']}
+                                                        onChange={handleChangeDate(ques)} />
+                                                </LocalizationProvider> : null
+                                            }
+                                            {formDetail.Questions[ques].Content.Date === 3 ?
+                                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                                    <DatePicker label={'Năm'}
+                                                        views={['year']}
+                                                        onChange={handleChangeDate(ques)} />
+                                                </LocalizationProvider> : null
+                                            }
+                                            {formDetail.Questions[ques].Content.Date === 4 ?
+                                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                                    <DemoContainer components={['TimePicker']}>
+                                                        <TimePicker
+                                                            label="Chọn giờ"
+                                                            // value={time}
+                                                            onChange={handleChangeDate(ques)}
+                                                        />
+                                                    </DemoContainer>
+                                                </LocalizationProvider> : null
+                                            }
+                                        </Box>
                                         : null
                                     }
-                                    {formDetail.Questions[ques].Type === 'date-single' && formDetail.Questions[ques].Content.Date === 1 ?
-                                        <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                            <DemoContainer components={['TimePicker']}>
-                                                <TimePicker
-                                                    label="Chọn giờ"
-                                                    // value={time}
-                                                    onChange={handleChangeHour(ques)}
-                                                />
-                                            </DemoContainer>
-                                        </LocalizationProvider>
-                                        : null
+                                    {formDetail.Questions[ques].Type === 'date-range' ?
+                                        <Box>
+                                            {formDetail.Questions[ques].Content.Date === 5 ?
+                                                <Grid container xs={12} sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                    <Grid item xs={5}>
+                                                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                                            <DatePicker label={'Bắt đầu'}
+                                                                views={['year', 'month', 'day']}
+                                                                onChange={handleChangeDateRange(ques, 'start')} />
+                                                        </LocalizationProvider>
+                                                    </Grid>
+
+                                                    <Typography>_</Typography>
+
+                                                    <Grid item xs={5}>
+                                                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                                            <DatePicker label={'Kết thúc'}
+                                                                views={['year', 'month', 'day']}
+                                                                onChange={handleChangeDateRange(ques, 'end')} />
+                                                        </LocalizationProvider>
+                                                    </Grid>
+                                                </Grid> : null
+                                            }
+                                            {formDetail.Questions[ques].Content.Date === 6 ?
+                                                <Grid container xs={12} sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                    <Grid item xs={5}>
+                                                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                                            <DatePicker label={'Bắt đầu'}
+                                                                views={['year', 'month']}
+                                                                onChange={handleChangeDateRange(ques, 'start')} />
+                                                        </LocalizationProvider>
+                                                    </Grid>
+
+                                                    <Typography>_</Typography>
+
+                                                    <Grid item xs={5}>
+                                                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                                            <DatePicker label={'Kết thúc'}
+                                                                views={['year', 'month']}
+                                                                onChange={handleChangeDateRange(ques, 'end')} />
+                                                        </LocalizationProvider>
+                                                    </Grid>
+                                                </Grid> : null
+                                            }
+                                            {formDetail.Questions[ques].Content.Date === 7 ?
+                                                <Grid container xs={12} sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                    <Grid item xs={5}>
+                                                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                                            <DatePicker label={'Bắt đầu'}
+                                                                views={['year']}
+                                                                onChange={handleChangeDateRange(ques, 'start')} />
+                                                        </LocalizationProvider>
+                                                    </Grid>
+
+                                                    <Typography>_</Typography>
+
+                                                    <Grid item xs={5}>
+                                                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                                            <DatePicker label={'Kết thúc'}
+                                                                views={['year']}
+                                                                onChange={handleChangeDateRange(ques, 'end')} />
+                                                        </LocalizationProvider>
+                                                    </Grid>
+                                                </Grid> : null
+                                            }
+                                            {formDetail.Questions[ques].Content.Date === 8 ?
+                                                <Grid container xs={12} sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                    <Grid item xs={5}>
+                                                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                                            <DemoContainer components={['TimePicker']}>
+                                                                <TimePicker
+                                                                    label="Giờ bắt đầu"
+                                                                    // value={time}
+                                                                    onChange={handleChangeDateRange(ques, 'start')}
+                                                                />
+                                                            </DemoContainer>
+                                                        </LocalizationProvider>
+                                                    </Grid>
+
+                                                    <Typography>_</Typography>
+
+                                                    <Grid item xs={5}>
+                                                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                                            <DemoContainer components={['TimePicker']}>
+                                                                <TimePicker
+                                                                    label="Giờ kết thúc"
+                                                                    // value={time}
+                                                                    onChange={handleChangeDateRange(ques, 'end')}
+                                                                />
+                                                            </DemoContainer>
+                                                        </LocalizationProvider>
+                                                    </Grid>
+                                                </Grid> : null
+                                            }
+                                            {formResponses[ques].error !== '' ? <Alert sx={{ background: 'transparent', p: '0' }} severity="error">{formResponses[ques].error}</Alert> : null}
+                                        </Box> : null
                                     }
+
                                     {formDetail.Questions[ques].Type === 'file' ?
                                         <Box>
                                             <Button

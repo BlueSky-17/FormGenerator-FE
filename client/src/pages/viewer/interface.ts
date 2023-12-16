@@ -27,27 +27,19 @@ export interface ResultShortText {
 export interface ResultDate {
     date: {
         single: {
-            dateOnly: Date,
-            hour: Date,
-            fulltime: Date
+            time: Date,
+            type: number
         }
         range: {
-            from: {
-                dateOnly: Date,
-                hour: Date,
-                fulltime: Date
-            }
-            to: {
-                dateOnly: Date,
-                hour: Date,
-                fulltime: Date
-            }
+            from: Date
+            to: Date
+            type: number
         }
     }
 }
 
 export interface ResultFile {
-    files:{
+    files: {
         // id: string,
         fileName: string,
         fileURL: string,
