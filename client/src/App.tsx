@@ -5,7 +5,7 @@ import DetailForm from './pages/home/DetailForm';
 import Form from './pages/viewer';
 import SignInSide from './pages/SignIn';
 import SignUp from './pages/SignUp';
-import { Route, BrowserRouter, Routes } from 'react-router-dom'
+import { Route, BrowserRouter, Routes, Navigate } from 'react-router-dom';
 import './App.css';
 import { error } from 'console';
 
@@ -30,48 +30,42 @@ function App() {
     }
   }
 
-  // const token = getToken()
-  // console.log(token.refreshToken)
 
-  //const [token, setToken] = React.useState();
-  // const token = getToken();
+  const token = getToken();
 
-  // try {
-  //   const token = getToken();
-  //   if (!token) {
-  //     return (
-  //       <BrowserRouter>
-  //         <SignInSide setToken={setToken} />
-  //       </BrowserRouter>)
-  //   }
-  // }
-  // catch (error) {
-  //   sessionStorage.removeItem('token');
-  // }
-
-  // const token = getToken();
-
-  // if (!token) {
-  //   return (
-  //     <BrowserRouter>
-  //       <Routes>
-  //         <Route path="/" element={<SignInSide setToken={setToken} />} />
-  //         <Route path="/signin" element={<SignInSide setToken={setToken} />} />
-  //         <Route path="/home" element={<HomePage pageComponent={MyForms} />} />
-  //       </Routes>
-  //     </BrowserRouter>
-  //   );
-  // }
 
   return (
     <div className="wrapper">
       <BrowserRouter>
         <Routes>
+        {!token ? (
+            <Route
+              path="*"
+              element={<Navigate to="/signin" />}
+            />
+          ) : (<Route
+            path="/"
+            element={
+              <HomePage>
+                <MyForms />
+                {/* <MyForms getToken={getToken} /> */}
+              </HomePage>
+            }
+          />)}
           <Route path="/signup" element={<SignUp />} />
           <Route path="/signin" element={<SignInSide setToken={setToken} />} />
-          <Route path="/" element={<SignInSide setToken={setToken} />} />
+          <Route path="/profile"/>
           <Route
             path="/myforms"
+            element={
+              <HomePage>
+                <MyForms />
+                {/* <MyForms getToken={getToken} /> */}
+              </HomePage>
+            }
+          />
+          <Route
+            path="/myForm"
             element={
               <HomePage>
                 <MyForms />
