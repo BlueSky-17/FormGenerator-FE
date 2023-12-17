@@ -12,7 +12,6 @@ import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 
 import Summary from './summary';
-import ResponseByQuestion from './question';
 import Detail from './detail';
 import { Answer } from './interface';
 import { Question } from '../DetailForm/interface';
@@ -32,7 +31,7 @@ function Responses() {
     const handleChangeTabs = (event: React.SyntheticEvent, newValue: number) => {
         setTab(newValue);
 
-        if (newValue === 2) setDetail(true);
+        if (newValue === 1) setDetail(true);
         else setDetail(false);
     };
 
@@ -80,7 +79,7 @@ function Responses() {
     const [indexDetail, setIndexDetail] = useState(1);
     const handleIndexDetail = (e) => setIndexDetail(e.target.value);
     const decreaseIndex = () => {
-        if (indexDetail === 0) return;
+        if (indexDetail === 1) return;
         else {
             let newIndex = indexDetail - 1;
             setIndexDetail(newIndex);
@@ -239,10 +238,6 @@ function Responses() {
             }
 
             {tab === 1 &&
-                <ResponseByQuestion responses={responses} />
-            }
-
-            {tab === 2 &&
                 <Detail responses={responses} indexDetail={indexDetail} />
             }
 
