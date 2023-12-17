@@ -20,11 +20,8 @@
     "@types/node": "^16.18.52",
     "@types/react": "^18.2.21",
     "@types/react-dom": "^18.2.7",
-<<<<<<< Updated upstream
     "date-fns": "^2.30.0",
-=======
     "axios": "^1.6.2",
->>>>>>> Stashed changes
     "dayjs": "^1.11.10",
     "exceljs": "^4.4.0",
     "firebase": "^10.7.0",
