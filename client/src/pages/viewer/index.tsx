@@ -282,8 +282,8 @@ function Form() {
         formResponses[ques].content.shortText = inputValue;
 
         //Return error if active textField but don't fill
-        if (inputValue === '') formResponses[ques].error = true
-        else formResponses[ques].error = false
+        if (inputValue === '') formResponses[ques].error = 'Vui lòng điền những câu hỏi bắt buộc';
+        else formResponses[ques].error = ''
 
         //Render update UI
         setRender(!render)
