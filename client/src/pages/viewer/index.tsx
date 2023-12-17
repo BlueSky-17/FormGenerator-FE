@@ -38,24 +38,6 @@ import { useParams } from 'react-router-dom';
 import { Response, ResultMultiChoice, ResultShortText, ResultDate, ResultLinkedData, ResultFile, ResultTable } from './interface';
 import { stringify } from 'querystring';
 
-function createData(
-    name: string,
-    calories: number,
-    fat: number,
-    carbs: number,
-    protein: number,
-) {
-    return { name, calories, fat, carbs, protein };
-}
-
-const rows = [
-    createData('Frozen yoghurt', 159, 6.0, 24, 4.0),
-    createData('Ice cream sandwich', 237, 9.0, 37, 4.3),
-    createData('Eclair', 262, 16.0, 24, 6.0),
-    createData('Cupcake', 305, 3.7, 67, 4.3),
-    createData('Gingerbread', 356, 16.0, 49, 3.9),
-];
-
 function Form() {
     // render: use to re-render after create or delete form
     const [render, setRender] = useState(false);
@@ -218,6 +200,17 @@ function Form() {
                         }
                     };
 
+                    //Với mỗi listOfColum thì sẽ init responses như dưới đây (content sẽ có 1 phần từ (row) trỗng sẵn)
+                    formDetail.Questions[i].Content.Table.ListOfColumn.forEach((item, index) => {
+                        result.table.listOfColumn.push({
+                            columnName: item.ColumnName,
+                            type: item.Type,
+                            content: [{
+                                shortText: ""
+                            }]
+                        })
+                    })
+
                     Object.assign(newResponse.content, result)
                 }
                 // setFormResponse(formResponses);
@@ -300,6 +293,29 @@ function Form() {
         //lưu vị trí field được active
         setActive(ques);
     }
+
+    //handleTableText Value
+    const [tableText, setTableText] = React.useState('');
+    const handleChangeTableText = (e) => {
+        setTableText(e.target.value);
+    };
+    const saveTableText = (ques: number, rowIndex: number, colIndex: number) => (e) => {
+        formResponses[ques].content.table.listOfColumn[colIndex].content[rowIndex].shortText = tableText;
+    };
+    const [activeTable, setActiveTable] = useState<[number, number, number]>([-1, -1, -1]);
+    const handleActiveTable = (ques: number, rowIndex: number, colIndex: number) => (e) => {
+        //Nếu field trống thì set tableText vễ rỗng, còn không rỗng thì set về giá trị cũ
+        if (formResponses[ques].content.table.listOfColumn[colIndex].content[rowIndex].shortText === '') {
+            setTableText('')
+        }
+        else {
+            setTableText(formResponses[ques].content.table.listOfColumn[colIndex].content[rowIndex].shortText)
+        }
+
+        //lưu vị trí tableText được active
+        setActiveTable([ques, rowIndex, colIndex]);
+    }
+
 
     //Lưu giá trị cho các field dạng Date
     const handleChangeDate = (ques: number) => (e) => {
@@ -591,6 +607,16 @@ function Form() {
     };
 
     const [height, setHeight] = useState('100%')
+
+    const addRowTable = (ques: number) => (e) => {
+        formDetail.Questions[ques].Content.Table.ListOfColumn.forEach((item, index) => {
+            formResponses[ques].content.table.listOfColumn[index].content.push
+                ({
+                    shortText: ''
+                })
+        })
+        setRender(!render)
+    };
 
     console.log(formResponses);
     console.log(formDetail);
@@ -996,23 +1022,44 @@ function Form() {
                                                     </TableRow>
                                                 </TableHead>
                                                 <TableBody>
-                                                    {[1,2,3].map((row) => (
+                                                    {formResponses[ques].content.table.listOfColumn[0].content.map((row, rowIndex) => (
                                                         <TableRow
-                                                            key={row}
+                                                            key={rowIndex}
                                                             sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                                         >
                                                             {/* <TableCell component="th" scope="row">
                                                                 {row.name}
                                                             </TableCell> */}
-                                                            {formDetail.Questions[ques].Content.Table.ListOfColumn.map((item) => (
-                                                                <TableCell align="left">
-                                                                    <TextField size="small">
-
+                                                            {formDetail.Questions[ques].Content.Table.ListOfColumn.map((item, colIndex) => (
+                                                                <TableCell key={colIndex} align="left">
+                                                                    <TextField
+                                                                        // value={tableText}
+                                                                        onChange={handleChangeTableText}
+                                                                        value={(ques === activeTable[0] && rowIndex === activeTable[1] && colIndex === activeTable[2]) ? tableText : formResponses[ques].content.table.listOfColumn[colIndex].content[rowIndex].shortText}
+                                                                        onBlur={saveTableText(ques, rowIndex, colIndex)}
+                                                                        onClick={handleActiveTable(ques, rowIndex, colIndex)}
+                                                                        size="small">
                                                                     </TextField>
                                                                 </TableCell>
                                                             ))}
                                                         </TableRow>
                                                     ))}
+                                                    <Button
+                                                        onClick={addRowTable(ques)}
+                                                        sx={{
+                                                            color: 'white',
+                                                            backgroundColor: '#008272',
+                                                            borderRadius: '15px',
+                                                            textTransform: 'initial',
+                                                            paddingX: '15px',
+                                                            margin: '15px',
+                                                            '&:hover': {
+                                                                backgroundColor: '#008272',
+                                                                color: 'white'
+                                                            },
+                                                        }}>
+                                                        Thêm 1 dòng
+                                                    </Button>
                                                 </TableBody>
                                             </Table>
                                         </TableContainer> : null
