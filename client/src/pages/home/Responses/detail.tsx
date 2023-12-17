@@ -6,7 +6,7 @@ import { styled, useTheme, alpha } from '@mui/material/styles';
 import Button from '@mui/material/Button';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
-import Form from '../../viewer/index'
+import FormResponse from './viewFormResponse'
 
 function Detail(props) {
 
@@ -17,7 +17,7 @@ function Detail(props) {
                 <Box sx={{ backgroundColor: 'white', borderRadius: '15px', marginTop: '15px' }}>
                     <Typography sx={{ color: '#364F6B', padding: '20px', fontWeight: 500 }} variant="h5" noWrap component="div">{props.responses[props.indexDetail - 1].id}</Typography>
                     {/* Xài hàm map với mảng response để display tất cả câu hỏi */}
-                    <Form></Form>
+                    <FormResponse></FormResponse>
                 </Box > : null
         }
         </Box>
