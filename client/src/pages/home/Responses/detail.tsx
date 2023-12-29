@@ -10,14 +10,17 @@ import FormResponse from './viewFormResponse'
 
 function Detail(props) {
 
-    //console.log(props.responses)
+    console.log(props.form)
     return (
         <Box>{
             props.responses.length > 0 ?
                 <Box sx={{ backgroundColor: 'white', borderRadius: '15px', marginTop: '15px' }}>
                     <Typography sx={{ color: '#364F6B', padding: '20px', fontWeight: 500 }} variant="h5" noWrap component="div">{props.responses[props.indexDetail - 1].id}</Typography>
                     {/* Xài hàm map với mảng response để display tất cả câu hỏi */}
-                    <FormResponse></FormResponse>
+                    <FormResponse 
+                        Answer={props.responses[props.indexDetail - 1]}
+                        Form={props.form}
+                    />
                 </Box > : null
         }
         </Box>

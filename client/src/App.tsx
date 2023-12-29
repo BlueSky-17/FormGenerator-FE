@@ -52,7 +52,7 @@ function App() {
               </HomePage>
             }
           />)}
-          <Route path="/signup" element={<SignUp />} />
+          <Route path="/signup" element={<SignUp setToken={setToken}/>} />
           <Route path="/signin" element={<SignInSide setToken={setToken} />} />
           <Route path="/profile"/>
           <Route

@@ -36,10 +36,6 @@ export default function SignInSide({ setToken }) {
 
   const nav: any = useNavigate()
 
-  // if (loginState) {
-  //   nav('/home')
-  // };
-
   //@ts-ignore
   async function loginUser(credentials) {
     return fetch('http://localhost:8080/login', {
