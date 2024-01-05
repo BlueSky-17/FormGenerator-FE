@@ -21,7 +21,6 @@ import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
 import { CardActionArea } from '@mui/material';
 
-import CircleIcon from '@mui/icons-material/Circle';
 import Icon from '@mui/material/Icon';
 import { Link, useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
@@ -169,20 +168,6 @@ export default function SignInSide({ setToken }) {
           left: '-15%'
         }}
         >
-          <CircleIcon sx={{
-            color: 'white',
-            position: 'absolute',
-            left: '-1%',
-            top: '-1%',
-            transform: 'scale(3.5, 3.5)'
-          }} />
-          <CircleIcon sx={{
-            color: '#364F6B',
-            position: 'absolute',
-            left: '-1%',
-            top: '-1%',
-            transform: 'scale(2.8, 2.8)'
-          }} />
           <Box
             sx={{
               my: 4,

@@ -231,24 +231,6 @@ export default function SignUpSide({ setToken }) {
             maxHeight: "84%"
           }}
         >
-          <CircleIcon
-            sx={{
-              color: "white",
-              position: "absolute",
-              left: "-1%",
-              top: "-1%",
-              transform: "scale(3.5, 3.5)",
-            }}
-          />
-          <CircleIcon
-            sx={{
-              color: "#364F6B",
-              position: "absolute",
-              left: "-1%",
-              top: "-1%",
-              transform: "scale(2.8, 2.8)",
-            }}
-          />
           <Box
             sx={{
               my: 4,
@@ -354,6 +336,12 @@ export default function SignUpSide({ setToken }) {
                   />
                 </Grid>
                 {rePasswordError !== '' ? <Alert sx={{ background: 'transparent', paddingLeft: '10' }} severity="error">{rePasswordError}</Alert> : null}
+                {/* <Grid item xs={12}>
+                  <FormControlLabel
+                    control={<Checkbox value="allowExtraEmails" color="primary" />}
+                    label="Tôi chấp nhận điều khoản"
+                  />
+                </Grid> */}
               </Grid>
               <Button
                 type="submit"
