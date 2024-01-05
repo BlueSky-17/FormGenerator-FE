@@ -225,14 +225,14 @@ function MyForms() {
         setItemsPerPage(event.target.value);
     };
 
-    // console.log(forms)
+    console.log(forms)
 
     return (
         <Box>
             <DrawerHeader />
             <Box sx={{ backgroundColor: 'white', border: "2px solid #DEDEDE" }}>
                 <Typography sx={{ color: '#364F6B', padding: '15px', fontWeight: 600 }} variant="h6" noWrap component="div">
-                    FORMS CỦA TÔI
+                    BIỂU MẪU CỦA TÔI
                 </Typography>
                 <Divider />
 
@@ -258,7 +258,7 @@ function MyForms() {
                             },
                         }}>
                         <Typography sx={{ fontWeight: 500, color: 'white', paddingX: '10px', paddingY: '4px' }} variant="body2" noWrap component="div">
-                            Tạo Form
+                            Tạo Biểu mẫu 
                         </Typography>
                     </Button>
                 </Box>
@@ -270,8 +270,8 @@ function MyForms() {
                             <TableHead>
                                 <TableRow >
                                     <TableCell sx={{ padding: 2, fontWeight: 800, fontSize: '1rem' }} align="left">STT</TableCell>
-                                    <TableCell sx={{ padding: 1, fontWeight: 800, fontSize: '1rem' }} align="left">Tên Form</TableCell>
-                                    <TableCell sx={{ padding: 1, fontWeight: 800, fontSize: '1rem' }} align="center">Quyền truy cập</TableCell>
+                                    <TableCell sx={{ padding: 1, fontWeight: 800, fontSize: '1rem' }} align="left">Người biểu mẫu</TableCell>
+                                    <TableCell sx={{ padding: 1, fontWeight: 800, fontSize: '1rem' }} align="center">Người sở hữu</TableCell>
                                     <TableCell sx={{ padding: 1, fontWeight: 800, fontSize: '1rem' }} align="center">Phản hồi</TableCell>
                                     <TableCell sx={{ padding: 1, fontWeight: 800, fontSize: '1rem' }} align="center">Tình trạng</TableCell>
                                     <TableCell sx={{ padding: 1, fontWeight: 800, fontSize: '1rem' }} align="center">Thao tác</TableCell>
@@ -288,7 +288,7 @@ function MyForms() {
                                         </TableCell>
                                         <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="left">{form.name}</TableCell>
                                         <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="center">
-                                            {/* {form.Editors[0]} */}
+                                            {form.owner}
                                         </TableCell>
                                         <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="center">{form.AnswersCounter}</TableCell>
                                         <TableCell sx={{ padding: 1 }} align="center">

@@ -225,15 +225,11 @@ export default function SignInSide({ setToken }) {
                 </Typography>
                 : null
               }
-              <FormControlLabel
-                control={<Checkbox value="remember" color="primary" />}
-                label="Duy trì đăng nhập"
-              />
               <Button
                 type="submit"
                 fullWidth
                 variant="contained"
-                sx={{ mt: 1, mb: 2 }}
+                sx={{ mt: 2, mb: 2 }}
               >
                 Đăng nhập
               </Button>

@@ -96,42 +96,43 @@ function Responses() {
     //handle create excel File
     const ExcelGenerator = () => {
         const generateExcelFile = async () => {
-          // Create a new workbook and add a worksheet
-          const workbook = new ExcelJS.Workbook();
-          const worksheet = workbook.addWorksheet('Sheet 1');
-    
+            // Create a new workbook and add a worksheet
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Sheet 1');
+
             let count = 2
             let containTable: boolean = false
-            for(let i in formDetail.QuestionOrder){
+            for (let i in formDetail.QuestionOrder) {
                 // if(formDetail.)
             }
 
-          // Add data to the worksheet
-          let columns: {
-            header: string;
-            key: string;
-            width: number;}[] = []
+            // Add data to the worksheet
+            let columns: {
+                header: string;
+                key: string;
+                width: number;
+            }[] = []
 
             columns.push({
                 header: "Thời gian",
                 key: "time",
-                width: 20 
-            }) 
+                width: 20
+            })
             columns.push({
                 header: "Người dùng",
                 key: "username",
-                width: 20 
-            }) 
-            if(containTable){
+                width: 20
+            })
+            if (containTable) {
                 worksheet.mergeCells('A1:A2')
                 worksheet.mergeCells('B1:B2')
             }
             worksheet.getCell('A1').value = 'Thời gian'
             worksheet.getCell('B1').value = 'Người dùng'
-            
-            for(let i in formDetail.QuestionOrder){
+
+            for (let i in formDetail.QuestionOrder) {
                 let question: any = formDetail.Questions[i];
-                if(question.Type === 'table'){
+                if (question.Type === 'table') {
                     let tables = ["Năm", "Việc", "Thành tích"];
                     worksheet.mergeCells(1, count + 1, 1, count + tables.length)
                     worksheet.getCell(1, count + 1).value = "Danh sách công tác";
@@ -140,55 +141,55 @@ function Responses() {
                     }
                     count += tables.length;
                 }
-                else{
+                else {
                     count += 1;
-                    worksheet.getCell(1,count).value = question.Question;
-                    if(containTable){
-                        worksheet.mergeCells(1,count,2,count)
+                    worksheet.getCell(1, count).value = question.Question;
+                    if (containTable) {
+                        worksheet.mergeCells(1, count, 2, count)
                     }
                 }
             }
 
             // Add rows based on responses
-            for(let response of responses) {
+            for (let response of responses) {
                 let rowData: any = []
                 let countR: number = 2
                 rowData.push(response.SubmitTime, response.Username)
-                for(let curr of response.Responses){
-                    if(curr.Type == 'shortText'){
-                        rowData[curr.Index] =  `${curr.Content.ShortText}`
-                    } else if(curr.Type === 'multi-choice' || curr.Type === 'checkbox'){
-                        let s : string = ''
+                for (let curr of response.Responses) {
+                    if (curr.Type == 'shortText') {
+                        rowData[curr.Index] = `${curr.Content.ShortText}`
+                    } else if (curr.Type === 'multi-choice' || curr.Type === 'checkbox') {
+                        let s: string = ''
                         let flag: boolean = true
-                        for(let j = 0; j < curr.Content.MultiChoice.Result.length; j++) {
+                        for (let j = 0; j < curr.Content.MultiChoice.Result.length; j++) {
                             if (curr.Content.MultiChoice.Result[j] === true) {
-                                if(flag){
+                                if (flag) {
                                     s += `${curr.Content.MultiChoice.Options[j]}`
                                     flag = false
                                 } else s += `;${curr.Content.MultiChoice.Options[j]}`
                             }
                         }
-                        rowData[curr.Index] =  s
+                        rowData[curr.Index] = s
                     }
-                    else if(curr.Type === "table"){
-                        
+                    else if (curr.Type === "table") {
+
                     }
-                } 
+                }
                 worksheet.addRow(rowData);
             };
-        
 
-      
-          const buffer = await workbook.xlsx.writeBuffer();
-      
-          // Create a Blob from the buffer
-          const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-      
-          // Create a download link and trigger a click event
-          const link = document.createElement('a');
-          link.href = window.URL.createObjectURL(blob);
-          link.download = 'responses.xlsx';
-          link.click();
+
+
+            const buffer = await workbook.xlsx.writeBuffer();
+
+            // Create a Blob from the buffer
+            const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+
+            // Create a download link and trigger a click event
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.download = 'responses.xlsx';
+            link.click();
         };
         generateExcelFile();
     };
@@ -201,7 +202,7 @@ function Responses() {
                 <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                     <Typography sx={{ color: '#364F6B', padding: '20px', fontWeight: 500 }} variant="h5" noWrap component="div">{responses === null ? 0 : responses.length} câu trả lời</Typography>
                     <Button sx={{ margin: '20px', fontWeight: 500, textTransform: 'initial', fontSize: '15px' }}
-                            onClick={ExcelGenerator}
+                        onClick={ExcelGenerator}
                     >Liên kết với trang tính</Button>
                 </Box>
                 <Tabs value={tab} onChange={handleChangeTabs} centered>
@@ -212,8 +213,8 @@ function Responses() {
                     <Box>
                         <Divider />
                         <Box sx={{ display: 'flex', justifyContent: 'center', alignContent: 'center', padding: '5px' }}>
-                            <IconButton>
-                                <NavigateBeforeIcon onClick={decreaseIndex} />
+                            <IconButton onClick={decreaseIndex}>
+                                <NavigateBeforeIcon />
                             </IconButton>
                             <TextField
                                 disabled

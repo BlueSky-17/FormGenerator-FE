@@ -211,7 +211,7 @@ function HomePage({ children }: LayoutProps) {
                     </DrawerHeader>
                     <Divider />
                     <List>
-                        {[{ id: 1, text: 'Thông tin cá nhân', path: '/profile' }, { id: 2, text: 'Forms của tôi', path: '/myforms' }].map((item) => (
+                        {[{ id: 1, text: 'Thông tin cá nhân', path: '/profile' }, { id: 2, text: 'Biểu mẫu của tôi', path: '/myforms' }].map((item) => (
                             <ListItem key={item.id} onClick={navSideBar(item.path)} sx={{ paddingY: '5px' }} disablePadding>
                                 <ListItemButton>
                                     <ListItemIcon sx={{ marginLeft: '25px' }}>

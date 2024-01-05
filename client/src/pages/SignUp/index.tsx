@@ -354,12 +354,6 @@ export default function SignUpSide({ setToken }) {
                   />
                 </Grid>
                 {rePasswordError !== '' ? <Alert sx={{ background: 'transparent', paddingLeft: '10' }} severity="error">{rePasswordError}</Alert> : null}
-                {/* <Grid item xs={12}>
-                  <FormControlLabel
-                    control={<Checkbox value="allowExtraEmails" color="primary" />}
-                    label="Tôi chấp nhận điều khoản"
-                  />
-                </Grid> */}
               </Grid>
               <Button
                 type="submit"
