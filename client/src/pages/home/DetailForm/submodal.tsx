@@ -190,6 +190,80 @@ export function SubModal(props) {
                         </Box>
                         : null
                     }
+                    {props.subopen === 'closeForm' ?
+                        <Box>
+                            <Typography variant='h5'><b>Xác nhận đóng form?</b></Typography>
+
+                            <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'right' }} >
+                                <Button
+                                    onClick={props.handleCloseForm}
+                                    sx={{
+                                        color: 'white',
+                                        backgroundColor: '#364F6B',
+                                        borderRadius: '10px',
+                                        marginY: '10px',
+                                        marginX: '5px',
+                                        '&:hover': {
+                                            backgroundColor: '#2E4155', // Màu nền thay đổi khi hover
+                                        },
+                                    }}>
+                                    Xác nhận
+                                </Button>
+                                <Button
+                                    onClick={props.handleSubClose}
+                                    sx={{
+                                        color: '#000000',
+                                        backgroundColor: '#E7E7E8',
+                                        borderRadius: '10px',
+                                        marginY: '10px',
+                                        marginX: '5px',
+                                        '&:hover': {
+                                            backgroundColor: '#E7E7E7', // Màu nền thay đổi khi hover
+                                        },
+                                    }}>
+                                    Hủy
+                                </Button>
+                            </Box>
+                        </Box>
+                        : null
+                    }
+                    {props.subopen === 'openForm' ?
+                        <Box>
+                            <Typography variant='h5'><b>Xác nhận mở lại form?</b></Typography>
+
+                            <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'right' }} >
+                                <Button
+                                    onClick={props.handleOpenForm}
+                                    sx={{
+                                        color: 'white',
+                                        backgroundColor: '#364F6B',
+                                        borderRadius: '10px',
+                                        marginY: '10px',
+                                        marginX: '5px',
+                                        '&:hover': {
+                                            backgroundColor: '#2E4155', // Màu nền thay đổi khi hover
+                                        },
+                                    }}>
+                                    Xác nhận
+                                </Button>
+                                <Button
+                                    onClick={props.handleSubClose}
+                                    sx={{
+                                        color: '#000000',
+                                        backgroundColor: '#E7E7E8',
+                                        borderRadius: '10px',
+                                        marginY: '10px',
+                                        marginX: '5px',
+                                        '&:hover': {
+                                            backgroundColor: '#E7E7E7', // Màu nền thay đổi khi hover
+                                        },
+                                    }}>
+                                    Hủy
+                                </Button>
+                            </Box>
+                        </Box>
+                        : null
+                    }
                 </Box>
             </Modal>
         </div>

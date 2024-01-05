@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useLocation } from "react-router-dom";
 
 import { Box, Typography, Drawer, Avatar, IconButton, Toolbar, List, Divider, Icon, Modal, Grid, Switch } from '@mui/material'
 import { styled, useTheme, alpha } from '@mui/material/styles';
@@ -58,6 +59,7 @@ function DetailForm() {
             .then(data => data.json())
             .then(formDetail => {
                 setFormDetail(formDetail);
+                setFormState(formDetail.formState);
             })
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
@@ -89,10 +91,44 @@ function DetailForm() {
     const navigate = useNavigate();
     const viewForm = () => {
         navigate('/form/' + formDetail.id + '/view');
+
+        // const currentBaseUrl = window.location.origin;
+
+        // const path = '/form/' + formDetail.id + '/view';
+
+        // const fullUrl = `${currentBaseUrl}${path}`;
+
+        // window.open(fullUrl, '_blank', 'noopener,noreferrer');
     };
 
+    const [formState, setFormState] = useState(true)
+
+    const confirmFormState = (state: string)=> (e) => {
+        setSubOpen(state)
+        setAnchorEl(null);
+    };
+
+    const handleCloseForm = () => {
+        updateObjectInDatabase({
+            "formState": false
+        })
+        setFormState(false);
+        setSubOpen("")
+    }
+
+    const handleOpenForm = () => {
+        updateObjectInDatabase({
+            "formState": true
+        })
+        setFormState(true);
+        setSubOpen("")
+    }
+
     // View Edit-Page or Responses
-    const [typeView, setTypeView] = useState('ViewEdit'); //ViewEdit or ViewResponses
+    const location = useLocation();
+    const data = location.state;
+
+    const [typeView, setTypeView] = useState(data); //ViewEdit or ViewResponses
     const changeToViewEdit = () => setTypeView('ViewEdit')
     const changeToViewResponses = () => setTypeView('ViewResponses')
 
@@ -436,7 +472,17 @@ function DetailForm() {
                         <Divider />
                         <Button sx={{ p: 2, fontWeight: 500, color: 'black', textTransform: 'initial', fontSize: '15px' }}>Sửa chủ đề</Button>
                         <Divider />
-                        <Button sx={{ p: 2, fontWeight: 500, color: 'black', textTransform: 'initial', fontSize: '15px' }}>Đóng Form</Button>
+                        {
+                            formState ?
+                                <Button
+                                    onClick={confirmFormState("closeForm")}
+                                    sx={{ p: 2, fontWeight: 500, color: 'black', textTransform: 'initial', fontSize: '15px' }}>Đóng Form
+                                </Button> :
+                                <Button
+                                    onClick={confirmFormState("openForm")}
+                                    sx={{ p: 2, fontWeight: 500, color: 'black', textTransform: 'initial', fontSize: '15px' }}>Mở Form
+                                </Button>
+                        }
                     </Popover>
                 </Box>
 
@@ -673,6 +719,9 @@ function DetailForm() {
                 convertTextToOptionList={convertTextToOptionList}
                 deleted={deleted}
                 handleDeleteQuestion={handleDeleteQuestion}
+
+                handleCloseForm={handleCloseForm}
+                handleOpenForm={handleOpenForm}
             />
 
         </Box >

@@ -214,8 +214,8 @@ function MyForms() {
 
     // Navigate when click edit form
     const navigate = useNavigate();
-    const editForm = (id: string) => (event: any) => {
-        navigate('/form/' + id);
+    const editForm = (id: string, typeView: string) => (event: any) => {
+        navigate('/form/' + id, { state: typeView });
     };
 
     // Page Pagination
@@ -225,7 +225,7 @@ function MyForms() {
         setItemsPerPage(event.target.value);
     };
 
-    console.log(forms)
+    // console.log(forms)
 
     return (
         <Box>
@@ -258,7 +258,7 @@ function MyForms() {
                             },
                         }}>
                         <Typography sx={{ fontWeight: 500, color: 'white', paddingX: '10px', paddingY: '4px' }} variant="body2" noWrap component="div">
-                            Tạo Biểu mẫu 
+                            Tạo Biểu mẫu
                         </Typography>
                     </Button>
                 </Box>
@@ -320,7 +320,7 @@ function MyForms() {
                                         <TableCell sx={{ padding: 1 }} align="center">
                                             <Tooltip title="Chỉnh sửa" placement="left">
                                                 <IconButton
-                                                    onClick={editForm(form.id)}
+                                                    onClick={editForm(form.id, "ViewEdit")}
                                                     sx={{
                                                         backgroundColor: '#364F6B',
                                                         color: 'white',
@@ -333,21 +333,20 @@ function MyForms() {
                                                     <EditIcon />
                                                 </IconButton>
                                             </Tooltip>
-                                            <Link to="/detail">
-                                                <Tooltip title="Xem phản hồi" placement="right">
-                                                    <IconButton
-                                                        sx={{
-                                                            backgroundColor: '#364F6B',
-                                                            color: 'white',
-                                                            margin: '5px',
-                                                            '&:hover': {
-                                                                backgroundColor: '#176B87', // Màu nền thay đổi khi hover
-                                                            },
-                                                        }}>
-                                                        <VisibilityIcon />
-                                                    </IconButton>
-                                                </Tooltip>
-                                            </Link>
+                                            <Tooltip title="Xem phản hồi" placement="right">
+                                                <IconButton
+                                                    onClick={editForm(form.id, "ViewResponses")}
+                                                    sx={{
+                                                        backgroundColor: '#364F6B',
+                                                        color: 'white',
+                                                        margin: '5px',
+                                                        '&:hover': {
+                                                            backgroundColor: '#176B87', // Màu nền thay đổi khi hover
+                                                        },
+                                                    }}>
+                                                    <VisibilityIcon />
+                                                </IconButton>
+                                            </Tooltip>
                                             <IconButton
                                                 onClick={openModalDelete(form.id)}
                                                 sx={{
