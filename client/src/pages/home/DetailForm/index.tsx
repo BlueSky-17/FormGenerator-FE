@@ -103,7 +103,7 @@ function DetailForm() {
 
     const [formState, setFormState] = useState(true)
 
-    const confirmFormState = (state: string)=> (e) => {
+    const confirmFormState = (state: string) => (e) => {
         setSubOpen(state)
         setAnchorEl(null);
     };
@@ -353,12 +353,13 @@ function DetailForm() {
 
         formDetail.Questions.splice(newIndex, 0, formDetail.Questions[ques])
 
-        if (duplicated === true) setDuplicate(false);
-        else setDuplicate(true);
         updateObjectInDatabase({
             "questionOrder": formDetail.QuestionOrder,
             "questions": formDetail.Questions
         })
+
+        if (duplicated === true) setDuplicate(false);
+        else setDuplicate(true);
     }
 
     // Swap Question
@@ -413,6 +414,9 @@ function DetailForm() {
             setMaxFileSize(formDetail.Questions[ques].Content.File.MaxFileSize);
             setFileType(formDetail.Questions[ques].Content.File.FileType)
         }
+        else if (formDetail.Questions[ques].Type === "date-single" || formDetail.Questions[ques].Type === 'date-range') {
+            setDateNum(formDetail.Questions[ques].Content.Date)
+        }
 
         if (formDetail.Questions[ques].Type === 'checkbox') {
             setConstraint(formDetail.Questions[ques].Content.MultiChoice.Constraint)
@@ -420,6 +424,12 @@ function DetailForm() {
         }
 
         setQuesEdit(ques);
+    }
+
+    //number: 0-5 with 6 type
+    const [dateNum, setDateNum] = useState<number>(-1)
+    const handleDateNum = (e) => {
+        setDateNum(e.target.value);
     }
 
     // Tùy chỉnh nút Settings
@@ -693,6 +703,10 @@ function DetailForm() {
                 handleMaxFileSize={handleMaxFileSize}
                 fileType={fileType}
                 setFileType={setFileType}
+
+                dateNum={dateNum}
+                setDateNum={setDateNum}
+                handleDateNum={handleDateNum}
 
                 excelData={excelData}
                 setExcelData={setExcelData}

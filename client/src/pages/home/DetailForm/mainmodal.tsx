@@ -147,7 +147,7 @@ export function MainModal(props) {
             }
             else if (props.type === "date-single" || props.type === "date-range") {
                 const updateDate: Date = {
-                    date: dateNum
+                    Date: props.dateNum
                 };
 
                 props.formDetail.Questions[ques].Content = {};
@@ -219,6 +219,9 @@ export function MainModal(props) {
                 props.formDetail.Questions[props.quesEdit].Content.File.FileType = props.fileType;
                 props.formDetail.Questions[props.quesEdit].Content.File.MaxFileAmount = props.maxFileAmount;
             }
+            else if (props.type === 'date-single' || props.type === 'date-range'){
+                props.formDetail.Questions[props.quesEdit].Content.Date = props.dateNum;
+            }
 
             updateObjectInDatabase({
                 "questionOrder": props.formDetail.QuestionOrder,
@@ -260,7 +263,7 @@ export function MainModal(props) {
             props.setExcelData([]);
         }
         else if (props.type === "date-single" || props.type === "date-range") {
-            setDateNum(-1);
+            props.setDateNum(-1);
         }
         props.setQuesEdit(-1)
     }
@@ -270,16 +273,16 @@ export function MainModal(props) {
         props.setType(event.target.value as string);
 
         if (props.type === 'date-single') {
-            if (dateNum === 1) setDateNum(5);
-            else if (dateNum === 2) setDateNum(6);
-            else if (dateNum === 3) setDateNum(7);
-            else if (dateNum === 4) setDateNum(8);
+            if (props.dateNum === 1) props.setDateNum(5);
+            else if (props.dateNum === 2) props.setDateNum(6);
+            else if (props.dateNum === 3) props.setDateNum(7);
+            else if (props.dateNum === 4) props.setDateNum(8);
         }
         else if (props.type === 'date-range') {
-            if (dateNum === 5) setDateNum(1);
-            else if (dateNum === 6) setDateNum(2);
-            else if (dateNum === 7) setDateNum(3);
-            else if (dateNum === 8) setDateNum(4);
+            if (props.dateNum === 5) props.setDateNum(1);
+            else if (props.dateNum === 6) props.setDateNum(2);
+            else if (props.dateNum === 7) props.setDateNum(3);
+            else if (props.dateNum === 8) props.setDateNum(4);
         }
     }
 
@@ -299,18 +302,18 @@ export function MainModal(props) {
         else if (props.type === 'date-single') {
             props.setType('date-range');
 
-            if (dateNum === 1) setDateNum(5);
-            else if (dateNum === 2) setDateNum(6);
-            else if (dateNum === 3) setDateNum(7);
-            else if (dateNum === 4) setDateNum(8);
+            if (props.dateNum === 1) props.setDateNum(5);
+            else if (props.dateNum === 2) props.setDateNum(6);
+            else if (props.dateNum === 3) props.setDateNum(7);
+            else if (props.dateNum === 4) props.setDateNum(8);
         }
         else if (props.type === 'date-range') {
             props.setType('date-single');
 
-            if (dateNum === 5) setDateNum(1);
-            else if (dateNum === 6) setDateNum(2);
-            else if (dateNum === 7) setDateNum(3);
-            else if (dateNum === 8) setDateNum(4);
+            if (props.dateNum === 5) props.setDateNum(1);
+            else if (props.dateNum === 6) props.setDateNum(2);
+            else if (props.dateNum === 7) props.setDateNum(3);
+            else if (props.dateNum === 8) props.setDateNum(4);
         }
     }
 
@@ -443,12 +446,6 @@ export function MainModal(props) {
 
     };
     const [typeError, setTypeError] = useState<string>(''); //Display error when upload invalid file
-
-    //number: 0-5 with 6 type
-    const [dateNum, setDateNum] = useState<number>(-1)
-    const handleDateNum = (e) => {
-        setDateNum(e.target.value);
-    }
 
     console.log(props.formDetail)
 
@@ -655,8 +652,8 @@ export function MainModal(props) {
                             <Typography sx={{ width: '100%', marginY: '10px', color: 'gray' }}><b>Chọn định dạng</b></Typography>
                             <FormControl sx={{ width: '50%' }}>
                                 <Select
-                                    value={dateNum}
-                                    onChange={handleDateNum}
+                                    value={props.dateNum}
+                                    onChange={props.handleDateNum}
                                 >
                                     <MenuItem value={props.type === 'date-single' ? 1 : 5}> Ngày/Tháng/Năm </MenuItem>
                                     <MenuItem value={props.type === 'date-single' ? 2 : 6}> Tháng/Năm </MenuItem>

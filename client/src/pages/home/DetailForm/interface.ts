@@ -23,7 +23,7 @@ export interface ShortText {
 
 // Content for date TYPE
 export interface Date {
-    date: number
+    Date: number
 }
 
 export interface File {
