@@ -154,6 +154,13 @@ function Responses(props) {
                         }
                         rowData[countR + curr.Index] = s
                     }
+                    else if(curr.Type === "date-single"){
+                        rowData[countR + curr.Index] =  `${curr.Content.Date.Single.Time}`
+                    }
+                    else if(curr.Type === "date-range")
+                    {
+                        rowData[countR + curr.Index] =  `${curr.Content.Date.Range.From} - ${curr.Content.Date.Range.To}` 
+                    }
                 }
                 worksheet.addRow(rowData);
             };

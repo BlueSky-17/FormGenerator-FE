@@ -23,9 +23,9 @@ export interface Files{
 }
 
 export interface Content{
-    date: Date
-    linearRange: LinearRange
-    linkedDate: any
+    Date: Date
+    LinearRange: LinearRange
+    LinkedDate: any
     MultiChoice: MultiChoice
     ShortText: string
     Table: any
