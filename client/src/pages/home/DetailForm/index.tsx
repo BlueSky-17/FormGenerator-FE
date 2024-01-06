@@ -109,15 +109,15 @@ function DetailForm() {
     // Navigate to view form page
     const navigate = useNavigate();
     const viewForm = () => {
-        navigate('/form/' + formDetail.id + '/view');
+        // navigate('/form/' + formDetail.id + '/view');
 
-        // const currentBaseUrl = window.location.origin;
+        const currentBaseUrl = window.location.origin;
 
-        // const path = '/form/' + formDetail.id + '/view';
+        const path = '/form/' + formDetail.id + '/view';
 
-        // const fullUrl = `${currentBaseUrl}${path}`;
+        const fullUrl = `${currentBaseUrl}${path}`;
 
-        // window.open(fullUrl, '_blank', 'noopener,noreferrer');
+        window.open(fullUrl, '_blank', 'noopener,noreferrer');
     };
 
     const [formState, setFormState] = useState(true)
