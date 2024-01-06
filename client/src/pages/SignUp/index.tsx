@@ -261,7 +261,6 @@ export default function SignUpSide({ setToken }) {
                     fullWidth
                     id="lastName"
                     label="Họ và tên lót"
-                    autoFocus
                     onChange={handleChangeInputValue}
                     onBlur={saveInputValue("lastName")}
                   />

@@ -43,10 +43,13 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 
 function DetailForm() {
     const [formDetail, setFormDetail] = useState<any>({})
+    const [formResponses, setFormResponses] = useState<any>({})
 
     const FormDetailAPI_URL = `http://localhost:8080/form/${useParams()?.formID}`;
 
     const UpdateFormAPI_URL = `http://localhost:8080/update-form/${useParams()?.formID}`;
+
+    const ResponsesAPI_URL = `http://localhost:8080/get-response/${useParams()?.formID}`;
 
     useEffect(() => {
         fetch(FormDetailAPI_URL, {
@@ -60,6 +63,22 @@ function DetailForm() {
             .then(formDetail => {
                 setFormDetail(formDetail);
                 setFormState(formDetail.formState);
+            })
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
+
+    useEffect(() => {
+        fetch(ResponsesAPI_URL, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + JSON.parse(sessionStorage.getItem('token') as string)?.accessToken
+            }
+        })
+            .then(data => data.json())
+            .then(responses => {
+                if (responses === null) setFormResponses([]);
+                else setFormResponses(responses);
             })
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
@@ -667,7 +686,7 @@ function DetailForm() {
             </Box >
 
             {typeView === 'ViewResponses' &&
-                <Responses />
+                <Responses form={formDetail} responses={formResponses}/>
             }
 
             <MainModal

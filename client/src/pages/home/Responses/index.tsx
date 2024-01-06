@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { useParams } from 'react-router-dom';
+import { useMemo } from 'react';
 import * as ExcelJS from 'exceljs';
 import { Box, Typography, TextField, Drawer, Avatar, IconButton, Toolbar, List, Divider, Icon, Modal, Grid, Switch } from '@mui/material'
 import { styled, useTheme, alpha } from '@mui/material/styles';
@@ -25,7 +25,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
     justifyContent: 'flex-end',
 }));
 
-function Responses() {
+function Responses(props) {
     //Set Tab
     const [tab, setTab] = React.useState(0);
     const handleChangeTabs = (event: React.SyntheticEvent, newValue: number) => {
@@ -35,43 +35,14 @@ function Responses() {
         else setDetail(false);
     };
 
-    const [responses, setFormResponse] = useState<Answer[]>([])
-    const [formDetail, setFormDetail] = useState<any>({})
-
-    const FormDetailAPI_URL = `http://localhost:8080/form/${useParams()?.formID}`;
-    const ResponsesAPI_URL = `http://localhost:8080/get-response/${useParams()?.formID}`;
-
-    // API GET: Get responses
-    useEffect(() => {
-        fetch(ResponsesAPI_URL, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + JSON.parse(sessionStorage.getItem('token') as string)?.accessToken
-            }
-        })
-            .then(data => data.json())
-            .then(responses => {
-                if (responses === null) setFormResponse([]);
-                else setFormResponse(responses);
-            })
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
+    const [responses, setFormResponse] = useState<Answer[]>([]);
+    const [formDetail, setFormDetail] = useState<any>({});
 
     useEffect(() => {
-        fetch(FormDetailAPI_URL, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + JSON.parse(sessionStorage.getItem('token') as string)?.accessToken
-            }
-        })
-            .then(data => data.json())
-            .then(formDetail => {
-                setFormDetail(formDetail);
-            })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
+        setFormResponse(props.responses);
+        setFormDetail(props.form);
+    }, [props.responses, props.form]);
+
 
     const [detail, setDetail] = useState(false);
 
@@ -96,6 +67,7 @@ function Responses() {
     //handle create excel File
     const ExcelGenerator = () => {
         const generateExcelFile = async () => {
+<<<<<<< Updated upstream
             // Create a new workbook and add a worksheet
             const workbook = new ExcelJS.Workbook();
             const worksheet = workbook.addWorksheet('Sheet 1');
@@ -104,6 +76,16 @@ function Responses() {
             let containTable: boolean = false
             for (let i in formDetail.QuestionOrder) {
                 // if(formDetail.)
+=======
+          // Create a new workbook and add a worksheet
+          const workbook = new ExcelJS.Workbook();
+          const worksheet = workbook.addWorksheet('Sheet 1');
+    
+            
+            let containTable: boolean = false
+            for(let ques of formDetail.Questions){
+                if(ques.Type === 'table') containTable = true;
+>>>>>>> Stashed changes
             }
 
             // Add data to the worksheet
@@ -121,6 +103,7 @@ function Responses() {
             columns.push({
                 header: "Người dùng",
                 key: "username",
+<<<<<<< Updated upstream
                 width: 20
             })
             if (containTable) {
@@ -134,6 +117,22 @@ function Responses() {
                 let question: any = formDetail.Questions[i];
                 if (question.Type === 'table') {
                     let tables = ["Năm", "Việc", "Thành tích"];
+=======
+                width: 20 
+            }) 
+            worksheet.getCell('A1').value = 'Thời gian'
+            worksheet.getCell('B1').value = 'Người dùng'
+            if(containTable){
+                worksheet.mergeCells('A1:A2')
+                worksheet.mergeCells('B1:B2')
+            }
+            
+            let count = 2
+            for(let i in formDetail.QuestionOrder){
+                let question: any = formDetail.Questions[i];
+                if(question.Type === 'table'){
+                    let tables = question.Content.Table.ListOfColumn
+>>>>>>> Stashed changes
                     worksheet.mergeCells(1, count + 1, 1, count + tables.length)
                     worksheet.getCell(1, count + 1).value = "Danh sách công tác";
                     for (let i = 0; i < tables.length; i++) {
@@ -155,11 +154,19 @@ function Responses() {
                 let rowData: any = []
                 let countR: number = 2
                 rowData.push(response.SubmitTime, response.Username)
+<<<<<<< Updated upstream
                 for (let curr of response.Responses) {
                     if (curr.Type == 'shortText') {
                         rowData[curr.Index] = `${curr.Content.ShortText}`
                     } else if (curr.Type === 'multi-choice' || curr.Type === 'checkbox') {
                         let s: string = ''
+=======
+                for(let curr of response.Responses){
+                    if(curr.Type == 'shortText'){
+                        rowData[countR + curr.Index] =  `${curr.Content.ShortText}`
+                    } else if(curr.Type === 'multi-choice' || curr.Type === 'checkbox' || curr.Type === 'dropdown'){
+                        let s : string = ''
+>>>>>>> Stashed changes
                         let flag: boolean = true
                         for (let j = 0; j < curr.Content.MultiChoice.Result.length; j++) {
                             if (curr.Content.MultiChoice.Result[j] === true) {
@@ -169,10 +176,25 @@ function Responses() {
                                 } else s += `;${curr.Content.MultiChoice.Options[j]}`
                             }
                         }
+<<<<<<< Updated upstream
                         rowData[curr.Index] = s
                     }
                     else if (curr.Type === "table") {
 
+=======
+                        rowData[countR + curr.Index] =  s
+                    }
+                    else if(curr.Type === "file"){
+                        let s : string = ''
+                        let flag: boolean = true
+                        for(let j = 0; j < curr.Content.Files.length; j++) {
+                            if(flag){
+                                s += `${curr.Content.Files[j].FileURL}`
+                                flag = false
+                            } else s += `;${curr.Content.Files[j].FileURL}`
+                        }
+                        rowData[countR + curr.Index] = s
+>>>>>>> Stashed changes
                     }
                 }
                 worksheet.addRow(rowData);
@@ -234,7 +256,7 @@ function Responses() {
             </Box >
 
             {tab === 0 &&
-                <Summary responses={responses} />
+                <Summary responses={responses} form={formDetail}/>
             }
 
             {tab === 1 &&

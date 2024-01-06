@@ -16,7 +16,7 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
-
+import dayjs from 'dayjs';
 import { styled } from "@mui/material/styles";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import ClearIcon from "@mui/icons-material/Clear";
@@ -57,6 +57,7 @@ import {
 } from "./interface";
 import { stringify } from "querystring";
 import PropTypes from "prop-types";
+import { Content } from "../interface";
 
 interface FormResponseProps {
   Answer: any;
@@ -69,7 +70,7 @@ const FormResponse: React.FC<FormResponseProps> = ({ Answer, Form }) => {
 
   const [formDetail, setFormDetail] = useState<any>(Form);
   const [formResponses, setFormResponse] = useState<any[]>(Answer.Responses);
-
+  console.log(formResponses)
   // Lưu giá trị cho các field dạng multi-choic
   const shouldDisableCheckbox = (ques: number, index: number): boolean => {
     const maxAllowed = formResponses[ques].content.multiChoice.maxOptions; // Set your maximum number of allowed checked boxes
@@ -79,40 +80,33 @@ const FormResponse: React.FC<FormResponseProps> = ({ Answer, Form }) => {
     return phanTuTrue.length >= maxAllowed;
   };
 
-  const [firstField, setFirstField] = useState("");
-  const handleFirstFieldChange = (ques: number) => (e) => {
+//Lưu giá trị cho các field dạng linkedData
+const [firstField, setFirstField] = useState('');
+const handleFirstFieldChange = (ques: number) => (e) => {
     setFirstField(e.target.value);
-    setSecondField("");
-    setThirdField("");
+    setSecondField('');
+    setThirdField('');
 
-    const firstChoice =
-      formDetail.Questions[ques].Content.LinkedData.ListOfOptions[
-        e.target.value
-      ].Key;
+    const firstChoice = formDetail.Questions[ques].Content.LinkedData.ListOfOptions[e.target.value].Key;
     formResponses[ques].content.linkedData.push(firstChoice);
-  };
+};
 
-  const [secondField, setSecondField] = useState("");
-  const handleSecondFieldChange = (ques: number) => (e) => {
+const [secondField, setSecondField] = useState('');
+const handleSecondFieldChange = (ques: number) => (e) => {
     setSecondField(e.target.value);
-    setThirdField("");
+    setThirdField('');
 
-    const secondChoice =
-      formDetail.Questions[ques].Content.LinkedData.ListOfOptions[firstField]
-        .Value[e.target.value].Key;
+    const secondChoice = formDetail.Questions[ques].Content.LinkedData.ListOfOptions[firstField].Value[e.target.value].Key;
     formResponses[ques].content.linkedData.push(secondChoice);
-  };
+};
 
-  const [thirdField, setThirdField] = useState("");
-  const handleThirdFieldChange = (ques: number) => (e) => {
+const [thirdField, setThirdField] = useState('');
+const handleThirdFieldChange = (ques: number) => (e) => {
     setThirdField(e.target.value);
 
-    const thirdChoice =
-      formDetail.Questions[ques].Content.LinkedData.ListOfOptions[firstField]
-        .Value[secondField].Value;
+    const thirdChoice = formDetail.Questions[ques].Content.LinkedData.ListOfOptions[firstField].Value[secondField].Value;
     formResponses[ques].content.linkedData.push(thirdChoice);
-  };
-
+};
   const [height, setHeight] = useState("100%");
 
   console.log(formResponses);
@@ -188,7 +182,7 @@ const FormResponse: React.FC<FormResponseProps> = ({ Answer, Form }) => {
                         component="div"
                       >
                         {index + 1}. {formDetail.Questions[ques].Question}
-                      </Typography>
+                      </Typography> 
                       {formDetail.Questions[ques].Required && (
                         <Typography sx={{ color: "red", fontSize: "18px" }}>
                           *
@@ -217,14 +211,18 @@ const FormResponse: React.FC<FormResponseProps> = ({ Answer, Form }) => {
                               {formDetail.Questions[
                                 ques
                               ].Content.MultiChoice.Options.map(
-                                (item, index) => (
+                                (item, index) => {
+                                  let checked = formResponses[ques].Content.MultiChoice.Result[index]
+                                  return (
                                   <FormControlLabel
                                     key={index}
                                     value={item}
                                     control={<Radio />}
                                     label={item}
+                                    checked={checked}
+                                    disabled={true}
                                   />
-                                )
+                                )}
                               )}
                             </RadioGroup>
                           </FormControl>
@@ -233,15 +231,19 @@ const FormResponse: React.FC<FormResponseProps> = ({ Answer, Form }) => {
                       {formDetail.Questions[ques].Type === "dropdown" ? (
                         <Box>
                           <FormControl fullWidth>
-                            <Select>
+                            <Select disabled={true}
+                              value={formResponses[ques].Content.MultiChoice.Result.findIndex(option => option === true)}
+                            >
                               {formDetail.Questions[
                                 ques
                               ].Content.MultiChoice.Options.map(
-                                (item, index) => (
-                                  <MenuItem key={index} value={index}>
+                                (item, index) =>
+                                { 
+                                  return (
+                                  <MenuItem key={index} value={index} selected={formResponses[ques].Content.MultiChoice.Result[index]}>
                                     {item}
                                   </MenuItem>
-                                )
+                                )}
                               )}
                             </Select>
                           </FormControl>
@@ -272,12 +274,8 @@ const FormResponse: React.FC<FormResponseProps> = ({ Answer, Form }) => {
                                 value={item}
                                 control={
                                   <Checkbox
-                                    disabled={
-                                      formResponses[ques].Content.MultiChoice
-                                        .Disabled &&
-                                      formResponses[ques].Content.MultiChoice
-                                        .Result[index] !== true
-                                    }
+                                    disabled={true}
+                                    checked={formResponses[ques].Content.MultiChoice.Result[index]}
                                   />
                                 }
                                 label={item}
@@ -295,7 +293,7 @@ const FormResponse: React.FC<FormResponseProps> = ({ Answer, Form }) => {
                             label="Điền ngắn"
                             variant="outlined"
                             disabled
-                            // defaultValue={Answer.}
+                            defaultValue={formResponses[ques].Content.ShortText}
                           />
                         </Box>
                       ) : null}
@@ -306,6 +304,8 @@ const FormResponse: React.FC<FormResponseProps> = ({ Answer, Form }) => {
                               <DatePicker
                                 label={"Ngày - Tháng - Năm"}
                                 views={["year", "month", "day"]}
+                                defaultValue={dayjs(formResponses[ques].Content.Date.Single.Time)}
+                                disabled={true}
                               />
                             </LocalizationProvider>
                           ) : null}
@@ -314,18 +314,25 @@ const FormResponse: React.FC<FormResponseProps> = ({ Answer, Form }) => {
                               <DatePicker
                                 label={"Tháng - Năm"}
                                 views={["year", "month"]}
+                                defaultValue={dayjs(formResponses[ques].Content.Date.Single.Time)}
+                                disabled={true}
                               />
                             </LocalizationProvider>
                           ) : null}
                           {formDetail.Questions[ques].Content.Date === 3 ? (
                             <LocalizationProvider dateAdapter={AdapterDayjs}>
-                              <DatePicker label={"Năm"} views={["year"]} />
+                              <DatePicker label={"Năm"} views={["year"]}
+                                          defaultValue={dayjs(formResponses[ques].Content.Date.Single.Time)}
+                                          disabled={true}
+                              />
                             </LocalizationProvider>
                           ) : null}
                           {formDetail.Questions[ques].Content.Date === 4 ? (
                             <LocalizationProvider dateAdapter={AdapterDayjs}>
                               <DemoContainer components={["TimePicker"]}>
-                                <TimePicker label="Chọn giờ" />
+                                <TimePicker label="Chọn giờ"
+                                            defaultValue={dayjs(formResponses[ques].Content.Date.Single.Time)}
+                                            disabled={true}  />
                               </DemoContainer>
                             </LocalizationProvider>
                           ) : null}
@@ -349,6 +356,8 @@ const FormResponse: React.FC<FormResponseProps> = ({ Answer, Form }) => {
                                   <DatePicker
                                     label={"Bắt đầu"}
                                     views={["year", "month", "day"]}
+                                    defaultValue={dayjs(formResponses[ques].Content.Date.Range.From)}
+                                    disabled={true}
                                   />
                                 </LocalizationProvider>
                               </Grid>
@@ -362,6 +371,8 @@ const FormResponse: React.FC<FormResponseProps> = ({ Answer, Form }) => {
                                   <DatePicker
                                     label={"Kết thúc"}
                                     views={["year", "month", "day"]}
+                                    defaultValue={dayjs(formResponses[ques].Content.Date.Range.To)}
+                                    disabled={true}
                                   />
                                 </LocalizationProvider>
                               </Grid>
@@ -383,6 +394,8 @@ const FormResponse: React.FC<FormResponseProps> = ({ Answer, Form }) => {
                                   <DatePicker
                                     label={"Bắt đầu"}
                                     views={["year", "month"]}
+                                    defaultValue={dayjs(formResponses[ques].Content.Date.Range.From)}
+                                    disabled={true}
                                   />
                                 </LocalizationProvider>
                               </Grid>
@@ -396,6 +409,8 @@ const FormResponse: React.FC<FormResponseProps> = ({ Answer, Form }) => {
                                   <DatePicker
                                     label={"Kết thúc"}
                                     views={["year", "month"]}
+                                    defaultValue={dayjs(formResponses[ques].Content.Date.Range.To)}
+                                    disabled={true}
                                   />
                                 </LocalizationProvider>
                               </Grid>
@@ -417,6 +432,8 @@ const FormResponse: React.FC<FormResponseProps> = ({ Answer, Form }) => {
                                   <DatePicker
                                     label={"Bắt đầu"}
                                     views={["year"]}
+                                    defaultValue={dayjs(formResponses[ques].Content.Date.Range.From)}
+                                    disabled={true}
                                   />
                                 </LocalizationProvider>
                               </Grid>
@@ -430,6 +447,8 @@ const FormResponse: React.FC<FormResponseProps> = ({ Answer, Form }) => {
                                   <DatePicker
                                     label={"Kết thúc"}
                                     views={["year"]}
+                                    defaultValue={dayjs(formResponses[ques].Content.Date.Range.To)}
+                                    disabled={true}
                                   />
                                 </LocalizationProvider>
                               </Grid>
@@ -449,7 +468,9 @@ const FormResponse: React.FC<FormResponseProps> = ({ Answer, Form }) => {
                                   dateAdapter={AdapterDayjs}
                                 >
                                   <DemoContainer components={["TimePicker"]}>
-                                    <TimePicker label="Giờ bắt đầu" />
+                                    <TimePicker label="Giờ bắt đầu"
+                                                defaultValue={dayjs(formResponses[ques].Content.Date.Range.From)}
+                                                disabled={true} />
                                   </DemoContainer>
                                 </LocalizationProvider>
                               </Grid>
@@ -461,44 +482,20 @@ const FormResponse: React.FC<FormResponseProps> = ({ Answer, Form }) => {
                                   dateAdapter={AdapterDayjs}
                                 >
                                   <DemoContainer components={["TimePicker"]}>
-                                    <TimePicker label="Giờ kết thúc" />
+                                    <TimePicker label="Giờ kết thúc" 
+                                                defaultValue={dayjs(formResponses[ques].Content.Date.Range.To)}
+                                                disabled={true}/>
                                   </DemoContainer>
                                 </LocalizationProvider>
                               </Grid>
                             </Grid>
-                          ) : null}
-                          {formResponses[ques].error !== "" ? (
-                            <Alert
-                              sx={{ background: "transparent", p: "0" }}
-                              severity="error"
-                            >
-                              {formResponses[ques].error}
-                            </Alert>
                           ) : null}
                         </Box>
                       ) : null}
 
                       {formDetail.Questions[ques].Type === "file" ? (
                         <Box>
-                          <Button
-                            sx={{
-                              backgroundColor: "#008272",
-                              color: "white",
-                              fontSize: "16px",
-                              py: "6px",
-                              textTransform: "initial",
-                              px: "20px",
-                              "&:hover": {
-                                backgroundColor: "#008272",
-                                color: "white",
-                              },
-                            }}
-                            component="label"
-                          >
-                            Thêm file
-                            <input type="file" hidden />
-                          </Button>
-                          {formResponses[ques].content.files.map(
+                          {formResponses[ques].Content.Files.map(
                             (file, index) => (
                               <Grid
                                 container
@@ -527,128 +524,26 @@ const FormResponse: React.FC<FormResponseProps> = ({ Answer, Form }) => {
                                     {file.fileName}
                                   </Button>
                                 </Grid>
-                                <Grid item xs={1}>
-                                  <IconButton
-                                    sx={{
-                                      backgroundColor: "#white",
-                                      color: "#7B7B7B",
-                                      margin: "5px",
-                                      "&:hover": {
-                                        backgroundColor: "#EBEBEB", // Màu nền thay đổi khi hover
-                                      },
-                                    }}
-                                  >
-                                    <ClearIcon />
-                                  </IconButton>
-                                </Grid>
                               </Grid>
                             )
                           )}
-                          {/* {fileError !== '' ? <Alert sx={{ background: 'transparent', p: '0' }} severity="error">{fileError}</Alert> : null} */}
-                          {formResponses[ques].error !== "" ? (
-                            <Alert
-                              sx={{ background: "transparent", p: "0" }}
-                              severity="error"
-                            >
-                              {formResponses[ques].error}
-                            </Alert>
-                          ) : null}
                         </Box>
                       ) : null}
                       {formDetail.Questions[ques].Type === "linkedData" ? (
                         <Grid container spacing={2}>
-                          {formDetail.Questions[
-                            ques
-                          ].Content.LinkedData.ImportedLink.map(
+                          {formDetail.Questions[ques].Content.LinkedData.ImportedLink.map(
                             (field, index) => (
                               <Grid item xs={4} key={field}>
-                                {index === 0 ? (
                                   <FormControl fullWidth>
                                     <InputLabel id="demo-simple-select-label">
                                       {field}
                                     </InputLabel>
-                                    <Select sx={{ marginTop: "10px" }}>
-                                      {formDetail.Questions[
-                                        ques
-                                      ].Content.LinkedData.ListOfOptions.map(
-                                        (obj, idx) => (
-                                          <MenuItem key={obj.Key} value={idx}>
-                                            {obj.Key}
-                                          </MenuItem>
-                                        )
-                                      )}
+                                    <Select sx={{ marginTop: "10px" }} value={index} disabled={true}>
+                                    <MenuItem key={index} value={index} selected={true}>
+                                      {formResponses[ques].Content.LinkedData[index]}
+                                    </MenuItem>
                                     </Select>
                                   </FormControl>
-                                ) : null}
-                                {index === 1 && firstField !== "" ? (
-                                  <FormControl fullWidth>
-                                    <InputLabel id="demo-simple-select-label">
-                                      {field}
-                                    </InputLabel>
-                                    <Select
-                                      value={secondField}
-                                      sx={{ marginTop: "10px" }}
-                                    >
-                                      {formDetail.Questions[
-                                        ques
-                                      ].Content.LinkedData.ListOfOptions[
-                                        firstField
-                                      ].Value.map((obj, idx) => (
-                                        <MenuItem key={obj.Key} value={idx}>
-                                          {obj.Key}
-                                        </MenuItem>
-                                      ))}
-                                    </Select>
-                                  </FormControl>
-                                ) : null}
-                                {index === 1 && firstField === "" ? (
-                                  <FormControl fullWidth disabled>
-                                    <InputLabel id="demo-simple-select-label">
-                                      {field}
-                                    </InputLabel>
-                                    <Select sx={{ marginTop: "10px" }}>
-                                      <MenuItem></MenuItem>
-                                    </Select>
-                                  </FormControl>
-                                ) : null}
-                                {index === 2 && secondField !== "" ? (
-                                  <FormControl fullWidth>
-                                    <InputLabel id="demo-simple-select-label">
-                                      {field}
-                                    </InputLabel>
-                                    <Select
-                                      value={thirdField}
-                                      sx={{ marginTop: "10px" }}
-                                      onChange={handleThirdFieldChange(ques)}
-                                    >
-                                      <MenuItem
-                                        value={
-                                          formDetail.Questions[ques].Content
-                                            .LinkedData.ListOfOptions[
-                                            firstField
-                                          ].Value[secondField].Value
-                                        }
-                                      >
-                                        {
-                                          formDetail.Questions[ques].Content
-                                            .LinkedData.ListOfOptions[
-                                            firstField
-                                          ].Value[secondField].Value
-                                        }
-                                      </MenuItem>
-                                    </Select>
-                                  </FormControl>
-                                ) : null}
-                                {index === 2 && secondField === "" ? (
-                                  <FormControl fullWidth disabled>
-                                    <InputLabel id="demo-simple-select-label">
-                                      {field}
-                                    </InputLabel>
-                                    <Select sx={{ marginTop: "10px" }}>
-                                      <MenuItem></MenuItem>
-                                    </Select>
-                                  </FormControl>
-                                ) : null}
                               </Grid>
                             )
                           )}

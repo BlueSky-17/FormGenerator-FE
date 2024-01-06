@@ -1,10 +1,10 @@
 export interface Response {
-    questionName: string,
-    type: string,
-    required: boolean,
-    error: string,
-    index: number,
-    content: {}
+    QuestionName: string,
+    Type: string,
+    Required: boolean,
+    Error: string,
+    Index: number,
+    Content: {}
 }
 
 // Content result for multi-choice TYPE

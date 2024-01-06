@@ -15,6 +15,13 @@ export interface MultiChoice{
     Result: boolean[]
 }
 
+export interface Files{
+    FileName: String
+    FileURL:  String
+    Type:    String
+    Size:     Number
+}
+
 export interface Content{
     date: Date
     linearRange: LinearRange
@@ -22,7 +29,7 @@ export interface Content{
     MultiChoice: MultiChoice
     ShortText: string
     Table: any
-    Files: any
+    Files: Files[]
 }
 
 
