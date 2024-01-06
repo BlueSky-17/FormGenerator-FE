@@ -25,21 +25,21 @@ function Summary(props) {
 
     let questionLength: number = props.responses.length > 0 ? props.responses[0].Responses.length : 0;
 
-    const [viewMode, setViewMode] = useState<string[]>(Array.from({ length: questionLength }, () => 'chart'));
-    const viewChartOrListHandle = (index: number) => {
-        setViewMode((prevViewMode) => {
-            let updatedViewMode
-            if (prevViewMode.length === 0) {
-                updatedViewMode = new Array(questionLength).fill('chart')
-            }
-            else{
-                updatedViewMode = [...prevViewMode]
-            }
-            updatedViewMode[index] = updatedViewMode[index] === 'chart' ? 'list' : 'chart'
+    // const [viewMode, setViewMode] = useState<string[]>(Array.from({ length: questionLength }, () => 'chart'));
+    // const viewChartOrListHandle = (index: number) => {
+    //     setViewMode((prevViewMode) => {
+    //         let updatedViewMode
+    //         if (prevViewMode.length === 0) {
+    //             updatedViewMode = new Array(questionLength).fill('chart')
+    //         }
+    //         else{
+    //             updatedViewMode = [...prevViewMode]
+    //         }
+    //         updatedViewMode[index] = updatedViewMode[index] === 'chart' ? 'list' : 'chart'
     
-            return updatedViewMode
-        });
-    };
+    //         return updatedViewMode
+    //     });
+    // };
 
     const handleMultiChoiceStatics = (responses: Answer[]) => {
         
@@ -131,21 +131,18 @@ function Summary(props) {
                           ) : null}
                           {(res.Type === 'multi-choice' || res.Type === 'checkbox') ? (
                               <Box sx={{ marginBottom: '15px' }}>
-                                {(viewMode && (viewMode[index] === 'list')) &&
+                                { 
                                   <Box>
                                     <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                                         <Typography sx={{ color: '#364F6B', padding: '20px', fontWeight: 500 }} variant="h5" noWrap component="div">
                                             {res.QuestionName}
                                         </Typography>
-                                            <Button onClick={() => viewChartOrListHandle(index)} sx={{ margin: '20px', fontWeight: 500, textTransform: 'initial', fontSize: '15px' }}>
-                                            Xem danh sách
-                                            </Button>
                                     </Box>
                                     <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                                     <PieChart
                                         series={[
                                             {
-                                            arcLabel: (item) => `${item.label} (${Math.round(item.value/props.responses.length*100)}%)`,    
+                                            arcLabel: (item) => `${Math.round(item.value/props.responses.length*100)}%`,    
                                             data: dataMap.length > 0 ? mapToListOption(dataMap[index]) : [],
                                             highlightScope: { faded: 'global', highlighted: 'item' },
                                             arcLabelMinAngle: 18,            
@@ -164,7 +161,7 @@ function Summary(props) {
                                   </Box>
                                 }
 
-                                {(viewMode.length === 0 || (viewMode as string[])[index] === 'chart') &&
+                                {/* {(viewMode.length === 0 || (viewMode as string[])[index] === 'chart') &&
                                   <Box>
                                     <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                                         <Typography sx={{ color: '#364F6B', padding: '20px', fontWeight: 500 }} variant="h5" noWrap component="div">
@@ -194,7 +191,7 @@ function Summary(props) {
                                        }
                                     </Box>
                                   </Box>
-                                }
+                                } */}
 
                                   
                               </Box>
