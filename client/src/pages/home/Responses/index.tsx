@@ -67,16 +67,6 @@ function Responses(props) {
     //handle create excel File
     const ExcelGenerator = () => {
         const generateExcelFile = async () => {
-<<<<<<< Updated upstream
-            // Create a new workbook and add a worksheet
-            const workbook = new ExcelJS.Workbook();
-            const worksheet = workbook.addWorksheet('Sheet 1');
-
-            let count = 2
-            let containTable: boolean = false
-            for (let i in formDetail.QuestionOrder) {
-                // if(formDetail.)
-=======
           // Create a new workbook and add a worksheet
           const workbook = new ExcelJS.Workbook();
           const worksheet = workbook.addWorksheet('Sheet 1');
@@ -85,7 +75,6 @@ function Responses(props) {
             let containTable: boolean = false
             for(let ques of formDetail.Questions){
                 if(ques.Type === 'table') containTable = true;
->>>>>>> Stashed changes
             }
 
             // Add data to the worksheet
@@ -103,21 +92,6 @@ function Responses(props) {
             columns.push({
                 header: "Người dùng",
                 key: "username",
-<<<<<<< Updated upstream
-                width: 20
-            })
-            if (containTable) {
-                worksheet.mergeCells('A1:A2')
-                worksheet.mergeCells('B1:B2')
-            }
-            worksheet.getCell('A1').value = 'Thời gian'
-            worksheet.getCell('B1').value = 'Người dùng'
-
-            for (let i in formDetail.QuestionOrder) {
-                let question: any = formDetail.Questions[i];
-                if (question.Type === 'table') {
-                    let tables = ["Năm", "Việc", "Thành tích"];
-=======
                 width: 20 
             }) 
             worksheet.getCell('A1').value = 'Thời gian'
@@ -132,7 +106,6 @@ function Responses(props) {
                 let question: any = formDetail.Questions[i];
                 if(question.Type === 'table'){
                     let tables = question.Content.Table.ListOfColumn
->>>>>>> Stashed changes
                     worksheet.mergeCells(1, count + 1, 1, count + tables.length)
                     worksheet.getCell(1, count + 1).value = "Danh sách công tác";
                     for (let i = 0; i < tables.length; i++) {
@@ -154,19 +127,11 @@ function Responses(props) {
                 let rowData: any = []
                 let countR: number = 2
                 rowData.push(response.SubmitTime, response.Username)
-<<<<<<< Updated upstream
-                for (let curr of response.Responses) {
-                    if (curr.Type == 'shortText') {
-                        rowData[curr.Index] = `${curr.Content.ShortText}`
-                    } else if (curr.Type === 'multi-choice' || curr.Type === 'checkbox') {
-                        let s: string = ''
-=======
                 for(let curr of response.Responses){
                     if(curr.Type == 'shortText'){
                         rowData[countR + curr.Index] =  `${curr.Content.ShortText}`
                     } else if(curr.Type === 'multi-choice' || curr.Type === 'checkbox' || curr.Type === 'dropdown'){
                         let s : string = ''
->>>>>>> Stashed changes
                         let flag: boolean = true
                         for (let j = 0; j < curr.Content.MultiChoice.Result.length; j++) {
                             if (curr.Content.MultiChoice.Result[j] === true) {
@@ -176,12 +141,6 @@ function Responses(props) {
                                 } else s += `;${curr.Content.MultiChoice.Options[j]}`
                             }
                         }
-<<<<<<< Updated upstream
-                        rowData[curr.Index] = s
-                    }
-                    else if (curr.Type === "table") {
-
-=======
                         rowData[countR + curr.Index] =  s
                     }
                     else if(curr.Type === "file"){
@@ -194,7 +153,6 @@ function Responses(props) {
                             } else s += `;${curr.Content.Files[j].FileURL}`
                         }
                         rowData[countR + curr.Index] = s
->>>>>>> Stashed changes
                     }
                 }
                 worksheet.addRow(rowData);
