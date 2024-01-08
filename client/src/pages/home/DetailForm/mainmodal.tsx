@@ -219,7 +219,7 @@ export function MainModal(props) {
                 props.formDetail.Questions[props.quesEdit].Content.File.FileType = props.fileType;
                 props.formDetail.Questions[props.quesEdit].Content.File.MaxFileAmount = props.maxFileAmount;
             }
-            else if (props.type === 'date-single' || props.type === 'date-range'){
+            else if (props.type === 'date-single' || props.type === 'date-range') {
                 props.formDetail.Questions[props.quesEdit].Content.Date = props.dateNum;
             }
 
@@ -336,6 +336,8 @@ export function MainModal(props) {
         else if (op === 'columnName') setColumnName(props.columnList[index].columnName)
     }
 
+    const handleActiveType = (index: number) => (e) => setActive(index);
+
     // Khi onBlur thì sẽ lưu value vào mảng options[]
     const saveOption = (index: number) => (e) => props.optionList[index] = optionValue;
     const saveColumnName = (index: number) => (e) => props.columnList[index].columnName = columnName;
@@ -343,11 +345,20 @@ export function MainModal(props) {
     // Thêm option trống 
     const handleOption = () => props.setOptionList([...props.optionList, ''])
 
-    const addColumnTable = () => props.setColumnList([...props.columnList, {
-        columnName: '',
-        type: '',
-        content: {}
-    }])
+    const addColumnTable = () => {
+        props.setColumnList([...props.columnList, {
+            columnName: '',
+            type: '',
+            content: {}
+        }])
+    }
+
+    const handleOptionTable = (index: string) => (e) => {
+        props.handleSubOpen()
+        props.setIndexOptionTable(index)
+
+        console.log(index);
+    }
 
     //Handle type of file
     const handleChangeCheckbox = (e) => {
@@ -577,7 +588,7 @@ export function MainModal(props) {
                                                 value={index === active ? optionValue : props.optionList[index]}
                                                 onChange={handleOptionChange}
                                                 onBlur={saveOption(index)}
-                                                onClick={handleActive(index,'option')}
+                                                onClick={handleActive(index, 'option')}
                                                 sx={{ marginRight: '10px', width: '100%' }}
                                                 // id={index.toString()}
                                                 variant="standard"
@@ -763,49 +774,64 @@ export function MainModal(props) {
                         : null
                     }
                     {props.type === 'table' ?
-                        <Box sx={{ display: 'flex', flexDirection: 'column', mt:'10px' }}>
+                        <Box sx={{ display: 'flex', flexDirection: 'column', mt: '10px' }}>
                             <Box sx={{ maxHeight: '200px', overflowY: 'scroll' }}>
                                 {
                                     props.columnList.map((item, index) => (
-                                        <Box key={index} sx={{ display: 'flex', alignItems: 'center' }}>
-                                            <Typography sx={{ color: 'gray', marginRight: '10px' }}>
-                                                {index + 1}.
-                                            </Typography>
-                                            <TextField
-                                                value={index === active ? columnName : props.columnList[index].columnName}
-                                                onChange={handleColumnName}
-                                                onBlur={saveColumnName(index)}
-                                                onClick={handleActive(index, 'columnName')}
-                                                sx={{ marginRight: '10px', width: '50%' }}
-                                                placeholder='Nhập tên cột'
-                                                // id={index.toString()}
-                                                variant="standard"
-                                            />
-                                            <FormControl placeholder='Chọn kiểu' sx={{ width: '35%' }}>
-                                                <InputLabel id="demo-simple-select-label">Kiểu</InputLabel>
-                                                <Select
-                                                    value={props.columnType}
-                                                    onChange={props.handleColumnType(index)}
-                                                    size='small'
-                                                    label='Kiểu'
-                                                >
-                                                    <MenuItem value={'shortText'}>Điền ngắn</MenuItem>
-                                                    {/* <MenuItem value={'dropdown'}>Menu thả xuống</MenuItem>
-                                                    <MenuItem value={'file'}>File</MenuItem> */}
-                                                </Select>
-                                            </FormControl>
-                                            <IconButton
-                                                // onClick={deleteQuestion(ques)}
-                                                sx={{
-                                                    backgroundColor: '#white',
-                                                    color: '#7B7B7B',
-                                                    margin: '5px',
-                                                    '&:hover': {
-                                                        backgroundColor: '#EBEBEB', // Màu nền thay đổi khi hover
-                                                    },
-                                                }}>
-                                                <ClearIcon />
-                                            </IconButton>
+                                        <Box key={index} sx={{ display: 'flex', flexDirection: 'column' }}>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: 'row', width: '100%' }}>
+                                                <Typography sx={{ color: 'gray', marginRight: '10px' }}>
+                                                    {index + 1}.
+                                                </Typography>
+                                                <TextField
+                                                    value={index === active ? columnName : item.columnName}
+                                                    onChange={handleColumnName}
+                                                    onBlur={saveColumnName(index)}
+                                                    onClick={handleActive(index, 'columnName')}
+                                                    sx={{ marginRight: '10px', width: '50%' }}
+                                                    placeholder='Nhập tên cột'
+                                                    // id={index.toString()}
+                                                    variant="standard"
+                                                />
+                                                <FormControl placeholder='Chọn kiểu' sx={{ width: '35%' }}>
+                                                    <InputLabel id="demo-simple-select-label">Kiểu</InputLabel>
+                                                    <Select
+                                                        value={index === active ? props.columnType : item.type}
+                                                        onChange={props.handleColumnType(index)}
+                                                        onClick={handleActiveType(index)}
+                                                        size='small'
+                                                        label='Kiểu'
+                                                    >
+                                                        <MenuItem value={'shortText'}>Điền ngắn</MenuItem>
+                                                        <MenuItem value={'dropdown'}>Menu thả xuống</MenuItem>
+                                                        <MenuItem value={'date-single'}>Mốc thời gian</MenuItem>
+                                                        <MenuItem value={'date-range'}>Khoảng thời gian</MenuItem>
+                                                    </Select>
+                                                </FormControl>
+                                                <IconButton
+                                                    // onClick={deleteQuestion(ques)}
+                                                    sx={{
+                                                        backgroundColor: '#white',
+                                                        color: '#7B7B7B',
+                                                        margin: '5px',
+                                                        '&:hover': {
+                                                            backgroundColor: '#EBEBEB', // Màu nền thay đổi khi hover
+                                                        },
+                                                    }}>
+                                                    <ClearIcon />
+                                                </IconButton>
+                                            </Box>
+                                            <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                                {item.type === 'dropdown' ?
+                                                    <Box>
+                                                        <Button onClick={handleOptionTable(index)} sx={{ color: '#364F6B', textTransform: 'initial', borderRadius: '20px' }}>Nhập các lựa chọn</Button>
+                                                    </Box> : null}
+                                                {item.content.MultiChoice ?
+                                                    <Box>
+                                                        {item.content.MultiChoice.Options.length > 0 ?
+                                                            <Typography>Đã nhập {item.content.MultiChoice.Options.length} lựa chọn</Typography> : null}
+                                                    </Box> : null}
+                                            </Box>
                                         </Box>
                                     ))
                                 }

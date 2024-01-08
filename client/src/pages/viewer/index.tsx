@@ -1,3 +1,4 @@
+/* eslint-disable no-loop-func */
 import React, { useState, useEffect } from 'react'
 import { Box, Typography, Drawer, Avatar, IconButton, Toolbar, List, Divider, Icon, Grid } from '@mui/material'
 import Button from '@mui/material/Button';
@@ -202,13 +203,32 @@ function Form() {
 
                     //Với mỗi listOfColum thì sẽ init responses như dưới đây (content sẽ có 1 phần từ (row) trỗng sẵn)
                     formDetail.Questions[i].Content.Table.ListOfColumn.forEach((item, index) => {
-                        result.table.listOfColumn.push({
-                            columnName: item.ColumnName,
-                            type: item.Type,
-                            content: [{
-                                shortText: ""
-                            }]
-                        })
+                        if (item.Type === 'shortText') {
+                            result.table.listOfColumn.push({
+                                columnName: item.ColumnName,
+                                type: item.Type,
+                                content: [{
+                                    shortText: ""
+                                }]
+                            })
+                        }
+                        else if (item.Type === 'dropdown') {
+                            let res = new Array(formDetail.Questions[i].Content.Table.ListOfColumn[0].Content.MultiChoice.Options.length).fill(false);
+
+                            result.table.listOfColumn.push({
+                                columnName: item.ColumnName,
+                                type: item.Type,
+                                content: [{
+                                    multiChoice: {
+                                        options: item.Content.MultiChoice.Options,
+                                        result: res,
+                                        constraint: "",
+                                        maxOptions: 1,
+                                        disabled: false
+                                    }
+                                }]
+                            })
+                        }
                     })
 
                     Object.assign(newResponse.content, result)
@@ -302,6 +322,17 @@ function Form() {
     const saveTableText = (ques: number, rowIndex: number, colIndex: number) => (e) => {
         formResponses[ques].content.table.listOfColumn[colIndex].content[rowIndex].shortText = tableText;
     };
+
+    const handleChangeTableDropdown = (ques: number, rowIndex: number, colIndex: number) => (e) => {
+        // console.log(e.target.value)
+        //Set all options to result 0
+        formResponses[ques].content.table.listOfColumn[colIndex].content[rowIndex].multiChoice.result.fill(false);
+
+        formResponses[ques].content.table.listOfColumn[colIndex].content[rowIndex].multiChoice.result[e.target.value] = true;
+
+        console.log(formResponses[ques].content.table.listOfColumn[colIndex].content[rowIndex].multiChoice.result)
+    };
+
     const [activeTable, setActiveTable] = useState<[number, number, number]>([-1, -1, -1]);
     const handleActiveTable = (ques: number, rowIndex: number, colIndex: number) => (e) => {
         //Nếu field trống thì set tableText vễ rỗng, còn không rỗng thì set về giá trị cũ
@@ -610,13 +641,37 @@ function Form() {
 
     const addRowTable = (ques: number) => (e) => {
         formDetail.Questions[ques].Content.Table.ListOfColumn.forEach((item, index) => {
-            formResponses[ques].content.table.listOfColumn[index].content.push
+            if (item.Type === 'shortText') {
+                formResponses[ques].content.table.listOfColumn[index].content.push
+                    ({
+                        shortText: ''
+                    })
+            }
+            else if (item.Type === 'dropdown'){
+                let res = new Array(formDetail.Questions[ques].Content.Table.ListOfColumn[index].Content.MultiChoice.Options.length).fill(false);
+
+                formResponses[ques].content.table.listOfColumn[index].content.push
                 ({
-                    shortText: ''
+                    multiChoice: {
+                        options: item.Content.MultiChoice.Options,
+                        result: res,
+                        constraint: "",
+                        maxOptions: 1,
+                        disabled: false
+                    }
                 })
+            }
         })
+
         setRender(!render)
     };
+
+    function findElementWithValueOne(arr: boolean[]): boolean | undefined {
+        // Sử dụng find để tìm phần tử có giá trị là 1 trong mảng
+        const element = arr.find(item => item === true);
+      
+        return element;
+      }
 
     console.log(formResponses);
     console.log(formDetail);
@@ -1032,14 +1087,29 @@ function Form() {
                                                             </TableCell> */}
                                                             {formDetail.Questions[ques].Content.Table.ListOfColumn.map((item, colIndex) => (
                                                                 <TableCell key={colIndex} align="left">
-                                                                    <TextField
+                                                                    {item.Type === 'shortText' ? <TextField
                                                                         // value={tableText}
                                                                         onChange={handleChangeTableText}
                                                                         value={(ques === activeTable[0] && rowIndex === activeTable[1] && colIndex === activeTable[2]) ? tableText : formResponses[ques].content.table.listOfColumn[colIndex].content[rowIndex].shortText}
                                                                         onBlur={saveTableText(ques, rowIndex, colIndex)}
                                                                         onClick={handleActiveTable(ques, rowIndex, colIndex)}
                                                                         size="small">
-                                                                    </TextField>
+                                                                    </TextField> : null}
+                                                                    {item.Type === 'dropdown' ?
+                                                                        <FormControl fullWidth>
+                                                                            <Select
+                                                                                // value={item.Content.MultiChoice.Options[item.Content.MultiChoice.result]}
+                                                                                onChange={handleChangeTableDropdown(ques, rowIndex, colIndex)}
+                                                                            >
+                                                                                {item.Content.MultiChoice.Options.map((item, index) => (
+                                                                                    <MenuItem
+                                                                                        key={index}
+                                                                                        value={index}>
+                                                                                        {item}
+                                                                                    </MenuItem>
+                                                                                ))}
+                                                                            </Select>
+                                                                        </FormControl> : null}
                                                                 </TableCell>
                                                             ))}
                                                         </TableRow>

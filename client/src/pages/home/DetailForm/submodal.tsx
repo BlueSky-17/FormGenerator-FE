@@ -38,7 +38,8 @@ export function SubModal(props) {
                 aria-describedby="modal-modal-description"
             >
                 <Box sx={{ ...style }}>
-                    {props.subopen === 'multi-choice' || props.subopen === 'checkbox' ?
+                    {/* multi-choice | checkbox | dropdown  */}
+                    {props.subopen === 'multi-choice' ?
                         <Box>
                             <Typography sx={{ color: '#6D7073', marginBottom: '15px' }}>Nhập <b>mỗi lựa chọn</b> là <b> một dòng</b></Typography>
                             <TextField
@@ -49,7 +50,7 @@ export function SubModal(props) {
                                 rows={8}
                                 sx={{ width: '100%' }}
                             />
-                            <Button
+                            {props.type === 'multi-choice' ? <Button
                                 onClick={solveMultiOptions}
                                 sx={{
                                     color: 'white',
@@ -64,7 +65,23 @@ export function SubModal(props) {
                                     }
                                 }}>
                                 Xử lý dữ liệu
-                            </Button>
+                            </Button> : null}
+                            {props.type === 'table' ? <Button
+                                onClick={props.solveOptionTable}
+                                sx={{
+                                    color: 'white',
+                                    backgroundColor: '#364F6B',
+                                    borderRadius: '10px',
+                                    paddingY: '10px',
+                                    paddingX: '5px',
+                                    marginTop: '10px',
+                                    width: '100%',
+                                    '&:hover': {
+                                        backgroundColor: '#2E4155', // Màu nền thay đổi khi hover
+                                    }
+                                }}>
+                                Xử lý dữ liệu
+                            </Button> : null}
                         </Box>
                         : null}
                     {props.subopen === 'linkedData' ?
@@ -113,44 +130,6 @@ export function SubModal(props) {
                                 <Typography>No File is uploaded yet!</Typography>
                             )
                             }
-                        </Box>
-                        : null}
-                    {props.subopen === 'dropDown' ?
-                        <Box>
-                            <Typography>Xác nhận các trường dữ liệu trong <b>Menu thả xuống</b> là:</Typography>
-                            {
-                                props.optionInDropDown.map((char, index) => (
-                                    <Typography sx={{ textAlign: 'center' }} key={index}> {char}</Typography>
-                                ))
-                            }
-                            <Box sx={{ display: 'flex', flexDirection: 'row-reverse' }} >
-                                <Button
-                                    onClick={props.handleSubClose}
-                                    sx={{
-                                        color: 'white',
-                                        backgroundColor: '#364F6B',
-                                        borderRadius: '10px',
-                                        margin: '5px',
-                                        '&:hover': {
-                                            backgroundColor: '#2E4155', // Màu nền thay đổi khi hover
-                                        },
-                                    }}>
-                                    Xác nhận
-                                </Button>
-                                <Button
-                                    onClick={props.handleSubClose}
-                                    sx={{
-                                        color: '#000000',
-                                        backgroundColor: '#E7E7E8',
-                                        borderRadius: '10px',
-                                        margin: '5px',
-                                        '&:hover': {
-                                            backgroundColor: '#E7E7E7', // Màu nền thay đổi khi hover
-                                        },
-                                    }}>
-                                    Hủy
-                                </Button>
-                            </Box>
                         </Box>
                         : null}
                     {props.subopen === 'delete' ?

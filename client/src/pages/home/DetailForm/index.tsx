@@ -30,7 +30,7 @@ import jsonData from '../../../assets/i18n/vi.json'
 import { MainModal } from './mainmodal';
 import { SubModal } from './submodal';
 import Responses from '../Responses';
-import { ShortText } from './interface';
+import { ShortText, MultiChoice } from './interface';
 
 const DrawerHeader = styled('div')(({ theme }) => ({
     display: 'flex',
@@ -188,7 +188,30 @@ function DetailForm() {
             columnList[index].content = {}
             Object.assign(columnList[index].content, updateShortText);
         }
+        else if (e.target.value === 'dropdown') {
+            const updateDropdown: MultiChoice = {
+                MultiChoice: {
+                    Options: [],
+                    Constraint:'',
+                    MaxOptions: 1
+                }
+            };
 
+            columnList[index].content = {}
+            Object.assign(columnList[index].content, updateDropdown);
+        }
+
+        console.log(columnList)
+
+    }
+    const [indexOptionTable,setIndexOptionTable] = useState('')
+
+    const solveOptionTable = () => {
+        const myDropdown = inputText.split('\n');
+        columnList[indexOptionTable].content.MultiChoice.Options = myDropdown;
+        console.log(columnList[indexOptionTable].content.MultiChoice.Options)
+        setInputText('')
+        setSubOpen('')
     }
 
     // Close/Open Main Modal 
@@ -219,7 +242,7 @@ function DetailForm() {
             setFields(rest); // fields: ['Tính','Huyện','Xã']
             // setColumn(rest);
         }
-        else if (type === 'multi-choice' || type === 'checkbox' || type === 'dropdown') setSubOpen('multi-choice')
+        else if (type === 'multi-choice' || type === 'checkbox' || type === 'dropdown' || type === 'table') setSubOpen('multi-choice')
         //When no type => delete question
         else {
             setSubOpen('delete')
@@ -686,7 +709,7 @@ function DetailForm() {
             </Box >
 
             {typeView === 'ViewResponses' &&
-                <Responses form={formDetail} responses={formResponses}/>
+                <Responses form={formDetail} responses={formResponses} />
             }
 
             <MainModal
@@ -736,12 +759,16 @@ function DetailForm() {
                 setOptionList={setOptionList}
                 quesEdit={quesEdit}
                 setQuesEdit={setQuesEdit}
+
+                indexOptionTable={indexOptionTable}
+                setIndexOptionTable={setIndexOptionTable}
             />
 
             <SubModal
                 subopen={subopen}
                 handleSubClose={handleSubClose}
                 excelData={excelData}
+                type={type}
                 setExcelData={setExcelData}
                 handleProcessRowUpdate={handleProcessRowUpdate}
                 columns={columns}
@@ -755,6 +782,8 @@ function DetailForm() {
 
                 handleCloseForm={handleCloseForm}
                 handleOpenForm={handleOpenForm}
+
+                solveOptionTable={solveOptionTable}
             />
 
         </Box >
