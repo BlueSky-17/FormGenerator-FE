@@ -16,10 +16,10 @@ export interface MultiChoice{
 }
 
 export interface Files{
-    FileName: String
-    FileURL:  String
-    Type:    String
-    Size:     Number
+    fileName: String
+    fileURL:  String
+    type:    String
+    size:     Number
 }
 
 export interface Content{

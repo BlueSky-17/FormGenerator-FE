@@ -148,9 +148,9 @@ function Responses(props) {
                         let flag: boolean = true
                         for(let j = 0; j < curr.Content.Files.length; j++) {
                             if(flag){
-                                s += `${curr.Content.Files[j].FileURL}`
+                                s += `${curr.Content.Files[j].fileURL}`
                                 flag = false
-                            } else s += `;${curr.Content.Files[j].FileURL}`
+                            } else s += `;${curr.Content.Files[j].fileURL}`
                         }
                         rowData[countR + curr.Index] = s
                     }
