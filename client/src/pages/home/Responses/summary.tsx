@@ -114,7 +114,7 @@ function Summary(props) {
             {props.responses.length > 0
                 ? props.responses[0].Responses.map((res, index) => (
                       <Box key={index} sx={{ backgroundColor: 'white', borderRadius: '15px', marginTop: '15px', paddingBottom: '5px' }}>
-                          {res.Type === 'shortText' ? (
+                          {/* {res.Type === 'shortText' ? (
                               <Box sx={{ marginBottom: '15px'}}>
                                   <Typography sx={{ color: '#364F6B', padding: '20px', fontWeight: 500 }} variant="h5" noWrap component="div">
                                       {res.QuestionName}
@@ -128,8 +128,8 @@ function Summary(props) {
                                   </Box>
                                   
                               </Box>
-                          ) : null}
-                          {(res.Type === 'multi-choice' || res.Type === 'checkbox') ? (
+                          ) : null} */}
+                          {(res.Type === 'multi-choice' || res.Type === 'checkbox' || res.Type === 'dropdown') ? (
                               <Box sx={{ marginBottom: '15px' }}>
                                 { 
                                   <Box>
