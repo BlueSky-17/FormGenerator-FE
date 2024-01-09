@@ -179,7 +179,7 @@ export function MainModal(props) {
             else if (props.type === "table") {
                 const updateTable: Table = {
                     Table: {
-                        listOfColumn: props.columnList
+                        ListOfColumn: props.columnList
                     }
                 };
 
@@ -268,9 +268,9 @@ export function MainModal(props) {
         else if (props.type === "table") {
             props.setColumnList([
                 {
-                    columnName: '',
-                    type: '',
-                    content: {}
+                    ColumnName: '',
+                    Type: '',
+                    Content: {}
                 }
             ])
             setColumnName('');
@@ -345,23 +345,23 @@ export function MainModal(props) {
     const handleActive = (index: number, op: string) => (e) => { //op is handle 'option' or handle 'columnName'
         setActive(index);
         if (op === 'option') setOptionValue(props.optionList[index]);
-        else if (op === 'columnName') setColumnName(props.columnList[index].columnName)
+        else if (op === 'columnName') setColumnName(props.columnList[index].ColumnName)
     }
 
     const handleActiveType = (index: number) => (e) => setActiveType(index);
 
     // Khi onBlur thì sẽ lưu value vào mảng options[]
     const saveOption = (index: number) => (e) => props.optionList[index] = optionValue;
-    const saveColumnName = (index: number) => (e) => props.columnList[index].columnName = columnName;
+    const saveColumnName = (index: number) => (e) => props.columnList[index].ColumnName = columnName;
 
     // Thêm option trống 
     const handleOption = () => props.setOptionList([...props.optionList, ''])
 
     const addColumnTable = () => {
         props.setColumnList([...props.columnList, {
-            columnName: '',
-            type: '',
-            content: {}
+            ColumnName: '',
+            Type: '',
+            Content: {}
         }])
     }
 
@@ -796,7 +796,7 @@ export function MainModal(props) {
                                                     {index + 1}.
                                                 </Typography>
                                                 <TextField
-                                                    value={index === active ? columnName : item.columnName}
+                                                    value={index === active ? columnName : item.ColumnName}
                                                     onChange={handleColumnName}
                                                     onBlur={saveColumnName(index)}
                                                     onClick={handleActive(index, 'columnName')}
@@ -808,7 +808,7 @@ export function MainModal(props) {
                                                 <FormControl placeholder='Chọn kiểu' sx={{ width: '35%' }}>
                                                     <InputLabel id="demo-simple-select-label">Kiểu</InputLabel>
                                                     <Select
-                                                        value={index === activeType ? props.columnType : item.type}
+                                                        value={index === activeType ? props.columnType : item.Type}
                                                         onChange={props.handleColumnType(index)}
                                                         onClick={handleActiveType(index)}
                                                         size='small'
@@ -834,14 +834,14 @@ export function MainModal(props) {
                                                 </IconButton>
                                             </Box>
                                             <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                                                {item.type === 'dropdown' ?
+                                                {item.Type === 'dropdown' ?
                                                     <Box>
                                                         <Button onClick={handleOptionTable(index)} sx={{ color: '#364F6B', textTransform: 'initial', borderRadius: '20px' }}>Nhập các lựa chọn</Button>
                                                     </Box> : null}
-                                                {item.content.MultiChoice ?
+                                                {item.Type === 'dropdown' ?
                                                     <Box>
-                                                        {item.content.MultiChoice.Options.length > 0 ?
-                                                            <Typography>Đã nhập {item.content.MultiChoice.Options.length} lựa chọn</Typography> : null}
+                                                        {item.Content.MultiChoice.Options.length > 0 ?
+                                                            <Typography>Đã nhập {item.Content.MultiChoice.Options.length} lựa chọn</Typography> : null}
                                                     </Box> : null}
                                             </Box>
                                         </Box>

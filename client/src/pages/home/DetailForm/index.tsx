@@ -170,25 +170,25 @@ function DetailForm() {
     }
 
     //columnList (Table type)
-    const [columnList, setColumnList] = useState<{ columnName: string, type: string, content: {} }[]>([
+    const [columnList, setColumnList] = useState<{ ColumnName: string, Type: string, Content: {} }[]>([
         {
-            columnName: '',
-            type: '',
-            content: {}
+            ColumnName: '',
+            Type: '',
+            Content: {}
         }
     ])
     const [columnType, setColumnType] = useState('');
     const handleColumnType = (index: number) => (e) => {
         setColumnType(e.target.value)
-        columnList[index].type = e.target.value
+        columnList[index].Type = e.target.value
 
         if (e.target.value === 'shortText') {
             const updateShortText: ShortText = {
                 shortText: true
             };
 
-            columnList[index].content = {}
-            Object.assign(columnList[index].content, updateShortText);
+            columnList[index].Content = {}
+            Object.assign(columnList[index].Content, updateShortText);
         }
         else if (e.target.value === 'dropdown') {
             const updateDropdown: MultiChoice = {
@@ -199,8 +199,8 @@ function DetailForm() {
                 }
             };
 
-            columnList[index].content = {}
-            Object.assign(columnList[index].content, updateDropdown);
+            columnList[index].Content = {}
+            Object.assign(columnList[index].Content, updateDropdown);
         }
 
         console.log(columnList)
@@ -210,8 +210,8 @@ function DetailForm() {
 
     const solveOptionTable = () => {
         const myDropdown = inputText.split('\n');
-        columnList[indexOptionTable].content.MultiChoice.Options = myDropdown;
-        console.log(columnList[indexOptionTable].content.MultiChoice.Options)
+        columnList[indexOptionTable].Content.MultiChoice.Options = myDropdown;
+        console.log(columnList[indexOptionTable].Content.MultiChoice.Options)
         setInputText('')
         setSubOpen('')
     }
@@ -460,6 +460,9 @@ function DetailForm() {
         }
         else if (formDetail.Questions[ques].Type === "date-single" || formDetail.Questions[ques].Type === 'date-range') {
             setDateNum(formDetail.Questions[ques].Content.Date)
+        }
+        else if (formDetail.Questions[ques].Type === "table"){
+            setColumnList(formDetail.Questions[ques].Content.Table.ListOfColumn)
         }
 
         if (formDetail.Questions[ques].Type === 'checkbox') {

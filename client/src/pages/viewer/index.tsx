@@ -985,7 +985,7 @@ function Form() {
                                                     <TableHead>
                                                         <TableRow>
                                                             {formDetail.Questions[ques].Content.Table.ListOfColumn.map((item) => (
-                                                                <TableCell align="left">{item.ColumnName}</TableCell>
+                                                                <TableCell align="left" sx={{width:`${100/formDetail.Questions[ques].Content.Table.ListOfColumn.length}%`}}>{item.ColumnName}</TableCell>
                                                             ))}
                                                         </TableRow>
                                                     </TableHead>
@@ -1006,7 +1006,8 @@ function Form() {
                                                                             value={(ques === activeTable[0] && rowIndex === activeTable[1] && colIndex === activeTable[2]) ? tableText : formResponses[ques].content.table.listOfColumn[colIndex].content[rowIndex].shortText}
                                                                             onBlur={saveTableText(ques, rowIndex, colIndex)}
                                                                             onClick={handleActiveTable(ques, rowIndex, colIndex)}
-                                                                            size="small">
+                                                                            size="small"
+                                                                            fullWidth>
                                                                         </TextField> : null}
                                                                         {item.Type === 'dropdown' ?
                                                                             <FormControl fullWidth>

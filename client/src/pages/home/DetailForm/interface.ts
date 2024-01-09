@@ -45,10 +45,10 @@ export interface LinkedData {
 // Content for table TYPE
 export interface Table {
     Table: {
-        listOfColumn: {
-            columnName: string,
-            type: string,
-            content: {}
+        ListOfColumn: {
+            ColumnName: string,
+            Type: string,
+            Content: {}
         }[]
     }
 }
