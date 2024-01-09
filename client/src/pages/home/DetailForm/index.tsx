@@ -177,7 +177,7 @@ function DetailForm() {
             content: {}
         }
     ])
-    const [columnType, setColumnType] = useState();
+    const [columnType, setColumnType] = useState('');
     const handleColumnType = (index: number) => (e) => {
         setColumnType(e.target.value)
         columnList[index].type = e.target.value
@@ -747,6 +747,7 @@ function DetailForm() {
                 columnList={columnList}
                 setColumnList={setColumnList}
                 columnType={columnType}
+                setColumnType={setColumnType}
                 handleColumnType={handleColumnType}
 
                 maxFileAmount={maxFileAmount}

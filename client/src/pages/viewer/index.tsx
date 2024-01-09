@@ -166,7 +166,7 @@ function Form() {
                                 })
                             }
                             else if (item.Type === 'dropdown') {
-                                let res = new Array(formDetail.Questions[i].Content.Table.ListOfColumn[0].Content.MultiChoice.Options.length).fill(false);
+                                let res = new Array(item.Content.MultiChoice.Options.length).fill(false);
 
                                 result.table.listOfColumn.push({
                                     columnName: item.ColumnName,

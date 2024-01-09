@@ -265,6 +265,17 @@ export function MainModal(props) {
         else if (props.type === "date-single" || props.type === "date-range") {
             props.setDateNum(-1);
         }
+        else if (props.type === "table") {
+            props.setColumnList([
+                {
+                    columnName: '',
+                    type: '',
+                    content: {}
+                }
+            ])
+            setColumnName('');
+            props.setColumnType('')
+        }
         props.setQuesEdit(-1)
     }
 
@@ -330,13 +341,14 @@ export function MainModal(props) {
 
     // active === index thì value của TextField sẽ thay đổi
     const [active, setActive] = useState<number>(-1);
+    const [activeType, setActiveType] = useState<number>(-1);
     const handleActive = (index: number, op: string) => (e) => { //op is handle 'option' or handle 'columnName'
         setActive(index);
         if (op === 'option') setOptionValue(props.optionList[index]);
         else if (op === 'columnName') setColumnName(props.columnList[index].columnName)
     }
 
-    const handleActiveType = (index: number) => (e) => setActive(index);
+    const handleActiveType = (index: number) => (e) => setActiveType(index);
 
     // Khi onBlur thì sẽ lưu value vào mảng options[]
     const saveOption = (index: number) => (e) => props.optionList[index] = optionValue;
@@ -796,7 +808,7 @@ export function MainModal(props) {
                                                 <FormControl placeholder='Chọn kiểu' sx={{ width: '35%' }}>
                                                     <InputLabel id="demo-simple-select-label">Kiểu</InputLabel>
                                                     <Select
-                                                        value={index === active ? props.columnType : item.type}
+                                                        value={index === activeType ? props.columnType : item.type}
                                                         onChange={props.handleColumnType(index)}
                                                         onClick={handleActiveType(index)}
                                                         size='small'
