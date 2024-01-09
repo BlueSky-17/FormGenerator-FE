@@ -31,6 +31,7 @@ import { MainModal } from './mainmodal';
 import { SubModal } from './submodal';
 import Responses from '../Responses';
 import { ShortText, MultiChoice } from './interface';
+import EditModal from './editmodal';
 
 const DrawerHeader = styled('div')(({ theme }) => ({
     display: 'flex',
@@ -42,6 +43,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 }));
 
 function DetailForm() {
+    const [render, setRender] = useState(false)
     const [formDetail, setFormDetail] = useState<any>({})
     const [formResponses, setFormResponses] = useState<any>({})
 
@@ -192,7 +194,7 @@ function DetailForm() {
             const updateDropdown: MultiChoice = {
                 MultiChoice: {
                     Options: [],
-                    Constraint:'',
+                    Constraint: '',
                     MaxOptions: 1
                 }
             };
@@ -204,7 +206,7 @@ function DetailForm() {
         console.log(columnList)
 
     }
-    const [indexOptionTable,setIndexOptionTable] = useState('')
+    const [indexOptionTable, setIndexOptionTable] = useState('')
 
     const solveOptionTable = () => {
         const myDropdown = inputText.split('\n');
@@ -484,6 +486,12 @@ function DetailForm() {
     };
     const open_settings = Boolean(anchorEl);
 
+    const [openEditModal, setOpenEditModal] = useState(false)
+
+    const handleOpenEditModal = () => {
+        setOpenEditModal(true);
+    }
+
     return (
         <Box>
             <DrawerHeader />
@@ -522,7 +530,11 @@ function DetailForm() {
                             Xem trước
                         </Button>
                         <Divider />
-                        <Button sx={{ p: 2, fontWeight: 500, color: 'black', textTransform: 'initial', fontSize: '15px' }}>Sửa chủ đề</Button>
+                        <Button
+                            onClick={handleOpenEditModal}
+                            sx={{ p: 2, fontWeight: 500, color: 'black', textTransform: 'initial', fontSize: '15px' }}>
+                            Sửa chủ đề
+                        </Button>
                         <Divider />
                         {
                             formState ?
@@ -784,6 +796,15 @@ function DetailForm() {
                 handleOpenForm={handleOpenForm}
 
                 solveOptionTable={solveOptionTable}
+            />
+
+            <EditModal
+                openEditModal={openEditModal}
+                setOpenEditModal={setOpenEditModal}
+                formDetail={formDetail}
+                updateObjectInDatabase={updateObjectInDatabase}
+                setRender={setRender}
+                render={render}
             />
 
         </Box >
