@@ -222,6 +222,9 @@ export function MainModal(props) {
             else if (props.type === 'date-single' || props.type === 'date-range') {
                 props.formDetail.Questions[props.quesEdit].Content.Date = props.dateNum;
             }
+            else if (props.type === 'table') {
+                props.formDetail.Questions[props.quesEdit].Content.Table.ListOfColumn = props.columnList;
+            }
 
             updateObjectInDatabase({
                 "questionOrder": props.formDetail.QuestionOrder,
