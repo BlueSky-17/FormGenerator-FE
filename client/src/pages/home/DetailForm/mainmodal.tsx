@@ -350,6 +350,14 @@ export function MainModal(props) {
 
     const handleActiveType = (index: number) => (e) => setActiveType(index);
 
+    const [dateNum, setDateNum] = useState()
+    const [activeDate, setActiveDate] = useState<number>(1);
+    const handleActiveDate = (index: number) => (e) => {
+        setActiveDate(index)
+        setDateNum(e.target.value)
+        props.columnList[index].Content.Date = e.target.value
+    }
+
     // Khi onBlur thì sẽ lưu value vào mảng options[]
     const saveOption = (index: number) => (e) => props.optionList[index] = optionValue;
     const saveColumnName = (index: number) => (e) => props.columnList[index].ColumnName = columnName;
@@ -817,7 +825,7 @@ export function MainModal(props) {
                                                         <MenuItem value={'shortText'}>Điền ngắn</MenuItem>
                                                         <MenuItem value={'dropdown'}>Menu thả xuống</MenuItem>
                                                         <MenuItem value={'date-single'}>Mốc thời gian</MenuItem>
-                                                        <MenuItem value={'date-range'}>Khoảng thời gian</MenuItem>
+                                                        {/* <MenuItem value={'date-range'}>Khoảng thời gian</MenuItem> */}
                                                     </Select>
                                                 </FormControl>
                                                 <IconButton
@@ -843,6 +851,24 @@ export function MainModal(props) {
                                                         {item.Content.MultiChoice.Options.length > 0 ?
                                                             <Typography>Đã nhập {item.Content.MultiChoice.Options.length} lựa chọn</Typography> : null}
                                                     </Box> : null}
+                                                {item.Type === 'date-single' ?
+                                                    <Box sx={{ width: '50%' }}>
+                                                        <Typography sx={{ width: '100%', marginBottom: '5px', color: 'gray' }}><b>Chọn định dạng</b></Typography>
+                                                        <FormControl fullWidth>
+                                                            <Select
+                                                                size='small'
+                                                                value={item.Content.Date}
+                                                                onChange={handleActiveDate(index)}
+                                                            >
+                                                                <MenuItem value={1}> Ngày/Tháng/Năm </MenuItem>
+                                                                <MenuItem value={2}> Tháng/Năm </MenuItem>
+                                                                <MenuItem value={3}> Năm </MenuItem>
+                                                                <MenuItem value={4}> Giờ </MenuItem>
+                                                            </Select>
+                                                        </FormControl>
+                                                    </Box>
+                                                    : null
+                                                }
                                             </Box>
                                         </Box>
                                     ))

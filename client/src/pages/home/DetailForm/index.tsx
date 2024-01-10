@@ -30,7 +30,7 @@ import jsonData from '../../../assets/i18n/vi.json'
 import { MainModal } from './mainmodal';
 import { SubModal } from './submodal';
 import Responses from '../Responses';
-import { ShortText, MultiChoice } from './interface';
+import { ShortText, MultiChoice, Date } from './interface';
 import EditModal from './editmodal';
 
 const DrawerHeader = styled('div')(({ theme }) => ({
@@ -202,9 +202,16 @@ function DetailForm() {
             columnList[index].Content = {}
             Object.assign(columnList[index].Content, updateDropdown);
         }
+        else if (e.target.value === 'date-single') {
+            const updateDate: Date = {
+                Date: 0
+            };
+
+            columnList[index].Content = {}
+            Object.assign(columnList[index].Content, updateDate);
+        }
 
         console.log(columnList)
-
     }
     const [indexOptionTable, setIndexOptionTable] = useState('')
 
