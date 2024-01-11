@@ -52,17 +52,20 @@ const style = {
 };
 
 function MyForms() {
+    const [forms, setForms] = useState<any[]>([])
+    
     // Page Pagination
-    const [currentPage, setCurrentPage] = React.useState(1);
+    const [currentPage, setCurrentPage] = React.useState<number | undefined>(1);
     const handleChangePagination = (event: React.ChangeEvent<unknown>, value: number) => {
         setCurrentPage(value);
     };
 
-    const [forms, setForms] = useState<any[]>([])
+    //Search Input
+    const [keyword, setKeyword] = React.useState("");
 
     //API GET: fetch forms by UserId
     useEffect(() => {
-        fetch(`http://localhost:8080/forms/${JSON.parse(sessionStorage.getItem('token') as string)?.user.ID}?page=${currentPage}`, {
+        fetch(`http://localhost:8080/forms/${JSON.parse(sessionStorage.getItem('token') as string)?.user.ID}?name=${keyword}&page=${currentPage}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -73,7 +76,7 @@ function MyForms() {
             .then(forms => {
                 setForms(forms);
             })
-    }, [currentPage])
+    }, [currentPage, keyword])
 
     const handleCreateForm = async () => {
         // Close modal
@@ -111,7 +114,7 @@ function MyForms() {
 
         setForms((prevData) => prevData.filter((item) => item.id !== formID))
 
-         // Call API DELETE form by ID
+        // Call API DELETE form by ID
         await deleteForm(formID);
     }
 
@@ -148,6 +151,9 @@ function MyForms() {
                             <SearchIcon />
                         </SearchIconWrapper>
                         <StyledInputBase
+                            onChange={(e) => {
+                                setKeyword(e.target.value)
+                            }}
                             placeholder="Tìm kiếm…"
                             inputProps={{ 'aria-label': 'search' }}
                         />
