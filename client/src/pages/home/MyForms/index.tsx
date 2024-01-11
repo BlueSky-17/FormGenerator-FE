@@ -53,7 +53,7 @@ const style = {
 
 function MyForms() {
     const [forms, setForms] = useState<any[]>([])
-    
+
     // Page Pagination
     const [currentPage, setCurrentPage] = React.useState<number | undefined>(1);
     const handleChangePagination = (event: React.ChangeEvent<unknown>, value: number) => {
@@ -176,12 +176,12 @@ function MyForms() {
                 </Box>
 
                 <Divider />
-                <Box sx={{ minHeight: 400 }}>
+                <Box sx={{ minHeight: 410 }}>
                     <TableContainer component={Paper}>
                         <Table sx={{ minWidth: 650 }} aria-label="simple table">
                             <TableHead>
                                 <TableRow >
-                                    <TableCell sx={{ padding: 2, fontWeight: 800, fontSize: '1rem' }} align="left">STT</TableCell>
+                                    <TableCell sx={{ padding: 1, paddingLeft: 3, fontWeight: 800, fontSize: '1rem' }} align="left">STT</TableCell>
                                     <TableCell sx={{ padding: 1, fontWeight: 800, fontSize: '1rem' }} align="left">Người biểu mẫu</TableCell>
                                     <TableCell sx={{ padding: 1, fontWeight: 800, fontSize: '1rem' }} align="center">Người sở hữu</TableCell>
                                     <TableCell sx={{ padding: 1, fontWeight: 800, fontSize: '1rem' }} align="center">Phản hồi</TableCell>
@@ -195,7 +195,7 @@ function MyForms() {
                                         key={index}
                                         sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                     >
-                                        <TableCell sx={{ padding: 2, fontWeight: 500, fontSize: '1.05rem' }} component="th" scope="row" align="left">
+                                        <TableCell sx={{ padding: 1, paddingLeft: 3, fontWeight: 500, fontSize: '1.05rem' }} component="th" scope="row" align="left">
                                             {index + 1}
                                         </TableCell>
                                         <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="left">{form.name}</TableCell>
