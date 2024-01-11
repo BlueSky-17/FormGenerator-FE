@@ -9,11 +9,6 @@ import EditIcon from '@mui/icons-material/Edit';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
-
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -57,12 +52,17 @@ const style = {
 };
 
 function MyForms() {
-    // render: use to re-render after create or delete form
-    const [render, setRender] = useState(false);
+    // Page Pagination
+    const [currentPage, setCurrentPage] = React.useState(1);
+    const handleChangePagination = (event: React.ChangeEvent<unknown>, value: number) => {
+        setCurrentPage(value);
+    };
+
+    const [forms, setForms] = useState<any[]>([])
 
     //API GET: fetch forms by UserId
     useEffect(() => {
-        fetch(`http://localhost:8080/forms/${JSON.parse(sessionStorage.getItem('token') as string)?.user.ID}`, {
+        fetch(`http://localhost:8080/forms/${JSON.parse(sessionStorage.getItem('token') as string)?.user.ID}?page=${currentPage}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -73,7 +73,7 @@ function MyForms() {
             .then(forms => {
                 setForms(forms);
             })
-    }, [render])
+    }, [currentPage])
 
     const handleCreateForm = async () => {
         // Close modal
@@ -109,11 +109,10 @@ function MyForms() {
         // Close modal
         dispatch(setModal({ modal: '', isOpen: false }))
 
-        // Call API DELETE form by ID
-        await deleteForm(formID);
+        setForms((prevData) => prevData.filter((item) => item.id !== formID))
 
-        // Re-render component
-        setRender(!render);
+         // Call API DELETE form by ID
+        await deleteForm(formID);
     }
 
     // Modal ADD + DELETE Form
@@ -133,15 +132,6 @@ function MyForms() {
     const editForm = (id: string, typeView: string) => (event: any) => {
         navigate('/form/' + id, { state: typeView });
     };
-
-    // Page Pagination
-    const [itemsPerPage, setItemsPerPage] = useState('');
-    const [forms, setForms] = useState<any[]>([])
-    const handleChange = (event: SelectChangeEvent) => {
-        setItemsPerPage(event.target.value);
-    };
-
-    // console.log(forms)
 
     return (
         <Box>
@@ -180,7 +170,7 @@ function MyForms() {
                 </Box>
 
                 <Divider />
-                <Box sx={{ margin: '15px', minHeight: 400 }}>
+                <Box sx={{ minHeight: 400 }}>
                     <TableContainer component={Paper}>
                         <Table sx={{ minWidth: 650 }} aria-label="simple table">
                             <TableHead>
@@ -283,30 +273,9 @@ function MyForms() {
                     </TableContainer>
                 </Box>
 
-                <Divider />
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'end' }}>
-                    <Typography>
-                        Số lượng/Trang:
-                    </Typography>
-                    <FormControl sx={{ m: 2, minWidth: 120 }} size="small">
-                        <InputLabel id="demo-select-small-label">Số lượng</InputLabel>
-                        <Select
-                            labelId="demo-select-small-label"
-                            id="demo-select-small"
-                            value={itemsPerPage}
-                            label="ItemsPerPage"
-                            onChange={handleChange}
-                        >
-                            <MenuItem value="">
-                                <em>None</em>
-                            </MenuItem>
-                            <MenuItem value={5}>5</MenuItem>
-                            <MenuItem value={10}>10</MenuItem>
-                            <MenuItem value={15}>15</MenuItem>
-                        </Select>
-                    </FormControl>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'end', m: 2 }}>
                     <Stack spacing={2}>
-                        <Pagination count={10} color="primary" />
+                        <Pagination count={5} page={currentPage} onChange={handleChangePagination} color="primary" />
                     </Stack>
                 </Box>
             </Box>
