@@ -368,6 +368,12 @@ export function MainModal(props) {
     // Thêm option trống 
     const handleOption = () => props.setOptionList([...props.optionList, ''])
 
+    const deleteOption = (index: number) => (e) => {
+        const newArray = [...props.optionList];
+        newArray.splice(index, 1);
+        props.setOptionList([...newArray]);
+    }
+
     const addColumnTable = () => {
         props.setColumnList([...props.columnList, {
             ColumnName: '',
@@ -617,7 +623,7 @@ export function MainModal(props) {
                                                 variant="standard"
                                             />
                                             <IconButton
-                                                // onClick={deleteQuestion(ques)}
+                                                onClick={deleteOption(index)}
                                                 sx={{
                                                     backgroundColor: '#white',
                                                     color: '#7B7B7B',
