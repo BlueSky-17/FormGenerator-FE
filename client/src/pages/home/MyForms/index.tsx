@@ -56,9 +56,9 @@ function MyForms() {
 
     // Page Pagination
     const [currentPage, setCurrentPage] = React.useState<number | undefined>(1);
-    const handleChangePagination = (event: React.ChangeEvent<unknown>, value: number) => {
+    function handleChangePagination(event: React.ChangeEvent<unknown>, value: number) {
         setCurrentPage(value);
-    };
+    }
 
     //Search Input
     const [keyword, setKeyword] = React.useState("");
@@ -139,7 +139,7 @@ function MyForms() {
     return (
         <Box>
             <DrawerHeader />
-            <Box sx={{ backgroundColor: 'white', border: "2px solid #DEDEDE", paddingTop:'15px' }}>
+            <Box sx={{ backgroundColor: 'white', border: "2px solid #DEDEDE", paddingTop:'5px' }}>
                 <Typography sx={{ color: '#364F6B', padding: '15px', fontWeight: 600 }} variant="h6" noWrap component="div">
                     BIỂU MẪU CỦA TÔI
                 </Typography>
@@ -176,7 +176,7 @@ function MyForms() {
                 </Box>
 
                 <Divider />
-                <Box sx={{ minHeight: 410 }}>
+                <Box sx={{ minHeight: 420 }}>
                     <TableContainer component={Paper}>
                         <Table sx={{ minWidth: 650 }} aria-label="simple table">
                             <TableHead>

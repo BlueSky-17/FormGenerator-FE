@@ -8,13 +8,14 @@ import SignUp from './pages/SignUp';
 import { Route, BrowserRouter, Routes, Navigate } from 'react-router-dom';
 import './App.css';
 import { error } from 'console';
+import Profile from './pages/profile';
 
-  
+
 function App() {
   function setToken(userToken: any) {
     sessionStorage.setItem('token', JSON.stringify(userToken));
   }
-  
+
   function getToken() {
     const tokenString = sessionStorage.getItem('token');
     // if (tokenString) {
@@ -38,7 +39,7 @@ function App() {
     <div className="wrapper">
       <BrowserRouter>
         <Routes>
-        {!token ? (
+          {!token ? (
             <Route
               path="*"
               element={<Navigate to="/signin" />}
@@ -52,9 +53,13 @@ function App() {
               </HomePage>
             }
           />)}
-          <Route path="/signup" element={<SignUp setToken={setToken}/>} />
+          <Route path="/signup" element={<SignUp setToken={setToken} />} />
           <Route path="/signin" element={<SignInSide setToken={setToken} />} />
-          <Route path="/profile"/>
+          <Route path="/profile" element={
+            <HomePage>
+              <Profile />
+            </HomePage>
+          } />
           <Route
             path="/myforms"
             element={
