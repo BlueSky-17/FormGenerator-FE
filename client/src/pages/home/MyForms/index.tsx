@@ -139,7 +139,7 @@ function MyForms() {
     return (
         <Box>
             <DrawerHeader />
-            <Box sx={{ backgroundColor: 'white', border: "2px solid #DEDEDE" }}>
+            <Box sx={{ backgroundColor: 'white', border: "2px solid #DEDEDE", paddingTop:'15px' }}>
                 <Typography sx={{ color: '#364F6B', padding: '15px', fontWeight: 600 }} variant="h6" noWrap component="div">
                     BIỂU MẪU CỦA TÔI
                 </Typography>
@@ -181,12 +181,12 @@ function MyForms() {
                         <Table sx={{ minWidth: 650 }} aria-label="simple table">
                             <TableHead>
                                 <TableRow >
-                                    <TableCell sx={{ padding: 1, paddingLeft: 3, fontWeight: 800, fontSize: '1rem' }} align="left">STT</TableCell>
-                                    <TableCell sx={{ padding: 1, fontWeight: 800, fontSize: '1rem' }} align="left">Người biểu mẫu</TableCell>
-                                    <TableCell sx={{ padding: 1, fontWeight: 800, fontSize: '1rem' }} align="center">Người sở hữu</TableCell>
-                                    <TableCell sx={{ padding: 1, fontWeight: 800, fontSize: '1rem' }} align="center">Phản hồi</TableCell>
-                                    <TableCell sx={{ padding: 1, fontWeight: 800, fontSize: '1rem' }} align="center">Tình trạng</TableCell>
-                                    <TableCell sx={{ padding: 1, fontWeight: 800, fontSize: '1rem' }} align="center">Thao tác</TableCell>
+                                    <TableCell sx={{ padding: 1, width: '5%', paddingLeft: 5, fontWeight: 800, fontSize: '1rem' }} align="left">STT</TableCell>
+                                    <TableCell sx={{ padding: 1, width: '20%', fontWeight: 800, fontSize: '1rem' }} align="left">Người biểu mẫu</TableCell>
+                                    <TableCell sx={{ padding: 1, width: '10%', fontWeight: 800, fontSize: '1rem' }} align="center">Người sở hữu</TableCell>
+                                    <TableCell sx={{ padding: 1, width: '10%', fontWeight: 800, fontSize: '1rem' }} align="center">Phản hồi</TableCell>
+                                    <TableCell sx={{ padding: 1, width: '15%', fontWeight: 800, fontSize: '1rem' }} align="center">Tình trạng</TableCell>
+                                    <TableCell sx={{ padding: 1, width: '15%', fontWeight: 800, fontSize: '1rem' }} align="center">Thao tác</TableCell>
                                 </TableRow >
                             </TableHead>
                             <TableBody>
@@ -195,7 +195,7 @@ function MyForms() {
                                         key={index}
                                         sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                     >
-                                        <TableCell sx={{ padding: 1, paddingLeft: 3, fontWeight: 500, fontSize: '1.05rem' }} component="th" scope="row" align="left">
+                                        <TableCell sx={{ padding: 1, paddingLeft: 5, fontWeight: 500, fontSize: '1.05rem' }} component="th" scope="row" align="left">
                                             {index + 1}
                                         </TableCell>
                                         <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="left">{form.name}</TableCell>

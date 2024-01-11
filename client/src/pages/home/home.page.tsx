@@ -231,7 +231,7 @@ function HomePage({ children }: LayoutProps) {
                 </Box>
             </Drawer >
 
-            <Main sx={{ backgroundColor: '#EBEBEB', height: '100vh' }} open={open}>
+            <Main sx={{ backgroundColor: '#EBEBEB' }} open={open}>
                 {children}
             </Main>
         </Box >

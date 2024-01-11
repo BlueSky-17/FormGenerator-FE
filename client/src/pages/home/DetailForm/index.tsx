@@ -468,7 +468,7 @@ function DetailForm() {
         else if (formDetail.Questions[ques].Type === "date-single" || formDetail.Questions[ques].Type === 'date-range') {
             setDateNum(formDetail.Questions[ques].Content.Date)
         }
-        else if (formDetail.Questions[ques].Type === "table"){
+        else if (formDetail.Questions[ques].Type === "table") {
             setColumnList(formDetail.Questions[ques].Content.Table.ListOfColumn)
         }
 
@@ -520,7 +520,6 @@ function DetailForm() {
                             color: '#364F6B',
                             backgroundColor: 'white',
                             margin: '5px',
-                            marginY: '15px',
                         }}>
                         <SettingsIcon />
                     </IconButton>
@@ -559,6 +558,13 @@ function DetailForm() {
                         }
                     </Popover>
                 </Box>
+
+                <Divider />
+
+                {/* Form Description */}
+                <Typography sx={{ marginY: '10px', paddingLeft: '12px', }} variant='body1' component="div">
+                    {Object.keys(formDetail).length !== 0 ? formDetail.header.Description : null}
+                </Typography>
 
                 <Divider />
 
@@ -610,18 +616,12 @@ function DetailForm() {
 
                 {/* Body of Form */}
                 {typeView === 'ViewEdit' &&
-                    <Box sx={{ margin: '15px' }}>
-
-                        {/* Form Description */}
-                        <Typography sx={{ marginBottom: '10px' }} variant='body1' component="div">
-                            {Object.keys(formDetail).length !== 0 ? formDetail.header.Description : null}
-                        </Typography>
-
+                    <Box>
                         <TableContainer component={Paper} sx={{ marginTop: '10px', height: '50vh', overflowY: 'scroll' }}>
                             <Table sx={{ minWidth: 650 }} aria-label="simple table">
                                 <TableHead>
                                     <TableRow>
-                                        <TableCell sx={{ padding: 1, fontWeight: 800, fontSize: '1rem' }} align="left">STT</TableCell>
+                                        <TableCell sx={{ padding: 1, paddingLeft: 5, fontWeight: 800, fontSize: '1rem' }} align="left">STT</TableCell>
                                         <TableCell sx={{ padding: 1, fontWeight: 800, fontSize: '1rem' }} align="left">Tiêu đề</TableCell>
                                         <TableCell sx={{ padding: 1, fontWeight: 800, fontSize: '1rem' }} align="left">Dạng</TableCell>
                                         <TableCell sx={{ padding: 1, fontWeight: 800, fontSize: '1rem' }} align="left">Ghi chú</TableCell>
@@ -634,7 +634,7 @@ function DetailForm() {
                                             key={index}
                                             sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                         >
-                                            <TableCell sx={{ padding: 1, fontWeight: 500, fontSize: '1.05rem' }} component="th" scope="row" align="left">
+                                            <TableCell sx={{ padding: 1, paddingLeft: 5, fontWeight: 500, fontSize: '1.05rem' }} component="th" scope="row" align="left">
                                                 {index + 1}
                                             </TableCell>
                                             <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="left">{formDetail.Questions[ques].Question}</TableCell>
