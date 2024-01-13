@@ -33,6 +33,7 @@ import Alert, { AlertProps } from '@mui/material/Alert';
 
 import { Question, ShortText, MultiChoice, Date, LinkedData, File, Table } from './interface';
 import * as XLSX from 'xlsx'
+import { LensBlur } from '@mui/icons-material';
 
 // Style cho modal edit
 const style = {
@@ -83,6 +84,40 @@ export function MainModal(props) {
             }
 
             const dataFromServer = await response.json();
+            // Xử lý dữ liệu từ máy chủ (nếu cần)
+        } catch (error) {
+            console.error('Lỗi khi gửi yêu cầu:', error);
+        }
+    };
+
+    //API to get type of a question by Random Forest
+    const getType = async (sentence) => {
+        const API_URL: string = `http://localhost:5000/predict`;
+        const sentenceJson = {
+            sentence: sentence
+        };
+        let label: any;
+    
+        try {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(sentenceJson)
+            });
+    
+    
+            if (!response.ok) {
+                throw new Error(`HTTP Error! Status: ${response.status}`);
+            }
+    
+            const data = await response.json();
+            label = data.label[0];
+            console.log('Label:', label);
+
+            changeType(label);
+    
             // Xử lý dữ liệu từ máy chủ (nếu cần)
         } catch (error) {
             console.error('Lỗi khi gửi yêu cầu:', error);
@@ -487,7 +522,39 @@ export function MainModal(props) {
     };
     const [typeError, setTypeError] = useState<string>(''); //Display error when upload invalid file
 
-    console.log(props.formDetail)
+    //Recommend type
+    const recommendType = (event) => {
+        if (event.key === 'Enter') {
+            getType(props.titleQuestion)
+        }
+    };
+
+    const changeType = (label) =>  {
+        if(label == '0') {
+            props.setType('shortText')
+        }
+        else if (label == '1') {
+            props.setType('multi-choice')
+        }
+        else if (label == '2') {
+            props.setType('checkbox')
+        }
+        else if (label == '3') {
+            props.setType('table')
+        }
+        else if (label == '4') {
+            props.setType('linkedData')
+        }
+        else if (label == '5') {
+            props.setType('date-single')
+        }
+        else if (label == '6') {
+            props.setType('file')
+        }
+    }
+
+
+    // console.log(props.formDetail)
 
     return (
         <div>
@@ -511,6 +578,7 @@ export function MainModal(props) {
                             id="outlined-basic"
                             variant="outlined"
                             placeholder='Nhập nội dung câu hỏi...'
+                            onKeyDown={recommendType}
                         />
                         <FormControl fullWidth>
                             <InputLabel id="demo-simple-select-label">Dạng</InputLabel>
