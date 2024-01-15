@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable no-loop-func */
 import React, { useState, useEffect } from 'react'
 import { Box, Typography, Drawer, Avatar, IconButton, Toolbar, List, Divider, Icon, Grid } from '@mui/material'
@@ -40,7 +41,7 @@ import { Response, ResultMultiChoice, ResultShortText, ResultDate, ResultLinkedD
 
 // APIs
 import { deleteFile, uploadFileToS3 } from '../../apis/file';
-import { addResponsetoDatabase } from '../../apis/responses';
+// import { addResponsetoDatabase } from '../../apis/responses';
 
 function Form() {
     // render: use to re-render after create or delete form
@@ -50,6 +51,30 @@ function Form() {
     const [formResponses, setFormResponse] = useState<any[]>([])
 
     const FormDetailAPI_URL = `http://localhost:8080/form/${useParams()?.formID}`;
+
+    const ResponsesAPI_URL = `http://localhost:8080/form-response/${useParams()?.formID}`
+
+    const addResponsetoDatabase = async (data) => {
+        try {
+            const response = await fetch(ResponsesAPI_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + JSON.parse(sessionStorage.getItem('token') as string)?.accessToken
+                },
+                body: JSON.stringify(data)
+            });
+    
+            if (!response.ok) {
+                throw new Error(`HTTP Error! Status: ${response.status}`);
+            }
+    
+            const dataFromServer = await response.json();
+            // Xử lý dữ liệu từ máy chủ (nếu cần)
+        } catch (error) {
+            console.error('Lỗi khi gửi yêu cầu:', error);
+        }
+    };
 
     useEffect(() => {
         fetch(FormDetailAPI_URL, {
@@ -64,6 +89,81 @@ function Form() {
                 setFormDetail(formDetail);
             })
     }, [])
+
+    const handleSubmitForm = async () => {
+        let checkRequired = true;
+        let checkFromTo = true;
+
+        formResponses.forEach(async item => {
+            if (item.required === true) {
+                if (item.type === 'multi-choice' || item.type === 'checkbox' || item.type === 'dropdown') {
+                    //Check required
+                    //some function: has >=1 true value => true; has no true value => false
+                    let checkSelect = item.content.multiChoice.result.some((giaTri) => giaTri === true);
+                    if (!checkSelect) {
+                        checkRequired = false;
+                        item.error = 'Vui lòng hoàn thành những câu hỏi bắt buộc';
+                    }
+                    else {
+                        item.error = '';
+                    }
+                }
+                else if (item.type === 'shortText') {
+                    if (item.content.shortText === '') {
+                        checkRequired = false;
+                        item.error = 'Vui lòng hoàn thành những câu hỏi bắt buộc';
+                    }
+                    else {
+                        item.error = '';
+                    }
+                }
+                else if (item.type === 'file') {
+                    if (item.content.files.length === 0) {
+                        checkRequired = false;
+                        item.error = 'Vui lòng hoàn thành những câu hỏi bắt buộc';
+                    }
+                    else {
+                        item.error = '';
+                    }
+                }
+                else if (item.type === 'date-range') {
+                    if (item.content.files.length === 0) {
+                        checkRequired = false;
+                        item.error = 'Vui lòng hoàn thành những câu hỏi bắt buộc';
+                    }
+                    else {
+                        item.error = '';
+                    }
+                }
+            }
+
+            if (item.type === 'date-range' && item.error !== '') {
+                checkFromTo = false;
+            }
+        });
+
+        console.log(formResponses)
+
+        //Success: Fill correctly required questions 
+        if (checkRequired && checkFromTo) {
+            console.log(formResponses);
+            await addResponsetoDatabase({
+                "id": "6526518a6b149bcb2510172f",
+                "formID": "651dbc9d49502243191371e3",
+                "username": formDetail.owner,
+                "userID": formDetail.owner,
+                "submitTime": "2023-10-11T07:40:58.1078101Z",
+                "responses": formResponses
+            });
+            setSubmit(true)
+            setHeight('100vh')
+        }
+        //Failed: Not fill required questions
+        else if (!checkRequired) {
+            setSubmit(false)
+            setRender(!render)
+        }
+    }
 
     const handleDeleteFile = (fileName: any, ques: number, index: number) => (e) => {
         //Call API to delete file (in aws s3)
@@ -442,80 +542,6 @@ function Form() {
 
     //Handle submit form
     const [submit, setSubmit] = useState<boolean>();
-    const handleSubmitForm = async () => {
-        let checkRequired = true;
-        let checkFromTo = true;
-
-        formResponses.forEach(async item => {
-            if (item.required === true) {
-                if (item.type === 'multi-choice' || item.type === 'checkbox' || item.type === 'dropdown') {
-                    //Check required
-                    //some function: has >=1 true value => true; has no true value => false
-                    let checkSelect = item.content.multiChoice.result.some((giaTri) => giaTri === true);
-                    if (!checkSelect) {
-                        checkRequired = false;
-                        item.error = 'Vui lòng hoàn thành những câu hỏi bắt buộc';
-                    }
-                    else {
-                        item.error = '';
-                    }
-                }
-                else if (item.type === 'shortText') {
-                    if (item.content.shortText === '') {
-                        checkRequired = false;
-                        item.error = 'Vui lòng hoàn thành những câu hỏi bắt buộc';
-                    }
-                    else {
-                        item.error = '';
-                    }
-                }
-                else if (item.type === 'file') {
-                    if (item.content.files.length === 0) {
-                        checkRequired = false;
-                        item.error = 'Vui lòng hoàn thành những câu hỏi bắt buộc';
-                    }
-                    else {
-                        item.error = '';
-                    }
-                }
-                else if (item.type === 'date-range') {
-                    if (item.content.files.length === 0) {
-                        checkRequired = false;
-                        item.error = 'Vui lòng hoàn thành những câu hỏi bắt buộc';
-                    }
-                    else {
-                        item.error = '';
-                    }
-                }
-            }
-
-            if (item.type === 'date-range' && item.error !== '') {
-                checkFromTo = false;
-            }
-        });
-
-        console.log(formResponses)
-
-        //Success: Fill correctly required questions 
-        if (checkRequired && checkFromTo) {
-            console.log(formResponses);
-            await addResponsetoDatabase({
-                "id": "6526518a6b149bcb2510172f",
-                "formID": "651dbc9d49502243191371e3",
-                "username": formDetail.owner,
-                "userID": formDetail.owner,
-                "submitTime": "2023-10-11T07:40:58.1078101Z",
-                "responses": formResponses
-            });
-            setSubmit(true)
-            setHeight('100vh')
-        }
-        //Failed: Not fill required questions
-        else if (!checkRequired) {
-            setSubmit(false)
-            setRender(!render)
-        }
-    }
 
     const handleFileChange = (ques: number) => async (e) => {
         let selectedFile = e.target.files[0]
