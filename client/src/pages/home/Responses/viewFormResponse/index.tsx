@@ -549,38 +549,52 @@ const handleThirdFieldChange = (ques: number) => (e) => {
                           )}
                         </Grid>
                       ) : null}
-                      {formDetail.Questions[ques].Type === "table" ? (
+                      {formDetail.Questions[ques].Type === 'table' && (
                         <TableContainer component={Paper}>
                           <Table aria-label="simple table">
                             <TableHead>
                               <TableRow>
-                                {formDetail.Questions[
-                                  ques
-                                ].Content.Table.ListOfColumn.map((item) => (
-                                  <TableCell align="left">
+                                {formDetail.Questions[ques].Content.Table.ListOfColumn.map((item) => (
+                                  <TableCell key={item.ColumnName} align="left" sx={{ width: `${100 / formDetail.Questions[ques].Content.Table.ListOfColumn.length}%` }}>
                                     {item.ColumnName}
                                   </TableCell>
                                 ))}
                               </TableRow>
                             </TableHead>
                             <TableBody>
-                              {[1, 2, 3].map((row) => (
-                                <TableRow
-                                  key={row}
-                                  sx={{
-                                    "&:last-child td, &:last-child th": {
-                                      border: 0,
-                                    },
-                                  }}
-                                >
-                                  {/* <TableCell component="th" scope="row">
-                                                                {row.name}
-                                                            </TableCell> */}
-                                  {formDetail.Questions[
-                                    ques
-                                  ].Content.Table.ListOfColumn.map((item) => (
-                                    <TableCell align="left">
-                                      <TextField size="small"></TextField>
+                              {formResponses[ques].Content.Table.ListOfColumn[0].Content.map((row, rowIndex) => (
+                                <TableRow key={rowIndex} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                                  {formDetail.Questions[ques].Content.Table.ListOfColumn.map((item, colIndex) => (
+                                    <TableCell key={colIndex} align="left">
+                                      {item.Type === 'shortText' ? (
+                                        <TextField
+                                          value={formResponses[ques].Content.Table.ListOfColumn[colIndex].Content[rowIndex].ShortText}
+                                          disabled
+                                          fullWidth
+                                        />
+                                      ) : null}
+                                      {item.Type === 'dropdown' ? (
+                                        <FormControl fullWidth>
+                                          <Select
+                                            value={formResponses[ques].Content.Table.ListOfColumn[colIndex].Content[rowIndex].MultiChoice.Options.findIndex(
+                                              (option, index) => formResponses[ques].Content.Table.ListOfColumn[colIndex].Content[rowIndex].MultiChoice.Result[index] === true
+                                            )}
+                                            disabled
+                                          >
+                                            {formResponses[ques].Content.Table.ListOfColumn[colIndex].Content[rowIndex].MultiChoice.Options.map((option, index) => (
+                                              <MenuItem key={index} value={index} disabled={!formResponses[ques].Content.Table.ListOfColumn[colIndex].Content[rowIndex].MultiChoice.Result[index]}>
+                                                {option}
+                                              </MenuItem>
+                                            ))}
+                                          </Select>
+                                        </FormControl>
+                                      ) : null}
+
+                                      {item.Type === 'date-single' ? (
+                                        <Box>
+                                          {/* Display date information here */}
+                                        </Box>
+                                      ) : null}
                                     </TableCell>
                                   ))}
                                 </TableRow>
@@ -588,7 +602,7 @@ const handleThirdFieldChange = (ques: number) => (e) => {
                             </TableBody>
                           </Table>
                         </TableContainer>
-                      ) : null}
+                      )}              
                     </Box>
                   </Box>
                 ))
