@@ -25,21 +25,6 @@ function Summary(props) {
 
     let questionLength: number = props.responses.length > 0 ? props.responses[0].Responses.length : 0;
 
-    // const [viewMode, setViewMode] = useState<string[]>(Array.from({ length: questionLength }, () => 'chart'));
-    // const viewChartOrListHandle = (index: number) => {
-    //     setViewMode((prevViewMode) => {
-    //         let updatedViewMode
-    //         if (prevViewMode.length === 0) {
-    //             updatedViewMode = new Array(questionLength).fill('chart')
-    //         }
-    //         else{
-    //             updatedViewMode = [...prevViewMode]
-    //         }
-    //         updatedViewMode[index] = updatedViewMode[index] === 'chart' ? 'list' : 'chart'
-    
-    //         return updatedViewMode
-    //     });
-    // };
 
     const handleMultiChoiceStatics = (responses: Answer[]) => {
         
@@ -113,23 +98,9 @@ function Summary(props) {
         <Box>
             {props.responses.length > 0
                 ? props.responses[0].Responses.map((res, index) => (
-                      <Box key={index} sx={{ backgroundColor: 'white', borderRadius: '15px', marginTop: '15px', paddingBottom: '5px' }}>
-                          {/* {res.Type === 'shortText' ? (
-                              <Box sx={{ marginBottom: '15px'}}>
-                                  <Typography sx={{ color: '#364F6B', padding: '20px', fontWeight: 500 }} variant="h5" noWrap component="div">
-                                      {res.QuestionName}
-                                  </Typography>
-                                  <Box sx={{maxHeight: props.responses.length > 6 ? '300px' : 'auto', overflowY: 'auto'}}>
-                                  {props.responses.map((ans, idx) => (
-                                      <Box key={idx} sx={{ minHeight:'44px', backgroundColor: '#EBEBEB', borderRadius: '5px', paddingLeft: '20px', paddingTop: '10px', paddingRight: '20px', marginX: '15px', marginBottom: '5px'}}>
-                                          {ans.Responses[index].Content.ShortText}
-                                      </Box>
-                                  ))}
-                                  </Box>
-                                  
-                              </Box>
-                          ) : null} */}
+                      <Box>
                           {(res.Type === 'multi-choice' || res.Type === 'checkbox' || res.Type === 'dropdown') ? (
+                            <Box key={index} sx={{ backgroundColor: 'white', borderRadius: '15px', marginTop: '15px', paddingBottom: '5px' }}>
                               <Box sx={{ marginBottom: '15px' }}>
                                 { 
                                   <Box>
@@ -195,6 +166,7 @@ function Summary(props) {
 
                                   
                               </Box>
+                            </Box>
                           ) : null}
                       </Box>
                   ))
