@@ -97,7 +97,7 @@ export function MainModal(props) {
             sentence: sentence
         };
         let label: any;
-    
+
         try {
             const response = await fetch(API_URL, {
                 method: 'POST',
@@ -106,18 +106,18 @@ export function MainModal(props) {
                 },
                 body: JSON.stringify(sentenceJson)
             });
-    
-    
+
+
             if (!response.ok) {
                 throw new Error(`HTTP Error! Status: ${response.status}`);
             }
-    
+
             const data = await response.json();
             label = data.label[0];
             console.log('Label:', label);
 
             changeType(label);
-    
+
             // Xử lý dữ liệu từ máy chủ (nếu cần)
         } catch (error) {
             console.error('Lỗi khi gửi yêu cầu:', error);
@@ -529,8 +529,8 @@ export function MainModal(props) {
         }
     };
 
-    const changeType = (label) =>  {
-        if(label == '0') {
+    const changeType = (label) => {
+        if (label == '0') {
             props.setType('shortText')
         }
         else if (label == '1') {
@@ -826,8 +826,25 @@ export function MainModal(props) {
                         : null
                     }
                     {props.type === 'linkedData' ?
-                        <Box>
-                            <Box sx={{ color: '#6D7073', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <Box sx={{display:'flex', flexDirection:'column'}}>
+                            <Button fullWidth href={'https://lvtn-db.s3.ap-southeast-1.amazonaws.com/sample_file.xlsx'}
+                                sx={{
+                                    color: '#737373',
+                                    padding: '10px',
+                                    marginBottom: '5px',
+                                    background: '#E9F2F4',
+                                    borderRadius: '20px',
+                                    textOverflow: 'ellipsis',
+                                    textAlign: 'left',
+                                    textTransform: 'initial',
+                                    '&:hover': {
+                                        backgroundColor: '#E9F2F4',
+                                        color: '#737373'
+                                    },
+                                }}>
+                                Tải file mẫu
+                            </Button>
+                            <Box sx={{ color: '#6D7073', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop:'5px' }}>
                                 <Box sx={{ color: '#6D7073', display: 'flex', alignItems: 'center', flexDirection: 'row' }}>
                                     <Typography>Nhập</Typography>
                                     <Button

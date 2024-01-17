@@ -200,7 +200,7 @@ function MyForms() {
                                         </TableCell>
                                         <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="left">{form.name}</TableCell>
                                         <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="center">
-                                            {form.owner === JSON.parse(sessionStorage.getItem('token') as string)?.user.ID ? 'tôi' : null}
+                                            {form.owner === JSON.parse(sessionStorage.getItem('token') as string)?.user.ID ? 'tôi' : 'tôi'}
                                         </TableCell>
                                         <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="center">{form.AnswersCounter}</TableCell>
                                         <TableCell sx={{ padding: 1 }} align="center">
