@@ -597,11 +597,7 @@ const handleThirdFieldChange = (ques: number) => (e) => {
                                               <DatePicker
                                                 label={'Ngày - Tháng - Năm'}
                                                 views={['year', 'month', 'day']}
-                                                value={
-                                                  formResponses[ques].Content.Table.ListOfColumn[colIndex].Content[rowIndex].Date.Single.Time
-                                                    ? new Date(formResponses[ques].Content.Table.ListOfColumn[colIndex].Content[rowIndex].Date.Single.Time)
-                                                    : null
-                                                }
+                                                value={dayjs(formResponses[ques].Content.Table.ListOfColumn[colIndex].Content[rowIndex].Date.Single.Time)}
                                                 disabled
                                               />
                                             </LocalizationProvider>
@@ -611,11 +607,7 @@ const handleThirdFieldChange = (ques: number) => (e) => {
                                               <DatePicker
                                                 label={'Tháng - Năm'}
                                                 views={['year', 'month']}
-                                                value={
-                                                  formResponses[ques].Content.Table.ListOfColumn[colIndex].Content[rowIndex].Date.Single.Time
-                                                    ? new Date(formResponses[ques].Content.Table.ListOfColumn[colIndex].Content[rowIndex].Date.Single.Time)
-                                                    : null
-                                                }
+                                                value={dayjs(formResponses[ques].Content.Table.ListOfColumn[colIndex].Content[rowIndex].Date.Single.Time)}
                                                 disabled
                                               />
                                             </LocalizationProvider>
@@ -625,11 +617,7 @@ const handleThirdFieldChange = (ques: number) => (e) => {
                                               <DatePicker
                                                 label={'Năm'}
                                                 views={['year']}
-                                                value={
-                                                  formResponses[ques].Content.Table.ListOfColumn[colIndex].Content[rowIndex].Date.Single.Time
-                                                    ? new Date(formResponses[ques].Content.Table.ListOfColumn[colIndex].Content[rowIndex].Date.Single.Time)
-                                                    : null
-                                                }
+                                                value={dayjs(formResponses[ques].Content.Table.ListOfColumn[colIndex].Content[rowIndex].Date.Single.Time)}
                                                 disabled
                                               />
                                             </LocalizationProvider>
@@ -639,11 +627,7 @@ const handleThirdFieldChange = (ques: number) => (e) => {
                                               <DemoContainer components={['TimePicker']}>
                                                 <TimePicker
                                                   label="Chọn giờ"
-                                                  value={
-                                                    formResponses[ques].Content.Table.ListOfColumn[colIndex].Content[rowIndex].Date.Single.Time
-                                                      ? new Date(formResponses[ques].Content.Table.ListOfColumn[colIndex].Content[rowIndex].Date.Single.Time)
-                                                      : null
-                                                  }
+                                                  value={dayjs(formResponses[ques].Content.Table.ListOfColumn[colIndex].Content[rowIndex].Date.Single.Time)}
                                                   disabled
                                                 />
                                               </DemoContainer>
