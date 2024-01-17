@@ -1098,7 +1098,7 @@ function Form() {
                                                                         </FormControl> : null}
                                                                     {item.Type === 'date-single' ? (
                                                                         <Box>
-                                                                            {item.Content.Table.ListOfColumn[colIndex].Content.Date === 1 ? (
+                                                                            {item.Content.Date === 1 ? (
                                                                             <LocalizationProvider dateAdapter={AdapterDayjs}>
                                                                                 <DatePicker
                                                                                 label={'Ngày - Tháng - Năm'}
@@ -1112,7 +1112,7 @@ function Form() {
                                                                                 />
                                                                             </LocalizationProvider>
                                                                             ) : null}
-                                                                            {item.Content.Table.ListOfColumn[colIndex].Content.Date === 2 ? (
+                                                                            {item.Content.Date === 2 ? (
                                                                             <LocalizationProvider dateAdapter={AdapterDayjs}>
                                                                                 <DatePicker
                                                                                 label={'Tháng - Năm'}
@@ -1126,7 +1126,7 @@ function Form() {
                                                                                 />
                                                                             </LocalizationProvider>
                                                                             ) : null}
-                                                                            {item.Content.Table.ListOfColumn[colIndex].Content.Date === 3 ? (
+                                                                            {item.Content.Date === 3 ? (
                                                                             <LocalizationProvider dateAdapter={AdapterDayjs}>
                                                                                 <DatePicker
                                                                                 label={'Năm'}
@@ -1140,7 +1140,7 @@ function Form() {
                                                                                 />
                                                                             </LocalizationProvider>
                                                                             ) : null}
-                                                                            {item.Content.Table.ListOfColumn[colIndex].Content.Date === 4 ? (
+                                                                            {item.Content.Date === 4 ? (
                                                                             <LocalizationProvider dateAdapter={AdapterDayjs}>
                                                                                 <DemoContainer components={['TimePicker']}>
                                                                                 <TimePicker
