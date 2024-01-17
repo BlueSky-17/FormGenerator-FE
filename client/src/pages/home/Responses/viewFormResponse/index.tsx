@@ -592,9 +592,66 @@ const handleThirdFieldChange = (ques: number) => (e) => {
 
                                       {item.Type === 'date-single' ? (
                                         <Box>
-                                          {/* Display date information here */}
+                                          {item.Content.Date === 1 ? (
+                                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                              <DatePicker
+                                                label={'Ngày - Tháng - Năm'}
+                                                views={['year', 'month', 'day']}
+                                                value={
+                                                  formResponses[ques].Content.Table.ListOfColumn[colIndex].Content[rowIndex].Date.Single.Time
+                                                    ? new Date(formResponses[ques].Content.Table.ListOfColumn[colIndex].Content[rowIndex].Date.Single.Time)
+                                                    : null
+                                                }
+                                                disabled
+                                              />
+                                            </LocalizationProvider>
+                                          ) : null}
+                                          {item.Content.Date === 2 ? (
+                                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                              <DatePicker
+                                                label={'Tháng - Năm'}
+                                                views={['year', 'month']}
+                                                value={
+                                                  formResponses[ques].Content.Table.ListOfColumn[colIndex].Content[rowIndex].Date.Single.Time
+                                                    ? new Date(formResponses[ques].Content.Table.ListOfColumn[colIndex].Content[rowIndex].Date.Single.Time)
+                                                    : null
+                                                }
+                                                disabled
+                                              />
+                                            </LocalizationProvider>
+                                          ) : null}
+                                          {item.Content.Date === 3 ? (
+                                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                              <DatePicker
+                                                label={'Năm'}
+                                                views={['year']}
+                                                value={
+                                                  formResponses[ques].Content.Table.ListOfColumn[colIndex].Content[rowIndex].Date.Single.Time
+                                                    ? new Date(formResponses[ques].Content.Table.ListOfColumn[colIndex].Content[rowIndex].Date.Single.Time)
+                                                    : null
+                                                }
+                                                disabled
+                                              />
+                                            </LocalizationProvider>
+                                          ) : null}
+                                          {item.Content.Date === 4 ? (
+                                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                              <DemoContainer components={['TimePicker']}>
+                                                <TimePicker
+                                                  label="Chọn giờ"
+                                                  value={
+                                                    formResponses[ques].Content.Table.ListOfColumn[colIndex].Content[rowIndex].Date.Single.Time
+                                                      ? new Date(formResponses[ques].Content.Table.ListOfColumn[colIndex].Content[rowIndex].Date.Single.Time)
+                                                      : null
+                                                  }
+                                                  disabled
+                                                />
+                                              </DemoContainer>
+                                            </LocalizationProvider>
+                                          ) : null}
                                         </Box>
                                       ) : null}
+
                                     </TableCell>
                                   ))}
                                 </TableRow>

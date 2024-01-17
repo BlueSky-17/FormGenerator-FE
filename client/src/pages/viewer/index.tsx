@@ -1096,69 +1096,41 @@ function Form() {
                                                                                 ))}
                                                                             </Select>
                                                                         </FormControl> : null}
-                                                                    {item.Type === 'date-single' ? (
+                                                                    {item.Type === 'date-single' ?
                                                                         <Box>
-                                                                            {item.Content.Date === 1 ? (
-                                                                            <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                                                                <DatePicker
-                                                                                label={'Ngày - Tháng - Năm'}
-                                                                                views={['year', 'month', 'day']}
-                                                                                value={
-                                                                                    formResponses[ques].Content.Table.ListOfColumn[colIndex].Content[rowIndex].Date.Single.Time
-                                                                                    ? new Date(formResponses[ques].Content.Table.ListOfColumn[colIndex].Content[rowIndex].Date.Single.Time)
-                                                                                    : null
-                                                                                }
-                                                                                disabled
-                                                                                />
-                                                                            </LocalizationProvider>
-                                                                            ) : null}
-                                                                            {item.Content.Date === 2 ? (
-                                                                            <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                                                                <DatePicker
-                                                                                label={'Tháng - Năm'}
-                                                                                views={['year', 'month']}
-                                                                                value={
-                                                                                    formResponses[ques].Content.Table.ListOfColumn[colIndex].Content[rowIndex].Date.Single.Time
-                                                                                    ? new Date(formResponses[ques].Content.Table.ListOfColumn[colIndex].Content[rowIndex].Date.Single.Time)
-                                                                                    : null
-                                                                                }
-                                                                                disabled
-                                                                                />
-                                                                            </LocalizationProvider>
-                                                                            ) : null}
-                                                                            {item.Content.Date === 3 ? (
-                                                                            <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                                                                <DatePicker
-                                                                                label={'Năm'}
-                                                                                views={['year']}
-                                                                                value={
-                                                                                    formResponses[ques].Content.Table.ListOfColumn[colIndex].Content[rowIndex].Date.Single.Time
-                                                                                    ? new Date(formResponses[ques].Content.Table.ListOfColumn[colIndex].Content[rowIndex].Date.Single.Time)
-                                                                                    : null
-                                                                                }
-                                                                                disabled
-                                                                                />
-                                                                            </LocalizationProvider>
-                                                                            ) : null}
-                                                                            {item.Content.Date === 4 ? (
-                                                                            <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                                                                <DemoContainer components={['TimePicker']}>
-                                                                                <TimePicker
-                                                                                    label="Chọn giờ"
-                                                                                    value={
-                                                                                    formResponses[ques].Content.Table.ListOfColumn[colIndex].Content[rowIndex].Date.Single.Time
-                                                                                        ? new Date(formResponses[ques].Content.Table.ListOfColumn[colIndex].Content[rowIndex].Date.Single.Time)
-                                                                                        : null
-                                                                                    }
-                                                                                    disabled
-                                                                                />
-                                                                                </DemoContainer>
-                                                                            </LocalizationProvider>
-                                                                            ) : null}
-                                                                        </Box>
-                                                                        ) : null}
-
-
+                                                                            {item.Content.Date === 1 ?
+                                                                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                                                                    <DatePicker label={'Ngày - Tháng - Năm'}
+                                                                                        views={['year', 'month', 'day']}
+                                                                                        onChange={handleChangeDateTable(ques, rowIndex, colIndex)} />
+                                                                                </LocalizationProvider> : null
+                                                                            }
+                                                                            {item.Content.Date === 2 ?
+                                                                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                                                                    <DatePicker label={'Tháng - Năm'}
+                                                                                        views={['year', 'month']}
+                                                                                        onChange={handleChangeDateTable(ques, rowIndex, colIndex)} />
+                                                                                </LocalizationProvider> : null
+                                                                            }
+                                                                            {item.Content.Date === 3 ?
+                                                                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                                                                    <DatePicker label={'Năm'}
+                                                                                        views={['year']}
+                                                                                        onChange={handleChangeDateTable(ques, rowIndex, colIndex)} />
+                                                                                </LocalizationProvider> : null
+                                                                            }
+                                                                            {item.Content.Date === 4 ?
+                                                                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                                                                    <DemoContainer components={['TimePicker']}>
+                                                                                        <TimePicker
+                                                                                            label="Chọn giờ"
+                                                                                            // value={time}
+                                                                                            onChange={handleChangeDateTable(ques, rowIndex, colIndex)}
+                                                                                        />
+                                                                                    </DemoContainer>
+                                                                                </LocalizationProvider> : null
+                                                                            }
+                                                                        </Box> : null}
                                                                 </TableCell>
                                                             ))}
                                                         </TableRow>
