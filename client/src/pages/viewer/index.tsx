@@ -596,6 +596,7 @@ function Form() {
         setThirdField('');
 
         const secondChoice = formDetail.Questions[ques].Content.LinkedData.ListOfOptions[firstField].Value[e.target.value].Key;
+        console.log(secondChoice);
         formResponses[ques].content.linkedData.push(secondChoice);
     };
 
@@ -603,7 +604,8 @@ function Form() {
     const handleThirdFieldChange = (ques: number) => (e) => {
         setThirdField(e.target.value);
 
-        const thirdChoice = formDetail.Questions[ques].Content.LinkedData.ListOfOptions[firstField].Value[secondField].Value;
+        const thirdChoice = formDetail.Questions[ques].Content.LinkedData.ListOfOptions[firstField].Value[secondField].Value[e.target.value];
+        console.log(thirdChoice);
         formResponses[ques].content.linkedData.push(thirdChoice);
     };
 
@@ -1026,7 +1028,10 @@ function Form() {
                                                                 sx={{ marginTop: '10px' }}
                                                                 onChange={handleThirdFieldChange(ques)}
                                                             >
-                                                                <MenuItem value={formDetail.Questions[ques].Content.LinkedData.ListOfOptions[firstField].Value[secondField].Value}>{formDetail.Questions[ques].Content.LinkedData.ListOfOptions[firstField].Value[secondField].Value}</MenuItem>
+                                                                {formDetail.Questions[ques].Content.LinkedData.ListOfOptions[firstField].Value[secondField].Value.map((obj, idx) => (
+                                                                    <MenuItem key={obj} value={idx} >{obj}</MenuItem>
+                                                                ))}
+                                                                {/* <MenuItem value={formDetail.Questions[ques].Content.LinkedData.ListOfOptions[firstField].Value[secondField].Value}>{formDetail.Questions[ques].Content.LinkedData.ListOfOptions[firstField].Value[secondField].Value}</MenuItem> */}
                                                             </Select>
                                                         </FormControl>
                                                         : null

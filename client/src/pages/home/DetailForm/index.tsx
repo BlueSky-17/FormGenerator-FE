@@ -316,13 +316,20 @@ function DetailForm() {
             return accumulator;
         }, []);
 
+        console.log(uniqueValues3)
 
         uniqueValues3.forEach(item => {
             excelData.forEach(item3 => {
-                if (item3[arr3] === item) tempObject[item3[arr]][item3[arr2]] = item;
+                // console.log(Object.is(tempObject[item3[arr]][item3[arr2]],null))
+                if (item3[arr3] === item && Object.keys(tempObject[item3[arr]][item3[arr2]]).length === 0) tempObject[item3[arr]][item3[arr2]] = [item];
+                else if (item3[arr3] === item && tempObject[item3[arr]][item3[arr2]].length > 0) {
+                    tempObject[item3[arr]][item3[arr2]].push(item);
+                }
             }
             )
         });
+
+        console.log(tempObject)
 
         setMyObject(tempObject);
     }
