@@ -9,6 +9,9 @@ import Tab from '@mui/material/Tab';
 import FormResponse from './viewFormResponse'
 
 function Detail(props) {
+    console.log(props.indexDetail - 1)
+    console.log(props.responses[props.indexDetail - 1])
+
     return (
         <Box>{
             props.responses.length > 0 ?
