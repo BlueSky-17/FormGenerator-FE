@@ -33,6 +33,8 @@ import Responses from '../Responses';
 import { ShortText, MultiChoice, Date } from './interface';
 import EditModal from './editmodal';
 
+import isEqual from 'lodash/isEqual';
+
 const DrawerHeader = styled('div')(({ theme }) => ({
     display: 'flex',
     alignItems: 'center',
@@ -52,6 +54,13 @@ function DetailForm() {
     const UpdateFormAPI_URL = `http://localhost:8080/update-form/${useParams()?.formID}`;
 
     const ResponsesAPI_URL = `http://localhost:8080/get-response/${useParams()?.formID}`;
+
+    const [openEditModal, setOpenEditModal] = useState(false)
+
+    const handleOpenEditModal = () => {
+        setOpenEditModal(true);
+        handleCloseSetting();
+    }
 
     useEffect(() => {
         fetch(FormDetailAPI_URL, {
@@ -502,12 +511,6 @@ function DetailForm() {
         setAnchorEl(null);
     };
     const open_settings = Boolean(anchorEl);
-
-    const [openEditModal, setOpenEditModal] = useState(false)
-
-    const handleOpenEditModal = () => {
-        setOpenEditModal(true);
-    }
 
     return (
         <Box>

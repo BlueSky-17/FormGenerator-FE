@@ -5,6 +5,7 @@ import { Box, Typography, Drawer, Avatar, IconButton, Toolbar, List, Divider, Ic
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import { useParams } from 'react-router-dom';
+import { UndoRounded } from '@mui/icons-material';
 
 // Style cho modal edit
 const style = {
@@ -21,8 +22,18 @@ const style = {
 };
 
 export function EditModal(props) {
-    const [name, setName] = useState('');
+
+    const [name, setName] = useState<string>('');
     const [description, setDescription] = useState('');
+
+    //get init value of name & description form (avoid undefined)
+    useEffect(() => {
+        if (props.formDetail.name) {
+            setName(props.formDetail.name);
+            setDescription(props.formDetail.header.Description)
+        }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      }, [props.formDetail.name]);
 
     const handleName = (e) => {
         setName(e.target.value);

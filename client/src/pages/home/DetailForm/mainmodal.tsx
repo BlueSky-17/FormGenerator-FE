@@ -553,7 +553,6 @@ export function MainModal(props) {
         }
     }
 
-
     // console.log(props.formDetail)
 
     return (
