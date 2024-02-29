@@ -37,6 +37,8 @@ import { LensBlur } from '@mui/icons-material';
 import AcceptButton from '../../../components/acceptButton';
 import CancelButton from '../../../components/cancelButton';
 
+import { typeOfFile, myRecordType } from '../../../constants/typeOfFile';
+
 // Style cho modal edit
 const style = {
     position: 'fixed',
@@ -49,21 +51,6 @@ const style = {
     borderRadius: '15px',
     boxShadow: 24,
     p: 4,
-};
-
-const typeOfFile = ['Tài liệu', 'Bảng tính', 'PDF', 'Hình ảnh', 'Video'];
-
-const myRecordType: Record<string, string> = {
-    //Đuôi docx
-    "Tài liệu": 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    //Đuôi .xlsx
-    "Bảng tính": 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    //Đuôi .pdf
-    "PDF": 'application/pdf',
-    //Đuối .png và .jpg
-    "Hình ảnh": 'image/png',
-    //Đuôi .mp4
-    "Video": 'video/mp4',
 };
 
 export function MainModal(props) {

@@ -20,7 +20,6 @@ import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown';
 import ArrowCircleUpIcon from '@mui/icons-material/ArrowCircleUp';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SettingsIcon from '@mui/icons-material/Settings';
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { useParams } from 'react-router-dom';
@@ -33,8 +32,8 @@ import Responses from '../Responses';
 import { ShortText, MultiChoice, Date } from './interface';
 import EditModal from './editmodal';
 
-import isEqual from 'lodash/isEqual';
 import CircleButton from '../../../components/circleButton';
+import AcceptButton from '../../../components/acceptButton';
 
 const DrawerHeader = styled('div')(({ theme }) => ({
     display: 'flex',
@@ -654,7 +653,7 @@ function DetailForm() {
                                             <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="center">
                                                 <CircleButton tooltip='Chỉnh sửa' onClick={editQuestion(ques, index)} children={<EditIcon />} />
                                                 <CircleButton tooltip='Sao chép' onClick={handleDuplicate(ques, index)} children={<ContentCopyIcon />} />
-                                                <CircleButton tooltip='Di chuyển lên' onClick={handleSwapUp(ques, index)} children={ <ArrowCircleUpIcon />} />
+                                                <CircleButton tooltip='Di chuyển lên' onClick={handleSwapUp(ques, index)} children={<ArrowCircleUpIcon />} />
                                                 <CircleButton tooltip='Di chuyển xuống' onClick={handleSwapDown(ques, index)} children={<ArrowCircleDownIcon />} />
                                                 <CircleButton tooltip='Xóa' onClick={confirmDeleteQuestion(ques)} children={<DeleteIcon />} />
                                             </TableCell>
@@ -666,21 +665,7 @@ function DetailForm() {
                         </TableContainer>
 
                         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <Button
-                                onClick={handleOpen}
-                                sx={{
-                                    color: 'white',
-                                    backgroundColor: '#364F6B',
-                                    borderRadius: '15px',
-                                    paddingX: '15px',
-                                    margin: '15px',
-                                    '&:hover': {
-                                        backgroundColor: '#2E4155', // Màu nền thay đổi khi hover
-                                    },
-                                }}>
-                                <AddCircleOutlineIcon sx={{ marginRight: '8px' }} />
-                                Thêm mới
-                            </Button>
+                            <AcceptButton title='Thêm câu hỏi' onClick={handleOpen} style={{marginTop:'15px'}} />
                         </Box>
                     </Box>}
             </Box >

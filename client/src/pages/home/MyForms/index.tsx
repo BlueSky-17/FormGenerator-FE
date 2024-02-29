@@ -199,9 +199,6 @@ function MyForms() {
                                                 <Button sx={{
                                                     backgroundColor: '#176B87',
                                                     margin: '10px',
-                                                    '&:hover': {
-                                                        backgroundColor: '#176B87', // Màu nền thay đổi khi hover
-                                                    },
                                                 }} disabled>
                                                     <Typography sx={{ color: 'white', paddingX: '5px', paddingY: '2px' }} variant="body2" noWrap component="div">
                                                         Đang mở
@@ -211,11 +208,8 @@ function MyForms() {
                                                 <Button sx={{
                                                     backgroundColor: '#FF6969',
                                                     margin: '10px',
-                                                    '&:hover': {
-                                                        backgroundColor: '#FF6969', // Màu nền thay đổi khi hover
-                                                    },
                                                 }} disabled>
-                                                    <Typography sx={{ color: 'white', paddingX: '10px', paddingY: '4px' }} variant="body2" noWrap component="div">
+                                                    <Typography sx={{ color: 'white', paddingX: '5px', paddingY: '2px' }} variant="body2" noWrap component="div">
                                                         Đã đóng
                                                     </Typography>
                                                 </Button>}
