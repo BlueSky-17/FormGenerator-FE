@@ -6,6 +6,8 @@ import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import { useParams } from 'react-router-dom';
 import { UndoRounded } from '@mui/icons-material';
+import AcceptButton from '../../../components/acceptButton';
+import CancelButton from '../../../components/cancelButton';
 
 // Style cho modal edit
 const style = {
@@ -32,8 +34,8 @@ export function EditModal(props) {
             setName(props.formDetail.name);
             setDescription(props.formDetail.header.Description)
         }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      }, [props.formDetail.name]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [props.formDetail.name]);
 
     const handleName = (e) => {
         setName(e.target.value);
@@ -51,7 +53,7 @@ export function EditModal(props) {
             "name": name,
             "header": {
                 "title": name,
-                "description" :description,
+                "description": description,
                 "imagePath": ""
             }
         })
@@ -99,34 +101,8 @@ export function EditModal(props) {
                         </Box>
 
                         <Box sx={{ display: 'flex', flexDirection: 'row-reverse' }} >
-                            <Button
-                                onClick={saveEditModal}
-                                sx={{
-                                    color: 'white',
-                                    backgroundColor: '#364F6B',
-                                    borderRadius: '10px',
-                                    marginY: '10px',
-                                    marginX: '5px',
-                                    '&:hover': {
-                                        backgroundColor: '#2E4155', // Màu nền thay đổi khi hover
-                                    },
-                                }}>
-                                Xác nhận
-                            </Button>
-                            <Button
-                                onClick={closeEditModal}
-                                sx={{
-                                    color: '#000000',
-                                    backgroundColor: '#E7E7E8',
-                                    borderRadius: '10px',
-                                    marginY: '10px',
-                                    marginX: '5px',
-                                    '&:hover': {
-                                        backgroundColor: '#E7E7E7', // Màu nền thay đổi khi hover
-                                    },
-                                }}>
-                                Hủy
-                            </Button>
+                            <AcceptButton title='Xác nhận' onClick={saveEditModal} />
+                            <CancelButton title='Hủy' onClick={closeEditModal} />
                         </Box>
                     </Box>
                 </Box>

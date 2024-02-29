@@ -34,6 +34,8 @@ import Alert, { AlertProps } from '@mui/material/Alert';
 import { Question, ShortText, MultiChoice, Date, LinkedData, File, Table } from './interface';
 import * as XLSX from 'xlsx'
 import { LensBlur } from '@mui/icons-material';
+import AcceptButton from '../../../components/acceptButton';
+import CancelButton from '../../../components/cancelButton';
 
 // Style cho modal edit
 const style = {
@@ -825,7 +827,7 @@ export function MainModal(props) {
                         : null
                     }
                     {props.type === 'linkedData' ?
-                        <Box sx={{display:'flex', flexDirection:'column'}}>
+                        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                             <Button fullWidth href={'https://lvtn-db.s3.ap-southeast-1.amazonaws.com/sample_file.xlsx'}
                                 sx={{
                                     color: '#737373',
@@ -843,7 +845,7 @@ export function MainModal(props) {
                                 }}>
                                 Tải file mẫu
                             </Button>
-                            <Box sx={{ color: '#6D7073', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop:'5px' }}>
+                            <Box sx={{ color: '#6D7073', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '5px' }}>
                                 <Box sx={{ color: '#6D7073', display: 'flex', alignItems: 'center', flexDirection: 'row' }}>
                                     <Typography>Nhập</Typography>
                                     <Button
@@ -1016,48 +1018,12 @@ export function MainModal(props) {
                     }
                     {error && <Alert sx={{ background: 'transparent', p: '0' }} severity="error">Vui lòng điền tiêu đề và lựa chọn dạng câu hỏi</Alert>}
                     <Box sx={{ display: 'flex', flexDirection: 'row-reverse' }} >
-                        {props.quesEdit === -1 ? <Button
-                            onClick={addQuestion}
-                            sx={{
-                                color: 'white',
-                                backgroundColor: '#364F6B',
-                                borderRadius: '10px',
-                                marginY: '10px',
-                                marginX: '5px',
-                                '&:hover': {
-                                    backgroundColor: '#2E4155', // Màu nền thay đổi khi hover
-                                },
-                            }}>
-                            Thêm
-                        </Button> :
-                            <Button
-                                onClick={saveQuestion}
-                                sx={{
-                                    color: 'white',
-                                    backgroundColor: '#364F6B',
-                                    borderRadius: '10px',
-                                    marginY: '10px',
-                                    marginX: '5px',
-                                    '&:hover': {
-                                        backgroundColor: '#2E4155', // Màu nền thay đổi khi hover
-                                    },
-                                }}>
-                                Lưu
-                            </Button>}
-                        <Button
-                            onClick={handleClose}
-                            sx={{
-                                color: '#000000',
-                                backgroundColor: '#E7E7E8',
-                                borderRadius: '10px',
-                                marginY: '10px',
-                                marginX: '5px',
-                                '&:hover': {
-                                    backgroundColor: '#E7E7E7', // Màu nền thay đổi khi hover
-                                },
-                            }}>
-                            Hủy
-                        </Button>
+                        {props.quesEdit === -1 ?
+                            <AcceptButton title='Thêm' onClick={addQuestion} />
+                            :
+                            <AcceptButton title='Lưu' onClick={saveQuestion} />
+                        }
+                        <CancelButton title='Hủy' onClick={handleClose} />
                     </Box>
                 </Box>
             </Modal>

@@ -28,6 +28,8 @@ import { createForm, deleteForm } from '../../../apis/form';
 //component đã được styled
 import { SearchIconWrapper, Search, StyledInputBase } from './searchBar';
 import CircleButton from '../../../components/circleButton';
+import AcceptButton from '../../../components/acceptButton';
+import CancelButton from '../../../components/cancelButton';
 
 const DrawerHeader = styled('div')(({ theme }) => ({
     display: 'flex',
@@ -140,7 +142,7 @@ function MyForms() {
     return (
         <Box>
             <DrawerHeader />
-            <Box sx={{ backgroundColor: 'white', border: "2px solid #DEDEDE", paddingTop:'5px' }}>
+            <Box sx={{ backgroundColor: 'white', border: "2px solid #DEDEDE", paddingTop: '5px' }}>
                 <Typography sx={{ color: '#364F6B', padding: '15px', fontWeight: 600 }} variant="h6" noWrap component="div">
                     BIỂU MẪU CỦA TÔI
                 </Typography>
@@ -161,19 +163,7 @@ function MyForms() {
                     </Search>
                     <Box sx={{ flexGrow: 1 }} />
 
-                    <Button
-                        onClick={openModalAdd}
-                        sx={{
-                            backgroundColor: '#364F6B',
-                            margin: '10px',
-                            '&:hover': {
-                                backgroundColor: '#176B87', // Màu nền thay đổi khi hover
-                            },
-                        }}>
-                        <Typography sx={{ fontWeight: 500, color: 'white', paddingX: '10px', paddingY: '4px' }} variant="body2" noWrap component="div">
-                            Tạo Biểu mẫu
-                        </Typography>
-                    </Button>
+                    <AcceptButton title='Tạo Biểu mẫu' onClick={openModalAdd} />
                 </Box>
 
                 <Divider />
@@ -232,7 +222,7 @@ function MyForms() {
                                         </TableCell>
                                         <TableCell sx={{ padding: 1 }} align="center">
                                             <CircleButton tooltip='Chỉnh sửa' onClick={editForm(form.id, "ViewEdit")} children={<EditIcon />} />
-                                            
+
                                             <CircleButton tooltip='Xem phản hồi' onClick={editForm(form.id, "ViewResponses")} children={<VisibilityIcon />} />
 
                                             <CircleButton tooltip='Xóa biểu mẫu' onClick={openModalDelete(form.id)} children={<DeleteIcon />} />
@@ -291,34 +281,8 @@ function MyForms() {
                                 </Box>
 
                                 <Box sx={{ display: 'flex', flexDirection: 'row-reverse' }} >
-                                    <Button
-                                        onClick={handleCreateForm}
-                                        sx={{
-                                            color: 'white',
-                                            backgroundColor: '#364F6B',
-                                            borderRadius: '10px',
-                                            marginY: '10px',
-                                            marginX: '5px',
-                                            '&:hover': {
-                                                backgroundColor: '#2E4155', // Màu nền thay đổi khi hover
-                                            },
-                                        }}>
-                                        Xác nhận
-                                    </Button>
-                                    <Button
-                                        onClick={handleCloseModal}
-                                        sx={{
-                                            color: '#000000',
-                                            backgroundColor: '#E7E7E8',
-                                            borderRadius: '10px',
-                                            marginY: '10px',
-                                            marginX: '5px',
-                                            '&:hover': {
-                                                backgroundColor: '#E7E7E7', // Màu nền thay đổi khi hover
-                                            },
-                                        }}>
-                                        Hủy
-                                    </Button>
+                                    <AcceptButton title='Xác nhận' onClick={handleCreateForm} />
+                                    <CancelButton title='Hủy' onClick={handleCloseModal} />
                                 </Box>
                             </Box>
                             : null}
@@ -328,34 +292,8 @@ function MyForms() {
                                 <Typography variant='h5'><b>Xác nhận xóa form?</b></Typography>
 
                                 <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'right' }} >
-                                    <Button
-                                        onClick={handleDeleteForm}
-                                        sx={{
-                                            color: 'white',
-                                            backgroundColor: '#364F6B',
-                                            borderRadius: '10px',
-                                            marginY: '10px',
-                                            marginX: '5px',
-                                            '&:hover': {
-                                                backgroundColor: '#2E4155', // Màu nền thay đổi khi hover
-                                            },
-                                        }}>
-                                        Xác nhận
-                                    </Button>
-                                    <Button
-                                        onClick={handleCloseModal}
-                                        sx={{
-                                            color: '#000000',
-                                            backgroundColor: '#E7E7E8',
-                                            borderRadius: '10px',
-                                            marginY: '10px',
-                                            marginX: '5px',
-                                            '&:hover': {
-                                                backgroundColor: '#E7E7E7', // Màu nền thay đổi khi hover
-                                            },
-                                        }}>
-                                        Hủy
-                                    </Button>
+                                    <AcceptButton title='Xác nhận' onClick={handleDeleteForm} />
+                                    <CancelButton title='Hủy' onClick={handleCloseModal} />
                                 </Box>
                             </Box>
                             : null
