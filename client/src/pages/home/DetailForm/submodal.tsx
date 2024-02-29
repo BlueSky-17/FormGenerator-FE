@@ -7,20 +7,7 @@ import TextField from '@mui/material/TextField';
 import CloseIcon from '@mui/icons-material/Close';
 
 import { DataGrid, GridColDef, GridValueGetterParams, GridRowModel, } from '@mui/x-data-grid';
-
-// Style cho modal edit
-const style = {
-    position: 'absolute' as 'absolute',
-    top: '35%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 700,
-    bgcolor: 'background.paper',
-    border: '1px solid #000',
-    borderRadius: '15px',
-    boxShadow: 24,
-    p: 4,
-};
+import { modalStyle } from '../home.page';
 
 export function SubModal(props) {
 
@@ -37,7 +24,7 @@ export function SubModal(props) {
                 aria-labelledby="modal-modal-title"
                 aria-describedby="modal-modal-description"
             >
-                <Box sx={{ ...style }}>
+                <Box sx={{ ...modalStyle }}>
                     {/* multi-choice | checkbox | dropdown  */}
                     {props.subopen === 'multi-choice' ?
                         <Box>

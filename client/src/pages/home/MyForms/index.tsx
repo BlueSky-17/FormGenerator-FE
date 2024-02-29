@@ -27,6 +27,7 @@ import { createForm, deleteForm } from '../../../apis/form';
 
 //component đã được styled
 import { SearchIconWrapper, Search, StyledInputBase } from './searchBar';
+import { modalStyle } from '../home.page';
 import CircleButton from '../../../components/circleButton';
 import AcceptButton from '../../../components/acceptButton';
 import CancelButton from '../../../components/cancelButton';
@@ -39,20 +40,6 @@ const DrawerHeader = styled('div')(({ theme }) => ({
     ...theme.mixins.toolbar,
     justifyContent: 'flex-end',
 }));
-
-// Style cho modal edit
-const style = {
-    position: 'absolute' as 'absolute',
-    top: '35%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 700,
-    bgcolor: 'background.paper',
-    border: '1px solid #000',
-    borderRadius: '15px',
-    boxShadow: 24,
-    p: 4,
-};
 
 function MyForms() {
     const [forms, setForms] = useState<any[]>([])
@@ -244,7 +231,7 @@ function MyForms() {
                 <Box>
                     {
                         modal === 'add' ?
-                            <Box sx={style}>
+                            <Box sx={modalStyle}>
                                 <Typography variant='h6' component="div">
                                     Vui lòng điền thông tin form
                                 </Typography>
@@ -282,7 +269,7 @@ function MyForms() {
                             : null}
                     {
                         modal === 'delete' ?
-                            <Box sx={{ ...style }}>
+                            <Box sx={{ ...modalStyle }}>
                                 <Typography variant='h5'><b>Xác nhận xóa form?</b></Typography>
 
                                 <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'right' }} >

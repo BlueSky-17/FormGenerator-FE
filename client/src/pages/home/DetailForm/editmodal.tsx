@@ -8,20 +8,7 @@ import { useParams } from 'react-router-dom';
 import { UndoRounded } from '@mui/icons-material';
 import AcceptButton from '../../../components/acceptButton';
 import CancelButton from '../../../components/cancelButton';
-
-// Style cho modal edit
-const style = {
-    position: 'absolute' as 'absolute',
-    top: '35%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 700,
-    bgcolor: 'background.paper',
-    border: '1px solid #000',
-    borderRadius: '15px',
-    boxShadow: 24,
-    p: 4,
-};
+import { modalStyle } from '../home.page';
 
 export function EditModal(props) {
 
@@ -70,7 +57,7 @@ export function EditModal(props) {
                 aria-describedby="modal-modal-description"
             >
                 <Box>
-                    <Box sx={style}>
+                    <Box sx={modalStyle}>
                         <Typography variant='h6' component="div">
                             Vui lòng điền thông tin chỉnh sửa form
                         </Typography>

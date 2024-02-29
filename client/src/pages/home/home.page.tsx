@@ -55,6 +55,19 @@ interface AppBarProps extends MuiAppBarProps {
     open?: boolean;
 }
 
+export const modalStyle = {
+    position: 'absolute' as 'absolute',
+    top: '30%', 
+    left: '50%', 
+    transform: 'translate(-50%, -30%)',
+    width: 700,
+    bgcolor: 'background.paper',
+    border: '1px solid #000',
+    borderRadius: '15px',
+    boxShadow: 24,
+    p: 4,
+};
+
 const AppBar = styled(MuiAppBar, {
     shouldForwardProp: (prop) => prop !== 'open',
 })<AppBarProps>(({ theme, open }) => ({

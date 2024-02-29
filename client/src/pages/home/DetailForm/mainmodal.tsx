@@ -38,20 +38,7 @@ import AcceptButton from '../../../components/acceptButton';
 import CancelButton from '../../../components/cancelButton';
 
 import { typeOfFile, myRecordType } from '../../../constants/typeOfFile';
-
-// Style cho modal edit
-const style = {
-    position: 'fixed',
-    top: '15%',
-    left: '50%',
-    marginLeft: '-350px',
-    width: 700,
-    bgcolor: 'background.paper',
-    border: '1px solid #000',
-    borderRadius: '15px',
-    boxShadow: 24,
-    p: 4,
-};
+import { modalStyle } from '../home.page';
 
 export function MainModal(props) {
     const UpdateFormAPI_URL = `http://localhost:8080/update-form/${useParams()?.formID}`;
@@ -552,7 +539,7 @@ export function MainModal(props) {
                 aria-labelledby="modal-modal-title"
                 aria-describedby="modal-modal-description"
             >
-                <Box sx={style}>
+                <Box sx={modalStyle}>
                     <Typography variant='h6' component="div">
                         Chỉnh sửa câu hỏi
                     </Typography>
@@ -571,6 +558,13 @@ export function MainModal(props) {
                         <FormControl fullWidth>
                             <InputLabel id="demo-simple-select-label">Dạng</InputLabel>
                             <Select
+                                MenuProps={{
+                                    PaperProps: {
+                                        sx: {
+                                            maxHeight: 230,
+                                        }
+                                    }
+                                }}
                                 labelId="demo-simple-select-label"
                                 id="demo-simple-select"
                                 value={props.type}
