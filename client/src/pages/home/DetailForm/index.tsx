@@ -34,6 +34,7 @@ import { ShortText, MultiChoice, Date } from './interface';
 import EditModal from './editmodal';
 
 import isEqual from 'lodash/isEqual';
+import CircleButton from '../../../components/circleButton';
 
 const DrawerHeader = styled('div')(({ theme }) => ({
     display: 'flex',
@@ -651,67 +652,11 @@ function DetailForm() {
                                             <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="left">{jsonData[formDetail.Questions[ques].Type]}</TableCell>
                                             <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="left">{formDetail.Questions[ques].Description}</TableCell>
                                             <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="center">
-                                                <IconButton
-                                                    onClick={editQuestion(ques, index)}
-                                                    sx={{
-                                                        backgroundColor: '#364F6B',
-                                                        color: 'white',
-                                                        margin: '5px',
-                                                        '&:hover': {
-                                                            backgroundColor: '#176B87', // Màu nền thay đổi khi hover
-                                                        },
-                                                    }}>
-                                                    <EditIcon />
-                                                </IconButton>
-                                                <IconButton
-                                                    onClick={handleDuplicate(ques, index)}
-                                                    sx={{
-                                                        backgroundColor: '#364F6B',
-                                                        color: 'white',
-                                                        margin: '5px',
-                                                        '&:hover': {
-                                                            backgroundColor: '#176B87', // Màu nền thay đổi khi hover
-                                                        },
-                                                    }}>
-                                                    <ContentCopyIcon />
-                                                </IconButton>
-                                                <IconButton
-                                                    onClick={handleSwapUp(ques, index)}
-                                                    sx={{
-                                                        backgroundColor: '#364F6B',
-                                                        color: 'white',
-                                                        margin: '5px',
-                                                        '&:hover': {
-                                                            backgroundColor: '#176B87', // Màu nền thay đổi khi hover
-                                                        },
-                                                    }}>
-                                                    <ArrowCircleUpIcon />
-                                                </IconButton>
-                                                <IconButton
-                                                    onClick={handleSwapDown(ques, index)}
-                                                    sx={{
-                                                        backgroundColor: '#364F6B',
-                                                        color: 'white',
-                                                        margin: '5px',
-                                                        '&:hover': {
-                                                            backgroundColor: '#176B87', // Màu nền thay đổi khi hover
-                                                        },
-                                                    }}>
-                                                    <ArrowCircleDownIcon />
-                                                </IconButton>
-
-                                                <IconButton
-                                                    onClick={confirmDeleteQuestion(ques)}
-                                                    sx={{
-                                                        backgroundColor: '#364F6B',
-                                                        color: 'white',
-                                                        margin: '5px',
-                                                        '&:hover': {
-                                                            backgroundColor: '#176B87', // Màu nền thay đổi khi hover
-                                                        },
-                                                    }}>
-                                                    <DeleteIcon />
-                                                </IconButton>
+                                                <CircleButton tooltip='Chỉnh sửa' onClick={editQuestion(ques, index)} children={<EditIcon />} />
+                                                <CircleButton tooltip='Sao chép' onClick={handleDuplicate(ques, index)} children={<ContentCopyIcon />} />
+                                                <CircleButton tooltip='Di chuyển lên' onClick={handleSwapUp(ques, index)} children={ <ArrowCircleUpIcon />} />
+                                                <CircleButton tooltip='Di chuyển xuống' onClick={handleSwapDown(ques, index)} children={<ArrowCircleDownIcon />} />
+                                                <CircleButton tooltip='Xóa' onClick={confirmDeleteQuestion(ques)} children={<DeleteIcon />} />
                                             </TableCell>
                                         </TableRow>
                                     )) : null

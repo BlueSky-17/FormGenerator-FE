@@ -27,6 +27,7 @@ import { createForm, deleteForm } from '../../../apis/form';
 
 //component đã được styled
 import { SearchIconWrapper, Search, StyledInputBase } from './searchBar';
+import CircleButton from '../../../components/circleButton';
 
 const DrawerHeader = styled('div')(({ theme }) => ({
     display: 'flex',
@@ -230,47 +231,11 @@ function MyForms() {
                                                 </Button>}
                                         </TableCell>
                                         <TableCell sx={{ padding: 1 }} align="center">
-                                            <Tooltip title="Chỉnh sửa" placement="left">
-                                                <IconButton
-                                                    onClick={editForm(form.id, "ViewEdit")}
-                                                    sx={{
-                                                        backgroundColor: '#364F6B',
-                                                        color: 'white',
-                                                        margin: '5px',
-                                                        '&:hover': {
-                                                            backgroundColor: '#176B87', // Màu nền thay đổi khi hover
-                                                        },
-                                                    }}
-                                                >
-                                                    <EditIcon />
-                                                </IconButton>
-                                            </Tooltip>
-                                            <Tooltip title="Xem phản hồi" placement="right">
-                                                <IconButton
-                                                    onClick={editForm(form.id, "ViewResponses")}
-                                                    sx={{
-                                                        backgroundColor: '#364F6B',
-                                                        color: 'white',
-                                                        margin: '5px',
-                                                        '&:hover': {
-                                                            backgroundColor: '#176B87', // Màu nền thay đổi khi hover
-                                                        },
-                                                    }}>
-                                                    <VisibilityIcon />
-                                                </IconButton>
-                                            </Tooltip>
-                                            <IconButton
-                                                onClick={openModalDelete(form.id)}
-                                                sx={{
-                                                    backgroundColor: '#364F6B',
-                                                    color: 'white',
-                                                    margin: '5px',
-                                                    '&:hover': {
-                                                        backgroundColor: '#176B87', // Màu nền thay đổi khi hover
-                                                    },
-                                                }}>
-                                                <DeleteIcon />
-                                            </IconButton>
+                                            <CircleButton tooltip='Chỉnh sửa' onClick={editForm(form.id, "ViewEdit")} children={<EditIcon />} />
+                                            
+                                            <CircleButton tooltip='Xem phản hồi' onClick={editForm(form.id, "ViewResponses")} children={<VisibilityIcon />} />
+
+                                            <CircleButton tooltip='Xóa biểu mẫu' onClick={openModalDelete(form.id)} children={<DeleteIcon />} />
                                         </TableCell>
                                     </TableRow>
                                 ))}
