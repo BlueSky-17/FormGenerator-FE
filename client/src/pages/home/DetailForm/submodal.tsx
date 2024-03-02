@@ -8,6 +8,8 @@ import CloseIcon from '@mui/icons-material/Close';
 
 import { DataGrid, GridColDef, GridValueGetterParams, GridRowModel, } from '@mui/x-data-grid';
 import { modalStyle } from '../home.page';
+import AcceptButton from '../../../components/acceptButton';
+import CancelButton from '../../../components/cancelButton';
 
 export function SubModal(props) {
 
@@ -37,38 +39,12 @@ export function SubModal(props) {
                                 rows={8}
                                 sx={{ width: '100%' }}
                             />
-                            {props.type === 'multi-choice' ? <Button
-                                onClick={solveMultiOptions}
-                                sx={{
-                                    color: 'white',
-                                    backgroundColor: '#364F6B',
-                                    borderRadius: '10px',
-                                    paddingY: '10px',
-                                    paddingX: '5px',
-                                    marginTop: '10px',
-                                    width: '100%',
-                                    '&:hover': {
-                                        backgroundColor: '#2E4155', // Màu nền thay đổi khi hover
-                                    }
-                                }}>
-                                Xử lý dữ liệu
-                            </Button> : null}
-                            {props.type === 'table' ? <Button
-                                onClick={props.solveOptionTable}
-                                sx={{
-                                    color: 'white',
-                                    backgroundColor: '#364F6B',
-                                    borderRadius: '10px',
-                                    paddingY: '10px',
-                                    paddingX: '5px',
-                                    marginTop: '10px',
-                                    width: '100%',
-                                    '&:hover': {
-                                        backgroundColor: '#2E4155', // Màu nền thay đổi khi hover
-                                    }
-                                }}>
-                                Xử lý dữ liệu
-                            </Button> : null}
+                            {props.type === 'multi-choice' ?
+                                <AcceptButton title='Xử lý dữ liệu' onClick={solveMultiOptions} />
+                                : null}
+                            {props.type === 'table' ?
+                                <AcceptButton title='Xử lý dữ liệu' onClick={props.solveOptionTable} />
+                                : null}
                         </Box>
                         : null}
                     {props.subopen === 'linkedData' ?
@@ -98,20 +74,7 @@ export function SubModal(props) {
                                             disableRowSelectionOnClick
                                         />
                                     </Box>
-                                    <Button
-                                        onClick={props.handleSaveLinkedData}
-                                        sx={{
-                                            color: 'white',
-                                            backgroundColor: '#364F6B',
-                                            borderRadius: '10px',
-                                            marginTop: '10px',
-                                            marginX: '5px',
-                                            '&:hover': {
-                                                backgroundColor: '#2E4155', // Màu nền thay đổi khi hover
-                                            },
-                                        }}>
-                                        Lưu
-                                    </Button>
+                                    <AcceptButton title='Lưu' onClick={props.handleSaveLinkedData} />
                                 </Box>
                             ) : (
                                 <Typography>No File is uploaded yet!</Typography>
@@ -121,37 +84,22 @@ export function SubModal(props) {
                         : null}
                     {props.subopen === 'delete' ?
                         <Box>
-                            <Typography variant='h5'><b>Xác nhận xóa câu hỏi?</b></Typography>
+                            <Typography variant='h5'><b>Bạn muốn xóa câu hỏi này?</b></Typography>
 
                             <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'right' }} >
-                                <Button
-                                    onClick={props.handleDeleteQuestion(props.deleted)}
-                                    sx={{
-                                        color: 'white',
-                                        backgroundColor: '#364F6B',
-                                        borderRadius: '10px',
-                                        marginY: '10px',
-                                        marginX: '5px',
-                                        '&:hover': {
-                                            backgroundColor: '#2E4155', // Màu nền thay đổi khi hover
-                                        },
-                                    }}>
-                                    Xác nhận
-                                </Button>
-                                <Button
-                                    onClick={props.handleSubClose}
-                                    sx={{
-                                        color: '#000000',
-                                        backgroundColor: '#E7E7E8',
-                                        borderRadius: '10px',
-                                        marginY: '10px',
-                                        marginX: '5px',
-                                        '&:hover': {
-                                            backgroundColor: '#E7E7E7', // Màu nền thay đổi khi hover
-                                        },
-                                    }}>
-                                    Hủy
-                                </Button>
+                                <AcceptButton title='Xác nhận' onClick={props.handleDeleteQuestion(props.deleted)} />
+                                <CancelButton title='Hủy' onClick={props.handleSubClose} />
+                            </Box>
+                        </Box>
+                        : null
+                    }
+                    {props.subopen === 'save' ?
+                        <Box>
+                            <Typography variant='h5'><b>Xác nhận lưu lại những thay đổi?</b></Typography>
+
+                            <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'right' }} >
+                                <AcceptButton title='Xác nhận' onClick={props.saveChange} />
+                                <CancelButton title='Hủy' onClick={props.handleSubClose} />
                             </Box>
                         </Box>
                         : null
@@ -161,34 +109,8 @@ export function SubModal(props) {
                             <Typography variant='h5'><b>Xác nhận đóng form?</b></Typography>
 
                             <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'right' }} >
-                                <Button
-                                    onClick={props.handleCloseForm}
-                                    sx={{
-                                        color: 'white',
-                                        backgroundColor: '#364F6B',
-                                        borderRadius: '10px',
-                                        marginY: '10px',
-                                        marginX: '5px',
-                                        '&:hover': {
-                                            backgroundColor: '#2E4155', // Màu nền thay đổi khi hover
-                                        },
-                                    }}>
-                                    Xác nhận
-                                </Button>
-                                <Button
-                                    onClick={props.handleSubClose}
-                                    sx={{
-                                        color: '#000000',
-                                        backgroundColor: '#E7E7E8',
-                                        borderRadius: '10px',
-                                        marginY: '10px',
-                                        marginX: '5px',
-                                        '&:hover': {
-                                            backgroundColor: '#E7E7E7', // Màu nền thay đổi khi hover
-                                        },
-                                    }}>
-                                    Hủy
-                                </Button>
+                                <AcceptButton title='Xác nhận' onClick={props.handleCloseForm} />
+                                <CancelButton title='Hủy' onClick={props.handleSubClose} />
                             </Box>
                         </Box>
                         : null
@@ -198,34 +120,8 @@ export function SubModal(props) {
                             <Typography variant='h5'><b>Xác nhận mở lại form?</b></Typography>
 
                             <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'right' }} >
-                                <Button
-                                    onClick={props.handleOpenForm}
-                                    sx={{
-                                        color: 'white',
-                                        backgroundColor: '#364F6B',
-                                        borderRadius: '10px',
-                                        marginY: '10px',
-                                        marginX: '5px',
-                                        '&:hover': {
-                                            backgroundColor: '#2E4155', // Màu nền thay đổi khi hover
-                                        },
-                                    }}>
-                                    Xác nhận
-                                </Button>
-                                <Button
-                                    onClick={props.handleSubClose}
-                                    sx={{
-                                        color: '#000000',
-                                        backgroundColor: '#E7E7E8',
-                                        borderRadius: '10px',
-                                        marginY: '10px',
-                                        marginX: '5px',
-                                        '&:hover': {
-                                            backgroundColor: '#E7E7E7', // Màu nền thay đổi khi hover
-                                        },
-                                    }}>
-                                    Hủy
-                                </Button>
+                                <AcceptButton title='Xác nhận' onClick={props.handleOpenForm} />
+                                <CancelButton title='Hủy' onClick={props.handleSubClose} />
                             </Box>
                         </Box>
                         : null

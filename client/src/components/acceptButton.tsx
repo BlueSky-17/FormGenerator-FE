@@ -5,14 +5,16 @@ import COLORS from '../constants/colors';
 export type CustomButtonProps = {
     title: string;
     style?: React.CSSProperties;
+    disabled?: boolean;
     onClick: () => void;
 };
 
 const AcceptButton: FC<CustomButtonProps> = memo(
-    ({ title, style, onClick }) => {
+    ({ title, style, onClick, disabled }) => {
         return (
             <Button
                 onClick={onClick}
+                disabled={disabled}
                 sx={{
                     backgroundColor: COLORS.darkBlue,
                     borderRadius: '10px',

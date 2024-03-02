@@ -41,31 +41,6 @@ import { typeOfFile, myRecordType } from '../../../constants/typeOfFile';
 import { modalStyle } from '../home.page';
 
 export function MainModal(props) {
-    const UpdateFormAPI_URL = `http://localhost:8080/update-form/${useParams()?.formID}`;
-
-    //API PUT: Update form 
-    const updateObjectInDatabase = async (updateData) => {
-        try {
-            const response = await fetch(UpdateFormAPI_URL, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + JSON.parse(sessionStorage.getItem('token') as string)?.accessToken
-                },
-                body: JSON.stringify(updateData),
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP Error! Status: ${response.status}`);
-            }
-
-            const dataFromServer = await response.json();
-            // Xử lý dữ liệu từ máy chủ (nếu cần)
-        } catch (error) {
-            console.error('Lỗi khi gửi yêu cầu:', error);
-        }
-    };
-
     //API to get type of a question by Random Forest
     const getType = async (sentence) => {
         const API_URL: string = `http://localhost:5000/predict`;
@@ -198,10 +173,7 @@ export function MainModal(props) {
                 Object.assign(props.formDetail.Questions[ques].Content, updateTable);
             }
 
-            updateObjectInDatabase({
-                "questionOrder": props.formDetail.QuestionOrder,
-                "questions": props.formDetail.Questions
-            })
+            props.setHasChange(true);
 
             setError(false);
             handleClose();
@@ -237,10 +209,7 @@ export function MainModal(props) {
                 props.formDetail.Questions[props.quesEdit].Content.Table.ListOfColumn = props.columnList;
             }
 
-            updateObjectInDatabase({
-                "questionOrder": props.formDetail.QuestionOrder,
-                "questions": props.formDetail.Questions
-            })
+            props.setHasChange(true);
 
             handleClose();
         } else {

@@ -403,10 +403,7 @@ function DetailForm() {
                 return num;
         })
 
-        updateObjectInDatabase({
-            "questionOrder": formDetail.QuestionOrder,
-            "questions": formDetail.Questions
-        })
+        setHasChange(true); //enabled button 'Lưu thay đổi'
         setSubOpen('');
     }
 
@@ -420,10 +417,7 @@ function DetailForm() {
 
         formDetail.Questions.splice(newIndex, 0, formDetail.Questions[ques])
 
-        updateObjectInDatabase({
-            "questionOrder": formDetail.QuestionOrder,
-            "questions": formDetail.Questions
-        })
+        setHasChange(true); //enabled button 'Lưu thay đổi'
 
         if (duplicated === true) setDuplicate(false);
         else setDuplicate(true);
@@ -450,19 +444,15 @@ function DetailForm() {
         // console.log(formDetail.QuestionOrder)
         if (swaped === true) setSwap(false);
         else setSwap(true);
-        updateObjectInDatabase({
-            "questionOrder": formDetail.QuestionOrder,
-            "questions": formDetail.Questions
-        })
+
+        setHasChange(true); //enabled button 'Lưu thay đổi'
     }
     const handleSwapUp = (ques: string, index: number) => (event: any) => {
         formDetail.QuestionOrder = swapElements(formDetail.QuestionOrder, index - 1);
         if (swaped === true) setSwap(false);
         else setSwap(true);
-        updateObjectInDatabase({
-            "questionOrder": formDetail.QuestionOrder,
-            "questions": formDetail.Questions
-        })
+
+        setHasChange(true); //enabled button 'Lưu thay đổi'
     }
 
     // Edit Question
@@ -494,6 +484,7 @@ function DetailForm() {
         }
 
         setQuesEdit(ques);
+        setHasChange(true); //enabled button 'Lưu thay đổi'
     }
 
     //number: 0-5 with 6 type
@@ -511,6 +502,22 @@ function DetailForm() {
         setAnchorEl(null);
     };
     const open_settings = Boolean(anchorEl);
+
+    const [hasChange, setHasChange] = useState<boolean>(false);
+
+    const confirmSaveChange = () => {
+        setSubOpen('save');
+    }
+
+    const saveChange = () => {
+        updateObjectInDatabase({
+            "questionOrder": formDetail.QuestionOrder,
+            "questions": formDetail.Questions
+        })
+
+        setHasChange(false);
+        setSubOpen("")
+    }
 
     return (
         <Box>
@@ -665,7 +672,10 @@ function DetailForm() {
                         </TableContainer>
 
                         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <AcceptButton title='Thêm câu hỏi' onClick={handleOpen} style={{marginTop:'15px'}} />
+                            <AcceptButton title='Thêm câu hỏi' onClick={handleOpen} style={{ marginTop: '15px' }} />
+                            {hasChange ?
+                                <AcceptButton title='Lưu thay đổi' onClick={confirmSaveChange} style={{ marginTop: '15px' }} /> :
+                                <AcceptButton title='Lưu thay đổi' disabled={true} onClick={confirmSaveChange} style={{ marginTop: '15px', backgroundColor: 'gray' }} />}
                         </Box>
                     </Box>}
             </Box >
@@ -725,6 +735,8 @@ function DetailForm() {
 
                 indexOptionTable={indexOptionTable}
                 setIndexOptionTable={setIndexOptionTable}
+
+                setHasChange={setHasChange}
             />
 
             <SubModal
@@ -745,6 +757,8 @@ function DetailForm() {
 
                 handleCloseForm={handleCloseForm}
                 handleOpenForm={handleOpenForm}
+
+                saveChange={saveChange}
 
                 solveOptionTable={solveOptionTable}
             />
