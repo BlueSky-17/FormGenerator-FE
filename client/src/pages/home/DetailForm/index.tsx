@@ -385,46 +385,42 @@ function DetailForm() {
     const [fileType, setFileType] = useState([]);
 
     // Delete Question 
-    const [deleted, setDelete] = React.useState<number>();
-    const confirmDeleteQuestion = (index: number) => (event: any) => {
-        setSubOpen('delete');
-        setDelete(index);
-    };
     const handleDeleteQuestion = (index: number) => (event: any) => {
-        //Xóa 1 phần tử ở vị trí index
-        formDetail.Questions.splice(index, 1)
+        // Create a copy of formDetail to avoid mutating the original state
+        const updatedFormDetail = { ...formDetail };
 
-        // Lọc mảng các num mà khác index, chỉnh lại cho các num
-        formDetail.QuestionOrder = formDetail.QuestionOrder.filter(num => num !== index);
-        formDetail.QuestionOrder = formDetail.QuestionOrder.map((num) => {
-            if (num > index)
+        // Update the Questions array by removing the element at the specified index
+        updatedFormDetail.Questions.splice(index, 1);
+
+        // Update the QuestionOrder array
+        updatedFormDetail.QuestionOrder = updatedFormDetail.QuestionOrder.filter(num => num !== index);
+        updatedFormDetail.QuestionOrder = updatedFormDetail.QuestionOrder.map((num) => {
+            if (num > index) {
                 return --num;
-            else
+            } else {
                 return num;
-        })
+            }
+        });
 
+        setFormDetail(updatedFormDetail);
         setHasChange(true); //enabled button 'Lưu thay đổi'
-        setSubOpen('');
     }
 
     // Duplicate Question
-    const [duplicated, setDuplicate] = React.useState(true);
     const handleDuplicate = (ques: string, index: number) => (event: any) => {
+        const updatedFormDetail = { ...formDetail };
+
         // Push index vào QuestionOrder
-        const newIndex = formDetail.Questions.length;
+        const newIndex = updatedFormDetail.Questions.length;
 
-        formDetail.QuestionOrder.splice(index + 1, 0, newIndex);
+        updatedFormDetail.QuestionOrder.splice(index + 1, 0, newIndex);
+        updatedFormDetail.Questions.splice(newIndex, 0, updatedFormDetail.Questions[ques])
 
-        formDetail.Questions.splice(newIndex, 0, formDetail.Questions[ques])
-
+        setFormDetail(updatedFormDetail);
         setHasChange(true); //enabled button 'Lưu thay đổi'
-
-        if (duplicated === true) setDuplicate(false);
-        else setDuplicate(true);
     }
 
     // Swap Question
-    const [swaped, setSwap] = React.useState(true);
     function swapElements<T>(arr: T[], index: number): T[] {
         // Kiểm tra xem index có hợp lệ không
         if (index < 0 || index >= arr.length - 1) {
@@ -440,18 +436,19 @@ function DetailForm() {
         return arr;
     }
     const handleSwapDown = (ques: string, index: number) => (event: any) => {
-        formDetail.QuestionOrder = swapElements(formDetail.QuestionOrder, index);
-        // console.log(formDetail.QuestionOrder)
-        if (swaped === true) setSwap(false);
-        else setSwap(true);
+        const updatedFormDetail = { ...formDetail };
 
+        updatedFormDetail.QuestionOrder = swapElements(updatedFormDetail.QuestionOrder, index);
+
+        setFormDetail(updatedFormDetail);
         setHasChange(true); //enabled button 'Lưu thay đổi'
     }
     const handleSwapUp = (ques: string, index: number) => (event: any) => {
-        formDetail.QuestionOrder = swapElements(formDetail.QuestionOrder, index - 1);
-        if (swaped === true) setSwap(false);
-        else setSwap(true);
+        const updatedFormDetail = { ...formDetail };
 
+        updatedFormDetail.QuestionOrder = swapElements(updatedFormDetail.QuestionOrder, index - 1);
+
+        setFormDetail(updatedFormDetail);
         setHasChange(true); //enabled button 'Lưu thay đổi'
     }
 
@@ -662,7 +659,7 @@ function DetailForm() {
                                                 <CircleButton tooltip='Sao chép' onClick={handleDuplicate(ques, index)} children={<ContentCopyIcon />} />
                                                 <CircleButton tooltip='Di chuyển lên' onClick={handleSwapUp(ques, index)} children={<ArrowCircleUpIcon />} />
                                                 <CircleButton tooltip='Di chuyển xuống' onClick={handleSwapDown(ques, index)} children={<ArrowCircleDownIcon />} />
-                                                <CircleButton tooltip='Xóa' onClick={confirmDeleteQuestion(ques)} children={<DeleteIcon />} />
+                                                <CircleButton tooltip='Xóa' onClick={handleDeleteQuestion(ques)} children={<DeleteIcon />} />
                                             </TableCell>
                                         </TableRow>
                                     )) : null
@@ -752,8 +749,6 @@ function DetailForm() {
                 setInputText={setInputText}
                 handleInputText={handleInputText}
                 convertTextToOptionList={convertTextToOptionList}
-                deleted={deleted}
-                handleDeleteQuestion={handleDeleteQuestion}
 
                 handleCloseForm={handleCloseForm}
                 handleOpenForm={handleOpenForm}

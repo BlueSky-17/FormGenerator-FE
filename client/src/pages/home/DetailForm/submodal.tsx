@@ -82,17 +82,6 @@ export function SubModal(props) {
                             }
                         </Box>
                         : null}
-                    {props.subopen === 'delete' ?
-                        <Box>
-                            <Typography variant='h5'><b>Bạn muốn xóa câu hỏi này?</b></Typography>
-
-                            <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'right' }} >
-                                <AcceptButton title='Xác nhận' onClick={props.handleDeleteQuestion(props.deleted)} />
-                                <CancelButton title='Hủy' onClick={props.handleSubClose} />
-                            </Box>
-                        </Box>
-                        : null
-                    }
                     {props.subopen === 'save' ?
                         <Box>
                             <Typography variant='h5'><b>Xác nhận lưu lại những thay đổi?</b></Typography>
