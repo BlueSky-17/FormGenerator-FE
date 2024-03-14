@@ -616,7 +616,6 @@ function Form() {
         formResponses[ques].content.index.push(e.target.value);
 
         setRender(!render);
-        console.log(formResponses[ques].content)
     };
 
     const [height, setHeight] = useState('100%')
@@ -995,7 +994,7 @@ function Form() {
                                                         <FormControl fullWidth>
                                                             <InputLabel id="demo-simple-select-label">{field}</InputLabel>
                                                             <Select
-                                                                value={formResponses[ques].content.linkedData[0]}
+                                                                value={formResponses[ques].content.linkedData[index]}
                                                                 sx={{ marginTop: '10px' }}
                                                                 onChange={handleFirstFieldChange(ques)}
                                                             >
@@ -1010,7 +1009,7 @@ function Form() {
                                                         <FormControl fullWidth>
                                                             <InputLabel id="demo-simple-select-label">{field}</InputLabel>
                                                             <Select
-                                                                value={formResponses[ques].content.linkedData[1]}
+                                                                value={formResponses[ques].content.linkedData[index]}
                                                                 sx={{ marginTop: '10px' }}
                                                                 onChange={handleSecondFieldChange(ques)}
                                                             >
@@ -1034,7 +1033,7 @@ function Form() {
                                                         <FormControl fullWidth>
                                                             <InputLabel id="demo-simple-select-label">{field}</InputLabel>
                                                             <Select
-                                                                value={formResponses[ques].content.linkedData[2]}
+                                                                value={formResponses[ques].content.linkedData[index]}
                                                                 sx={{ marginTop: '10px' }}
                                                                 onChange={handleThirdFieldChange(ques)}
                                                             >

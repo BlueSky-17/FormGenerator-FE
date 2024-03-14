@@ -175,6 +175,9 @@ export function MainModal(props) {
 
             props.setHasChange(true);
 
+            setActive(-1);
+            setActiveType(-1);
+
             setError(false);
             handleClose();
         }
@@ -210,6 +213,8 @@ export function MainModal(props) {
             }
 
             props.setHasChange(true);
+            setActive(-1);
+            setActiveType(-1);
 
             handleClose();
         } else {
