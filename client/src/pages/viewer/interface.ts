@@ -51,6 +51,7 @@ export interface ResultFile {
 // Content for linked data TYPE
 export interface ResultLinkedData {
     linkedData: string[]
+    index: number[]
 }
 
 export interface ResultTable {

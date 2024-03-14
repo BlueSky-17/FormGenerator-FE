@@ -6,12 +6,6 @@ const COLORS = {
 
     darkGray: '#E7E7E7',
     lightGray: '#EAEAEA',
-
-    // Secondary Color
-    darkviolet: '#3F3D56',
-    darkgray: '#7D858E',
-    green: '#00BF71',
-    yellow: '#FFB100',
 };
 
 export default COLORS;

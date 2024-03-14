@@ -64,11 +64,11 @@ function Form() {
                 },
                 body: JSON.stringify(data)
             });
-    
+
             if (!response.ok) {
                 throw new Error(`HTTP Error! Status: ${response.status}`);
             }
-    
+
             const dataFromServer = await response.json();
             // Xử lý dữ liệu từ máy chủ (nếu cần)
         } catch (error) {
@@ -242,7 +242,8 @@ function Form() {
                 }
                 else if (formDetail.Questions[i].Type === "linkedData") {
                     const result: ResultLinkedData = {
-                        linkedData: []
+                        linkedData: [],
+                        index: []
                     };
 
                     Object.assign(newResponse.content, result)
@@ -580,33 +581,42 @@ function Form() {
     }
 
     //Lưu giá trị cho các field dạng linkedData
-    const [firstField, setFirstField] = useState('');
     const handleFirstFieldChange = (ques: number) => (e) => {
-        setFirstField(e.target.value);
-        setSecondField('');
-        setThirdField('');
+        if (formResponses[ques].content.linkedData.length !== 0) {
+            formResponses[ques].content.linkedData = []
+            formResponses[ques].content.index = []
+        }
 
         const firstChoice = formDetail.Questions[ques].Content.LinkedData.ListOfOptions[e.target.value].Key;
         formResponses[ques].content.linkedData.push(firstChoice);
+        formResponses[ques].content.index.push(e.target.value);
+
+        setRender(!render); 
     };
 
-    const [secondField, setSecondField] = useState('');
     const handleSecondFieldChange = (ques: number) => (e) => {
-        setSecondField(e.target.value);
-        setThirdField('');
+        if (formResponses[ques].content.linkedData.length !== 1) {
+            let subArray1 = formResponses[ques].content.linkedData.slice(0, 1);
+            let subArray2 = formResponses[ques].content.index.slice(0, 1);
 
-        const secondChoice = formDetail.Questions[ques].Content.LinkedData.ListOfOptions[firstField].Value[e.target.value].Key;
-        console.log(secondChoice);
+            formResponses[ques].content.linkedData = subArray1;
+            formResponses[ques].content.index = subArray2;
+        }
+        
+        const secondChoice = formDetail.Questions[ques].Content.LinkedData.ListOfOptions[formResponses[ques].content.index[0]].Value[e.target.value].Key;
         formResponses[ques].content.linkedData.push(secondChoice);
+        formResponses[ques].content.index.push(e.target.value);
+
+        setRender(!render);
     };
 
-    const [thirdField, setThirdField] = useState('');
     const handleThirdFieldChange = (ques: number) => (e) => {
-        setThirdField(e.target.value);
-
-        const thirdChoice = formDetail.Questions[ques].Content.LinkedData.ListOfOptions[firstField].Value[secondField].Value[e.target.value];
-        console.log(thirdChoice);
+        const thirdChoice = formDetail.Questions[ques].Content.LinkedData.ListOfOptions[formResponses[ques].content.index[0]].Value[formResponses[ques].content.index[1]].Value[e.target.value];
         formResponses[ques].content.linkedData.push(thirdChoice);
+        formResponses[ques].content.index.push(e.target.value);
+
+        setRender(!render);
+        console.log(formResponses[ques].content)
     };
 
     const [height, setHeight] = useState('100%')
@@ -985,7 +995,7 @@ function Form() {
                                                         <FormControl fullWidth>
                                                             <InputLabel id="demo-simple-select-label">{field}</InputLabel>
                                                             <Select
-                                                                value={firstField}
+                                                                value={formResponses[ques].content.linkedData[0]}
                                                                 sx={{ marginTop: '10px' }}
                                                                 onChange={handleFirstFieldChange(ques)}
                                                             >
@@ -996,22 +1006,22 @@ function Form() {
                                                         </FormControl>
                                                         : null
                                                     }
-                                                    {index === 1 && firstField !== '' ?
+                                                    {index === 1 && formResponses[ques].content.linkedData[0] !== undefined ?
                                                         <FormControl fullWidth>
                                                             <InputLabel id="demo-simple-select-label">{field}</InputLabel>
                                                             <Select
-                                                                value={secondField}
+                                                                value={formResponses[ques].content.linkedData[1]}
                                                                 sx={{ marginTop: '10px' }}
                                                                 onChange={handleSecondFieldChange(ques)}
                                                             >
-                                                                {formDetail.Questions[ques].Content.LinkedData.ListOfOptions[firstField].Value.map((obj, idx) => (
+                                                                {formDetail.Questions[ques].Content.LinkedData.ListOfOptions[formResponses[ques].content.index[0]].Value.map((obj, idx) => (
                                                                     <MenuItem key={obj.Key} value={idx} >{obj.Key}</MenuItem>
                                                                 ))}
                                                             </Select>
                                                         </FormControl>
                                                         : null
                                                     }
-                                                    {index === 1 && firstField === '' ?
+                                                    {index === 1 && formResponses[ques].content.linkedData[0] === undefined ?
                                                         <FormControl fullWidth disabled>
                                                             <InputLabel id="demo-simple-select-label">{field}</InputLabel>
                                                             <Select sx={{ marginTop: '10px' }}>
@@ -1020,15 +1030,15 @@ function Form() {
                                                         </FormControl>
                                                         : null
                                                     }
-                                                    {index === 2 && secondField !== '' ?
+                                                    {index === 2 && formResponses[ques].content.linkedData[1] !== undefined ?
                                                         <FormControl fullWidth>
                                                             <InputLabel id="demo-simple-select-label">{field}</InputLabel>
                                                             <Select
-                                                                value={thirdField}
+                                                                value={formResponses[ques].content.linkedData[2]}
                                                                 sx={{ marginTop: '10px' }}
                                                                 onChange={handleThirdFieldChange(ques)}
                                                             >
-                                                                {formDetail.Questions[ques].Content.LinkedData.ListOfOptions[firstField].Value[secondField].Value.map((obj, idx) => (
+                                                                {formDetail.Questions[ques].Content.LinkedData.ListOfOptions[formResponses[ques].content.index[0]].Value[formResponses[ques].content.index[1]].Value.map((obj, idx) => (
                                                                     <MenuItem key={obj} value={idx} >{obj}</MenuItem>
                                                                 ))}
                                                                 {/* <MenuItem value={formDetail.Questions[ques].Content.LinkedData.ListOfOptions[firstField].Value[secondField].Value}>{formDetail.Questions[ques].Content.LinkedData.ListOfOptions[firstField].Value[secondField].Value}</MenuItem> */}
@@ -1036,7 +1046,7 @@ function Form() {
                                                         </FormControl>
                                                         : null
                                                     }
-                                                    {index === 2 && secondField === '' ?
+                                                    {index === 2 && formResponses[ques].content.linkedData[1] === undefined ?
                                                         <FormControl fullWidth disabled>
                                                             <InputLabel id="demo-simple-select-label">{field}</InputLabel>
                                                             <Select sx={{ marginTop: '10px' }}>
