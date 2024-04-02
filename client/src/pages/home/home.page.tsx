@@ -18,6 +18,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import HomeIcon from '@mui/icons-material/Home';
 import InfoIcon from '@mui/icons-material/Info';
+import HistoryIcon from '@mui/icons-material/History';
 import ArticleIcon from '@mui/icons-material/Article';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import LogoutIcon from '@mui/icons-material/Logout';
@@ -57,8 +58,8 @@ interface AppBarProps extends MuiAppBarProps {
 
 export const modalStyle = {
     position: 'absolute' as 'absolute',
-    top: '30%', 
-    left: '50%', 
+    top: '30%',
+    left: '50%',
     transform: 'translate(-50%, -30%)',
     width: 700,
     bgcolor: 'background.paper',
@@ -224,12 +225,13 @@ function HomePage({ children }: LayoutProps) {
                     </DrawerHeader>
                     <Divider />
                     <List>
-                        {[{ id: 1, text: 'Thông tin cá nhân', path: '/profile' }, { id: 2, text: 'Biểu mẫu của tôi', path: '/myforms' }].map((item) => (
+                        {[{ id: 1, text: 'Thông tin cá nhân', path: '/profile' }, { id: 2, text: 'Biểu mẫu của tôi', path: '/myforms' }, { id: 3, text: 'Lịch sử điền form', path: '/history' }].map((item) => (
                             <ListItem key={item.id} onClick={navSideBar(item.path)} sx={{ paddingY: '5px' }} disablePadding>
                                 <ListItemButton>
                                     <ListItemIcon sx={{ marginLeft: '25px' }}>
                                         {item.id === 1 ? <InfoIcon sx={{ color: 'white' }} /> : ''}
                                         {item.id === 2 ? <ArticleIcon sx={{ color: 'white' }} /> : ''}
+                                        {item.id === 3 ? <HistoryIcon sx={{ color: 'white' }} /> : ''}
                                     </ListItemIcon>
                                     <ListItemText>
                                         <Typography sx={{ fontWeight: 400, fontSize: '1.1rem', color: 'white' }}>

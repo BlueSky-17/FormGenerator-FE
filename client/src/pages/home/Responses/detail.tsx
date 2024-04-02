@@ -12,6 +12,8 @@ function Detail(props) {
     console.log(props.indexDetail - 1)
     console.log(props.responses[props.indexDetail - 1])
 
+    console.log(props.form);
+
     return (
         <Box>{
             props.responses.length > 0 ?

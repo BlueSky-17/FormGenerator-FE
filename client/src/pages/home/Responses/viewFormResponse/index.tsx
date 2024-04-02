@@ -65,52 +65,13 @@ interface FormResponseProps {
 }
 
 const FormResponse: React.FC<FormResponseProps> = ({ Answer, Form }) => {
-  // render: use to re-render after create or delete form
-  const [render, setRender] = useState(false);
-
   const [formDetail, setFormDetail] = useState<any>(Form);
   const [formResponses, setFormResponse] = useState<any[]>(Answer.Responses);
-  console.log(formResponses)
-  // Lưu giá trị cho các field dạng multi-choic
-  const shouldDisableCheckbox = (ques: number, index: number): boolean => {
-    const maxAllowed = formResponses[ques].content.multiChoice.maxOptions; // Set your maximum number of allowed checked boxes
-    const phanTuTrue = formResponses[ques].content.multiChoice.result.filter(
-      (giaTri) => giaTri === true
-    ); //Return array have true value
-    return phanTuTrue.length >= maxAllowed;
-  };
-
-  //Lưu giá trị cho các field dạng linkedData
-  const [firstField, setFirstField] = useState('');
-  const handleFirstFieldChange = (ques: number) => (e) => {
-    setFirstField(e.target.value);
-    setSecondField('');
-    setThirdField('');
-
-    const firstChoice = formDetail.Questions[ques].Content.LinkedData.ListOfOptions[e.target.value].Key;
-    formResponses[ques].content.linkedData.push(firstChoice);
-  };
-
-  const [secondField, setSecondField] = useState('');
-  const handleSecondFieldChange = (ques: number) => (e) => {
-    setSecondField(e.target.value);
-    setThirdField('');
-
-    const secondChoice = formDetail.Questions[ques].Content.LinkedData.ListOfOptions[firstField].Value[e.target.value].Key;
-    formResponses[ques].content.linkedData.push(secondChoice);
-  };
-
-  const [thirdField, setThirdField] = useState('');
-  const handleThirdFieldChange = (ques: number) => (e) => {
-    setThirdField(e.target.value);
-
-    const thirdChoice = formDetail.Questions[ques].Content.LinkedData.ListOfOptions[firstField].Value[secondField].Value;
-    formResponses[ques].content.linkedData.push(thirdChoice);
-  };
   const [height, setHeight] = useState("100%");
 
-  console.log(formResponses);
-  console.log(formDetail);
+  useEffect(() => {
+    setFormDetail(Form);
+  }, [Form]); 
 
   return (
     <div>

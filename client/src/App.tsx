@@ -9,6 +9,8 @@ import { Route, BrowserRouter, Routes, Navigate } from 'react-router-dom';
 import './App.css';
 import { error } from 'console';
 import Profile from './pages/profile';
+import History from './pages/history';
+import HistoryDetail from './pages/history/detail';
 
 
 function App() {
@@ -58,6 +60,16 @@ function App() {
           <Route path="/profile" element={
             <HomePage>
               <Profile />
+            </HomePage>
+          } />
+          <Route path="/history" element={
+            <HomePage>
+              <History />
+            </HomePage>
+          } />
+          <Route path="/history/:id" element={
+            <HomePage>
+              <HistoryDetail />
             </HomePage>
           } />
           <Route
