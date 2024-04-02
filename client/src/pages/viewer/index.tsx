@@ -150,6 +150,7 @@ function Form() {
             await addResponsetoDatabase({
                 "id": "6526518a6b149bcb2510172f",
                 "formID": "651dbc9d49502243191371e3",
+                "formName": formDetail.name,
                 "username": formDetail.owner,
                 "userID": formDetail.owner,
                 "submitTime": "2023-10-11T07:40:58.1078101Z",

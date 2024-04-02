@@ -45,6 +45,7 @@ export interface Response{
 export interface Answer{
     id: string
     FormID: string
+    FormName: string
     Username: string
     UserID: string
     SubmitTime: Date
