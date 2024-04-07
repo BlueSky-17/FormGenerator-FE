@@ -38,6 +38,7 @@ import TextField from '@mui/material/TextField';
 import { useParams } from 'react-router-dom';
 
 import { Response, ResultMultiChoice, ResultShortText, ResultDate, ResultLinkedData, ResultFile, ResultTable } from './interface';
+import bg from "../../assets/background.png"
 
 // APIs
 import { deleteFile, uploadFileToS3 } from '../../apis/file';
@@ -592,7 +593,7 @@ function Form() {
         formResponses[ques].content.linkedData.push(firstChoice);
         formResponses[ques].content.index.push(e.target.value);
 
-        setRender(!render); 
+        setRender(!render);
     };
 
     const handleSecondFieldChange = (ques: number) => (e) => {
@@ -603,7 +604,7 @@ function Form() {
             formResponses[ques].content.linkedData = subArray1;
             formResponses[ques].content.index = subArray2;
         }
-        
+
         const secondChoice = formDetail.Questions[ques].Content.LinkedData.ListOfOptions[formResponses[ques].content.index[0]].Value[e.target.value].Key;
         formResponses[ques].content.linkedData.push(secondChoice);
         formResponses[ques].content.index.push(e.target.value);
@@ -670,7 +671,15 @@ function Form() {
 
     return (
         <div>
-            <Box sx={{ backgroundColor: '#E9F2F4', border: "2px solid #DEDEDE", height: { height }, width: '100vw' }}>
+            <Box sx={{
+                backgroundImage: `url(${bg})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                // backgroundRepeat: 'no-repeat',
+                border: "2px solid #DEDEDE",
+                height: { height },
+                width: '100vw'
+            }}>
                 <Box sx={{ backgroundColor: 'white', border: "2px solid #DEDEDE", borderRadius: '10px', marginX: '25vw', marginTop: '70px' }}>
                     {/* Header of Form */}
                     <Box sx={{ textAlign: 'center', backgroundColor: '#008272', paddingY: '30px', borderRadius: '10px 10px 0 0' }}>

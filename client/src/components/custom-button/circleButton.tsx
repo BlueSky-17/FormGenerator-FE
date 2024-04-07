@@ -1,6 +1,6 @@
 import { IconButton, Tooltip } from '@mui/material';
 import React from 'react';
-import COLORS from '../constants/colors';
+import COLORS from '../../constants/colors';
 
 const CircleButton = ({ children, onClick, tooltip }) => {
     return (

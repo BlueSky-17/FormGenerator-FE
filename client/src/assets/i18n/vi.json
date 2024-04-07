@@ -1,5 +1,6 @@
 {
     "shortText": "Điền ngắn",
+    "longText": "Điền dài",
     "multi-choice": "Trắc nghiệm",
     "checkbox": "Ô đánh dấu",
     "dropdown": "Menu thả xuống",
@@ -7,5 +8,8 @@
     "date-range": "Khoảng thời gian",
     "linkedData": "Dữ liệu liên kết",
     "file": "File",
-    "table": "Bảng"
+    "table": "Bảng",
+    "email": "Email",
+    "phone": "Số điện thoại",
+    "OTPinput": "OTP Input"
 }

@@ -45,6 +45,7 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 
 import TextField from "@mui/material/TextField";
 import { useParams } from "react-router-dom";
+import bg from '../../../../assets/background.png'
 
 import {
   Response,
@@ -73,13 +74,19 @@ const FormResponse: React.FC<FormResponseProps> = ({ Answer, Form }) => {
     setFormDetail(Form);
   }, [Form]); 
 
+  console.log(bg);
+
   return (
     <div>
       <Box
         sx={{
-          backgroundColor: "#E9F2F4",
+          // backgroundColor: "#E9F2F4",
+          backgroundImage: `url(${bg})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
           border: "2px solid #DEDEDE",
-          height: { height },
+          // height: { height },
         }}
       >
         <Box

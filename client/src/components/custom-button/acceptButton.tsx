@@ -1,6 +1,6 @@
 import { Button, IconButton, Tooltip, Typography } from '@mui/material';
 import React, { memo, FC } from 'react';
-import COLORS from '../constants/colors';
+import COLORS from '../../constants/colors';
 
 export type CustomButtonProps = {
     title: string;

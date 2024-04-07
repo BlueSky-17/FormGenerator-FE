@@ -28,9 +28,9 @@ import { createForm, deleteForm } from '../../../apis/form';
 //component đã được styled
 import { SearchIconWrapper, Search, StyledInputBase } from './searchBar';
 import { modalStyle } from '../home.page';
-import CircleButton from '../../../components/circleButton';
-import AcceptButton from '../../../components/acceptButton';
-import CancelButton from '../../../components/cancelButton';
+import CircleButton from '../../../components/custom-button/circleButton';
+import AcceptButton from '../../../components/custom-button/acceptButton';
+import CancelButton from '../../../components/custom-button/cancelButton';
 
 const DrawerHeader = styled('div')(({ theme }) => ({
     display: 'flex',

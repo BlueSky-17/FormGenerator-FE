@@ -6,8 +6,8 @@ import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import { useParams } from 'react-router-dom';
 import { UndoRounded } from '@mui/icons-material';
-import AcceptButton from '../../../components/acceptButton';
-import CancelButton from '../../../components/cancelButton';
+import AcceptButton from '../../../components/custom-button/acceptButton';
+import CancelButton from '../../../components/custom-button/cancelButton';
 import { modalStyle } from '../home.page';
 
 export function EditModal(props) {

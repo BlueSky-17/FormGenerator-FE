@@ -3,26 +3,14 @@ import React, { useState, useEffect, useLayoutEffect } from 'react'
 import { Box, Typography, Drawer, Avatar, IconButton, Toolbar, List, Divider, Icon, Modal, Grid, Switch } from '@mui/material'
 import Button from '@mui/material/Button';
 
-import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked';
-import CheckBoxIcon from '@mui/icons-material/CheckBox';
-import NotesIcon from '@mui/icons-material/Notes';
 import ClearIcon from '@mui/icons-material/Clear';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
-import EventIcon from '@mui/icons-material/Event';
-import DatasetLinkedIcon from '@mui/icons-material/DatasetLinked';
-import ArrowDropDownCircleIcon from '@mui/icons-material/ArrowDropDownCircle';
-import CloseIcon from '@mui/icons-material/Close';
 import AddIcon from '@mui/icons-material/Add';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
-import AttachFileIcon from '@mui/icons-material/AttachFile';
-import DateRangeIcon from '@mui/icons-material/DateRange';
-import TableViewIcon from '@mui/icons-material/TableView';
 
 import TextField from '@mui/material/TextField';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
 import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import FormGroup from '@mui/material/FormGroup';
@@ -31,14 +19,16 @@ import Checkbox from '@mui/material/Checkbox';
 import { useParams } from 'react-router-dom';
 import Alert, { AlertProps } from '@mui/material/Alert';
 
-import { Question, ShortText, MultiChoice, Date, LinkedData, File, Table } from './interface';
+import { Question, ShortText, MultiChoice, Date, LinkedData, File, Table, SpecialText } from './interface';
 import * as XLSX from 'xlsx'
 import { LensBlur } from '@mui/icons-material';
-import AcceptButton from '../../../components/acceptButton';
-import CancelButton from '../../../components/cancelButton';
+import AcceptButton from '../../../components/custom-button/acceptButton';
+import CancelButton from '../../../components/custom-button/cancelButton';
 
 import { typeOfFile, myRecordType } from '../../../constants/typeOfFile';
 import { modalStyle } from '../home.page';
+import SelectType from '../../../components/select-type/select-type';
+import SwitchType from '../../../components/custom-switch/switch-type';
 
 export function MainModal(props) {
     //API to get type of a question by Random Forest
@@ -123,13 +113,21 @@ export function MainModal(props) {
                 props.formDetail.Questions[ques].Content = {};
                 Object.assign(props.formDetail.Questions[ques].Content, updateMultiChoice);
             }
-            else if (props.type === "shortText") {
+            else if (props.type === "shortText" || props.type === 'longText') {
                 const updateShortText: ShortText = {
-                    shortText: true
+                    shortText: props.type === "shortText" ? true : false
                 };
 
                 props.formDetail.Questions[ques].Content = {};
                 Object.assign(props.formDetail.Questions[ques].Content, updateShortText);
+            }
+            else if (props.type === "email" || props.type === 'phone' || props.type === 'OTPinput') {
+                const updateSpecialText: SpecialText = {
+                    specialText: props.type
+                };
+
+                props.formDetail.Questions[ques].Content = {};
+                Object.assign(props.formDetail.Questions[ques].Content, updateSpecialText);
             }
             else if (props.type === "date-single" || props.type === "date-range") {
                 const updateDate: Date = {
@@ -296,23 +294,59 @@ export function MainModal(props) {
 
     // convert Multi-choice <-> Checkbox
     const convertType = (e) => {
-        if (props.type === 'multi-choice') props.setType('checkbox');
-        else if (props.type === 'checkbox') props.setType('multi-choice');
-        else if (props.type === 'date-single') {
-            props.setType('date-range');
-
-            if (props.dateNum === 1) props.setDateNum(5);
-            else if (props.dateNum === 2) props.setDateNum(6);
-            else if (props.dateNum === 3) props.setDateNum(7);
-            else if (props.dateNum === 4) props.setDateNum(8);
-        }
-        else if (props.type === 'date-range') {
-            props.setType('date-single');
-
-            if (props.dateNum === 5) props.setDateNum(1);
-            else if (props.dateNum === 6) props.setDateNum(2);
-            else if (props.dateNum === 7) props.setDateNum(3);
-            else if (props.dateNum === 8) props.setDateNum(4);
+        switch (props.type) {
+            case 'shortText':
+                props.setType('longText');
+                break;
+            case 'longText':
+                props.setType('shortText');
+                break;
+            case 'multi-choice':
+                props.setType('checkbox');
+                break;
+            case 'checkbox':
+                props.setType('multi-choice');
+                break;
+            case 'date-single':
+                props.setType('date-range');
+                switch (props.dateNum) {
+                    case 1:
+                        props.setDateNum(5);
+                        break;
+                    case 2:
+                        props.setDateNum(6);
+                        break;
+                    case 3:
+                        props.setDateNum(7);
+                        break;
+                    case 4:
+                        props.setDateNum(8);
+                        break;
+                    default:
+                        break;
+                }
+                break;
+            case 'date-range':
+                props.setType('date-single');
+                switch (props.dateNum) {
+                    case 5:
+                        props.setDateNum(1);
+                        break;
+                    case 6:
+                        props.setDateNum(2);
+                        break;
+                    case 7:
+                        props.setDateNum(3);
+                        break;
+                    case 8:
+                        props.setDateNum(4);
+                        break;
+                    default:
+                        break;
+                }
+                break;
+            default:
+                break;
         }
     }
 
@@ -519,6 +553,7 @@ export function MainModal(props) {
                     </Typography>
 
                     <Box component="form" sx={{ mt: '10px', mb: '5px', display: 'flex', alignItems: 'center' }}>
+                        {/* Input Form Name */}
                         <TextField
                             required
                             value={props.titleQuestion}
@@ -529,96 +564,9 @@ export function MainModal(props) {
                             placeholder='Nhập nội dung câu hỏi...'
                             onKeyDown={recommendType}
                         />
-                        <FormControl fullWidth>
-                            <InputLabel id="demo-simple-select-label">Dạng</InputLabel>
-                            <Select
-                                MenuProps={{
-                                    PaperProps: {
-                                        sx: {
-                                            maxHeight: 230,
-                                        }
-                                    }
-                                }}
-                                labelId="demo-simple-select-label"
-                                id="demo-simple-select"
-                                value={props.type}
-                                label="Dạng"
-                                onChange={handleChangeType}
-                            >
-                                <MenuItem value={'shortText'}>
-                                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                                        <NotesIcon sx={{ marginRight: '10px', color: '#6D7073' }} />
-                                        <ListItemText>
-                                            Điền ngắn
-                                        </ListItemText>
-                                    </div>
-                                </MenuItem>
-                                <MenuItem value={'multi-choice'}>
-                                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                                        <RadioButtonCheckedIcon sx={{ marginRight: '10px', color: '#6D7073' }} />
-                                        <ListItemText>
-                                            Trắc nghiệm
-                                        </ListItemText>
-                                    </div>
-                                </MenuItem>
-                                <MenuItem value={'checkbox'}>
-                                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                                        <CheckBoxIcon sx={{ marginRight: '10px', color: '#6D7073' }} />
-                                        <ListItemText>
-                                            Ô đánh dấu
-                                        </ListItemText>
-                                    </div>
-                                </MenuItem>
-                                <MenuItem value={'dropdown'}>
-                                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                                        <ArrowDropDownCircleIcon sx={{ marginRight: '10px', color: '#6D7073' }} />
-                                        <ListItemText>
-                                            Menu thả xuống
-                                        </ListItemText>
-                                    </div>
-                                </MenuItem>
-                                <MenuItem value={'date-single'}>
-                                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                                        <EventIcon sx={{ marginRight: '10px', color: '#6D7073' }} />
-                                        <ListItemText>
-                                            Mốc thời gian
-                                        </ListItemText>
-                                    </div>
-                                </MenuItem>
-                                <MenuItem value={'date-range'}>
-                                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                                        <DateRangeIcon sx={{ marginRight: '10px', color: '#6D7073' }} />
-                                        <ListItemText>
-                                            Khoảng thời gian
-                                        </ListItemText>
-                                    </div>
-                                </MenuItem>
-                                <MenuItem value={'file'}>
-                                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                                        <AttachFileIcon sx={{ marginRight: '10px', color: '#6D7073' }} />
-                                        <ListItemText>
-                                            File
-                                        </ListItemText>
-                                    </div>
-                                </MenuItem>
-                                <MenuItem value={'linkedData'}>
-                                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                                        <DatasetLinkedIcon sx={{ marginRight: '10px', color: '#6D7073' }} />
-                                        <ListItemText>
-                                            Dữ liệu liên kết
-                                        </ListItemText>
-                                    </div>
-                                </MenuItem>
-                                <MenuItem value={'table'}>
-                                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                                        <TableViewIcon sx={{ marginRight: '10px', color: '#6D7073' }} />
-                                        <ListItemText>
-                                            Bảng
-                                        </ListItemText>
-                                    </div>
-                                </MenuItem>
-                            </Select>
-                        </FormControl>
+
+                        {/* Select-Type Component */}
+                        <SelectType value={props.type} handleFunction={handleChangeType} />
                     </Box>
                     {props.type === 'multi-choice' || props.type === 'checkbox' || props.type === 'dropdown' ?
                         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
@@ -709,6 +657,10 @@ export function MainModal(props) {
                     }
                     {props.type === 'shortText' ?
                         <TextField disabled sx={{ width: '100%' }} id="standard-basic" label="Nhập câu trả lời" variant="standard" />
+                        : null
+                    }
+                    {props.type === 'longText' ?
+                        <TextField disabled multiline rows={4} sx={{ width: '100%' }} id="standard-basic" label="Nhập câu trả lời" variant="standard" />
                         : null
                     }
                     {props.type === 'date-single' || props.type === 'date-range' ?
@@ -938,38 +890,9 @@ export function MainModal(props) {
                     }
 
                     {props.type !== '' &&
-                        <Box>
-                            <Divider />
-                            <FormGroup sx={{ display: 'flex', flexDirection: 'row-reverse', marginTop: '5px' }}>
-                                <FormControlLabel control={<Switch checked={props.required}
-                                    onChange={handleChangeRequired} />} label="Bắt buộc"
-                                />
-                                {props.type === 'multi-choice' &&
-                                    <FormControlLabel control={<Switch defaultChecked={false}
-                                        onChange={convertType}
-                                    />} label="Nhiều lựa chọn"
-                                    />
-                                }
-                                {props.type === 'checkbox' &&
-                                    <FormControlLabel control={<Switch defaultChecked={true}
-                                        onChange={convertType}
-                                    />} label="Nhiều lựa chọn"
-                                    />
-                                }
-                                {props.type === 'date-range' &&
-                                    <FormControlLabel control={<Switch defaultChecked={true}
-                                        onChange={convertType}
-                                    />} label="Khoảng thời gian"
-                                    />
-                                }
-                                {props.type === 'date-single' &&
-                                    <FormControlLabel control={<Switch defaultChecked={false}
-                                        onChange={convertType}
-                                    />} label="Khoảng thời gian"
-                                    />
-                                }
-                            </FormGroup>
-                        </Box>
+                        <SwitchType checked={props.required} handleChangeRequired={handleChangeRequired}
+                            type={props.type} convertType={convertType}
+                        />
                     }
                     {error && <Alert sx={{ background: 'transparent', p: '0' }} severity="error">Vui lòng điền tiêu đề và lựa chọn dạng câu hỏi</Alert>}
                     <Box sx={{ display: 'flex', flexDirection: 'row-reverse' }} >

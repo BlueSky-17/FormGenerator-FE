@@ -21,6 +21,11 @@ export interface ShortText {
     shortText: boolean
 }
 
+// Content for multi-choice TYPE
+export interface SpecialText {
+    specialText: string
+}
+
 // Content for date TYPE
 export interface Date {
     Date: number

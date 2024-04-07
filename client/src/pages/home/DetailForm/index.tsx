@@ -32,8 +32,8 @@ import Responses from '../Responses';
 import { ShortText, MultiChoice, Date } from './interface';
 import EditModal from './editmodal';
 
-import CircleButton from '../../../components/circleButton';
-import AcceptButton from '../../../components/acceptButton';
+import CircleButton from '../../../components/custom-button/circleButton';
+import AcceptButton from '../../../components/custom-button/acceptButton';
 
 const DrawerHeader = styled('div')(({ theme }) => ({
     display: 'flex',

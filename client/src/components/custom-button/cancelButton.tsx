@@ -1,6 +1,6 @@
 import { Button, IconButton, Tooltip, Typography } from '@mui/material';
 import React from 'react';
-import COLORS from '../constants/colors';
+import COLORS from '../../constants/colors';
 
 const CancelButton = ({ title, onClick }) => {
     return (

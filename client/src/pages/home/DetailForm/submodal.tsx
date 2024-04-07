@@ -8,8 +8,8 @@ import CloseIcon from '@mui/icons-material/Close';
 
 import { DataGrid, GridColDef, GridValueGetterParams, GridRowModel, } from '@mui/x-data-grid';
 import { modalStyle } from '../home.page';
-import AcceptButton from '../../../components/acceptButton';
-import CancelButton from '../../../components/cancelButton';
+import AcceptButton from '../../../components/custom-button/acceptButton';
+import CancelButton from '../../../components/custom-button/cancelButton';
 
 export function SubModal(props) {
 
