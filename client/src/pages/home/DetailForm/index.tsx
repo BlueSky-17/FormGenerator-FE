@@ -516,6 +516,8 @@ function DetailForm() {
         setSubOpen("")
     }
 
+    console.log(formDetail);
+
     return (
         <Box>
             <DrawerHeader />

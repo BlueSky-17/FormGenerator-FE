@@ -19,7 +19,7 @@ import Checkbox from '@mui/material/Checkbox';
 import { useParams } from 'react-router-dom';
 import Alert, { AlertProps } from '@mui/material/Alert';
 
-import { Question, ShortText, MultiChoice, Date, LinkedData, File, Table, SpecialText } from './interface';
+import { Question, ShortText, MultiChoice, Date, LinkedData, File, Table, SpecialText, OTPInput } from './interface';
 import * as XLSX from 'xlsx'
 import { LensBlur } from '@mui/icons-material';
 import AcceptButton from '../../../components/custom-button/acceptButton';
@@ -121,13 +121,21 @@ export function MainModal(props) {
                 props.formDetail.Questions[ques].Content = {};
                 Object.assign(props.formDetail.Questions[ques].Content, updateShortText);
             }
-            else if (props.type === "email" || props.type === 'phone' || props.type === 'OTPinput') {
+            else if (props.type === "email" || props.type === 'phone') {
                 const updateSpecialText: SpecialText = {
                     specialText: props.type
                 };
 
                 props.formDetail.Questions[ques].Content = {};
                 Object.assign(props.formDetail.Questions[ques].Content, updateSpecialText);
+            }
+            else if (props.type === "OTPInput") {
+                const updateOTPInput: OTPInput = {
+                    otpInput: OTPNumber
+                };
+
+                props.formDetail.Questions[ques].Content = {};
+                Object.assign(props.formDetail.Questions[ques].Content, updateOTPInput);
             }
             else if (props.type === "date-single" || props.type === "date-range") {
                 const updateDate: Date = {
@@ -537,7 +545,13 @@ export function MainModal(props) {
         }
     }
 
-    // console.log(props.formDetail)
+    const [OTPNumber, setOTPNumber] = useState<number>(12);
+    const handleOTPNumber = (event) => {
+        setOTPNumber(event.target.value);
+    }
+
+    console.log(props.type)
+    console.log(OTPNumber)
 
     return (
         <div>
@@ -888,7 +902,10 @@ export function MainModal(props) {
                         </Box>
                         : null
                     }
-
+                    {props.type === 'OTPInput' ?
+                        <TextField value={OTPNumber} onChange={handleOTPNumber} sx={{ width: '100%' }} id="standard-basic" label="Nhập số lượng ô" variant="standard" />
+                        : null
+                    }
                     {props.type !== '' &&
                         <SwitchType checked={props.required} handleChangeRequired={handleChangeRequired}
                             type={props.type} convertType={convertType}

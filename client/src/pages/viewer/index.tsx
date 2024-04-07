@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable no-loop-func */
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Box, Typography, Drawer, Avatar, IconButton, Toolbar, List, Divider, Icon, Grid } from '@mui/material'
 import Button from '@mui/material/Button';
 import InputLabel from '@mui/material/InputLabel';
@@ -36,8 +36,9 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 import TextField from '@mui/material/TextField';
 import { useParams } from 'react-router-dom';
+import OtpInput from 'react-otp-input';
 
-import { Response, ResultMultiChoice, ResultShortText, ResultDate, ResultLinkedData, ResultFile, ResultTable } from './interface';
+import { Response, ResultMultiChoice, ResultShortText, ResultDate, ResultLinkedData, ResultFile, ResultTable, ResultSpecialText, ResultOTPText } from './interface';
 import bg from "../../assets/background.png"
 
 // APIs
@@ -212,6 +213,20 @@ function Form() {
                 else if (formDetail.Questions[i].Type === "shortText") {
                     const result: ResultShortText = {
                         shortText: ""
+                    };
+
+                    Object.assign(newResponse.content, result)
+                }
+                else if (formDetail.Questions[i].Type === "email" || formDetail.Questions[i].Type === "phone") {
+                    const result: ResultSpecialText = {
+                        specialText: ""
+                    };
+
+                    Object.assign(newResponse.content, result)
+                }
+                else if (formDetail.Questions[i].Type === "OTPInput") {
+                    const result: ResultOTPText = {
+                        OTPInput: ""
                     };
 
                     Object.assign(newResponse.content, result)
@@ -666,6 +681,43 @@ function Form() {
         setRender(!render)
     };
 
+    // PHONE NUMBER
+    const [phoneNumber, setPhoneNumber] = useState('');
+    const [phoneNumberError, setPhoneNumberError] = useState('');
+
+    const validatePhoneNumber = (inputPhoneNumber) => {
+        const phoneNumberRegex = /(0[3|5|7|8|9])+([0-9]{8})\b/; // Định dạng số điện thoại, ví dụ: 1234567890
+        if (!phoneNumberRegex.test(inputPhoneNumber)) {
+            return 'Số điện thoại không hợp lệ';
+        }
+        return '';
+    };
+
+    const handleBlurPhone = () => {
+        const error = validatePhoneNumber(phoneNumber);
+        setPhoneNumberError(error);
+    };
+
+    // EMAIL
+    const [email, setEmail] = useState('');
+    const [emailError, setEmailError] = useState('');
+
+    const validateEmail = (inputEmail) => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(inputEmail)) {
+            return 'Email không hợp lệ';
+        }
+        return '';
+    };
+
+    const handleBlurEmail = () => {
+        const error = validateEmail(email);
+        setEmailError(error);
+    };
+
+    //OTP Input
+    const [otp, setOtp] = useState('');
+
     console.log(formResponses);
     console.log(formDetail);
 
@@ -675,7 +727,7 @@ function Form() {
                 backgroundImage: `url(${bg})`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
-                // backgroundRepeat: 'no-repeat',
+                backgroundRepeat: 'no-repeat',
                 border: "2px solid #DEDEDE",
                 height: { height },
                 width: '100vw'
@@ -1173,6 +1225,41 @@ function Form() {
                                                 </TableBody>
                                             </Table>
                                         </TableContainer> : null
+                                    }
+                                    {formDetail.Questions[ques].Type === 'phone' ?
+                                        <TextField
+                                            name='phoneNumber'
+                                            value={phoneNumber}
+                                            variant='outlined'
+                                            onBlur={handleBlurPhone}
+                                            error={!!phoneNumberError}
+                                            helperText={phoneNumberError}
+                                            onChange={(e) => setPhoneNumber(e.target.value)}
+                                        />
+                                        : null
+                                    }
+                                    {formDetail.Questions[ques].Type === 'email' ?
+                                        <TextField
+                                            name='email'
+                                            value={email}
+                                            variant='outlined'
+                                            onBlur={handleBlurEmail}
+                                            error={!!emailError}
+                                            helperText={emailError}
+                                            onChange={(e) => setEmail(e.target.value)}
+                                        />
+                                        : null
+                                    }
+                                    {formDetail.Questions[ques].Type === 'OTPInput' ?
+                                        <OtpInput
+                                            value={otp}
+                                            onChange={setOtp}
+                                            numInputs={formDetail.Questions[ques].Content.OtpInput}
+                                            renderSeparator={<span>-</span>}
+                                            renderInput={(props) => <input {...props} />}
+                                            inputStyle={{ width: '32px', height: '32px', border: '1px solid gray', borderRadius: '5px' }}
+                                        />
+                                        : null
                                     }
                                 </Box>
                             </Box>

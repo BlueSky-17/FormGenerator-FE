@@ -23,6 +23,13 @@ export interface ResultShortText {
     shortText: string
 }
 
+export interface ResultSpecialText {
+    specialText: string
+}
+export interface ResultOTPText {
+    OTPInput: string
+}
+
 // Content for date TYPE
 export interface ResultDate {
     date: {

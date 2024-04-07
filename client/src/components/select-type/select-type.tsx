@@ -141,7 +141,7 @@ function SelectType({
                         </ListItemText>
                     </div>
                 </MenuItem>
-                <MenuItem value={'OTPinput'}>
+                <MenuItem value={'OTPInput'}>
                     <div style={{ display: 'flex', alignItems: 'center' }}>
                         <InputIcon sx={{ marginRight: '10px', color: '#6D7073' }} />
                         <ListItemText>

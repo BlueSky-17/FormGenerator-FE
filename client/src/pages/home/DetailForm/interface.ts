@@ -26,6 +26,10 @@ export interface SpecialText {
     specialText: string
 }
 
+export interface OTPInput {
+    otpInput: number
+}
+
 // Content for date TYPE
 export interface Date {
     Date: number
