@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable no-loop-func */
 import React, { useState, useEffect, useRef } from 'react'
@@ -43,6 +44,7 @@ import bg from "../../assets/background.png"
 
 // APIs
 import { deleteFile, uploadFileToS3 } from '../../apis/file';
+import OTPInput from 'react-otp-input';
 // import { addResponsetoDatabase } from '../../apis/responses';
 
 function Form() {
@@ -385,10 +387,9 @@ function Form() {
     //Get value of textField after onBlur the field
     const saveInputValue = (ques: number) => (e) => {
         formResponses[ques].content.shortText = inputValue;
-
         //Return error if active textField but don't fill
-        if (inputValue === '') formResponses[ques].error = 'Vui lòng điền những câu hỏi bắt buộc';
-        else formResponses[ques].error = ''
+        // if (inputValue === '') formResponses[ques].error = 'Vui lòng điền những câu hỏi bắt buộc';
+        // else formResponses[ques].error = ''
 
         //Render update UI
         setRender(!render)
@@ -693,9 +694,11 @@ function Form() {
         return '';
     };
 
-    const handleBlurPhone = () => {
+    const handleBlurPhone = (ques: number) => (e) => {
         const error = validatePhoneNumber(phoneNumber);
         setPhoneNumberError(error);
+        //save
+        formResponses[ques].content.specialText = email;
     };
 
     // EMAIL
@@ -710,14 +713,26 @@ function Form() {
         return '';
     };
 
-    const handleBlurEmail = () => {
+    const handleBlurEmail = (ques: number) => (e) => {
         const error = validateEmail(email);
         setEmailError(error);
+
+        formResponses[ques].content.specialText = phoneNumber;
     };
 
     //OTP Input
     const [otp, setOtp] = useState('');
 
+    const handleSaveOTP = (ques: number) => (e) => {
+        setOtp(e);
+        formResponses[ques].content.OTPInput = e;
+    }
+
+    // useEffect(() => {
+    //     formResponses[indexOTP].content.OTPInput = otp;
+    // }, [otp])
+
+    console.log(otp);
     console.log(formResponses);
     console.log(formDetail);
 
@@ -1231,7 +1246,7 @@ function Form() {
                                             name='phoneNumber'
                                             value={phoneNumber}
                                             variant='outlined'
-                                            onBlur={handleBlurPhone}
+                                            onBlur={handleBlurPhone(ques)}
                                             error={!!phoneNumberError}
                                             helperText={phoneNumberError}
                                             onChange={(e) => setPhoneNumber(e.target.value)}
@@ -1243,7 +1258,7 @@ function Form() {
                                             name='email'
                                             value={email}
                                             variant='outlined'
-                                            onBlur={handleBlurEmail}
+                                            onBlur={handleBlurEmail(ques)}
                                             error={!!emailError}
                                             helperText={emailError}
                                             onChange={(e) => setEmail(e.target.value)}
@@ -1253,7 +1268,9 @@ function Form() {
                                     {formDetail.Questions[ques].Type === 'OTPInput' ?
                                         <OtpInput
                                             value={otp}
-                                            onChange={setOtp}
+                                            onChange={handleSaveOTP(ques)}
+                                            // onBlur={saveInputValue(ques)}
+                                            // handleBlur={saveInputValue(ques)}
                                             numInputs={formDetail.Questions[ques].Content.OtpInput}
                                             renderSeparator={<span>-</span>}
                                             renderInput={(props) => <input {...props} />}

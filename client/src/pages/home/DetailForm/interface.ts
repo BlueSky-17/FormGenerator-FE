@@ -27,7 +27,7 @@ export interface SpecialText {
 }
 
 export interface OTPInput {
-    otpInput: number
+    OtpInput: number
 }
 
 // Content for date TYPE

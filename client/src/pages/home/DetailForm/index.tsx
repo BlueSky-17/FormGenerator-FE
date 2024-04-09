@@ -474,6 +474,9 @@ function DetailForm() {
         else if (formDetail.Questions[ques].Type === "table") {
             setColumnList(formDetail.Questions[ques].Content.Table.ListOfColumn)
         }
+        else if (formDetail.Questions[ques].Type === "OTPInput"){
+            setOTPNumber(formDetail.Questions[ques].Content.OtpInput)
+        }
 
         if (formDetail.Questions[ques].Type === 'checkbox') {
             setConstraint(formDetail.Questions[ques].Content.MultiChoice.Constraint)
@@ -515,6 +518,8 @@ function DetailForm() {
         setHasChange(false);
         setSubOpen("")
     }
+
+    const [OTPNumber, setOTPNumber] = useState<number>(12);
 
     console.log(formDetail);
 
@@ -736,6 +741,9 @@ function DetailForm() {
                 setIndexOptionTable={setIndexOptionTable}
 
                 setHasChange={setHasChange}
+
+                OTPNumber={OTPNumber}
+                setOTPNumber={setOTPNumber}
             />
 
             <SubModal

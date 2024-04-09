@@ -131,7 +131,7 @@ export function MainModal(props) {
             }
             else if (props.type === "OTPInput") {
                 const updateOTPInput: OTPInput = {
-                    otpInput: OTPNumber
+                    OtpInput: props.OTPNumber as number
                 };
 
                 props.formDetail.Questions[ques].Content = {};
@@ -216,6 +216,10 @@ export function MainModal(props) {
             }
             else if (props.type === 'table') {
                 props.formDetail.Questions[props.quesEdit].Content.Table.ListOfColumn = props.columnList;
+            }
+            else if (props.type === 'OTPInput') {
+                props.formDetail.Questions[props.quesEdit].Content.OtpInput = Number(props.OTPNumber);
+                console.log(typeof(props.formDetail.Questions[props.quesEdit].Content.OtpInput))
             }
 
             props.setHasChange(true);
@@ -545,13 +549,12 @@ export function MainModal(props) {
         }
     }
 
-    const [OTPNumber, setOTPNumber] = useState<number>(12);
     const handleOTPNumber = (event) => {
-        setOTPNumber(event.target.value);
+        props.setOTPNumber(event.target.value);
     }
 
     console.log(props.type)
-    console.log(OTPNumber)
+    console.log(props.OTPNumber)
 
     return (
         <div>
@@ -903,7 +906,7 @@ export function MainModal(props) {
                         : null
                     }
                     {props.type === 'OTPInput' ?
-                        <TextField value={OTPNumber} onChange={handleOTPNumber} sx={{ width: '100%' }} id="standard-basic" label="Nhập số lượng ô" variant="standard" />
+                        <TextField value={props.OTPNumber} onChange={handleOTPNumber} sx={{ width: '100%' }} id="standard-basic" label="Nhập số lượng ô" variant="standard" />
                         : null
                     }
                     {props.type !== '' &&
