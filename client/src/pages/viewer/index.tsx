@@ -33,7 +33,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 import TextField from '@mui/material/TextField';
 import { useParams } from 'react-router-dom';
-import OtpInput from 'react-otp-input';
+import OTPInput from '../../components/otp-input/otp-input';
 
 import { Response, ResultMultiChoice, ResultShortText, ResultDate, ResultLinkedData, ResultFile, ResultTable, ResultSpecialText, ResultOTPText } from './interface';
 import bg from "../../assets/background.png"
@@ -45,6 +45,7 @@ import { deleteFile, uploadFileToS3 } from '../../apis/file';
 function Form() {
     // render: use to re-render after create or delete form
     const [render, setRender] = useState(false);
+    const [height, setHeight] = useState('100%')
 
     const [formDetail, setFormDetail] = useState<any>({})
     const [formResponses, setFormResponse] = useState<any[]>([])
@@ -86,95 +87,10 @@ function Form() {
             .then(data => data.json())
             .then(formDetail => {
                 setFormDetail(formDetail);
+                setOtpArrayLength(formDetail.Questions.length);
             })
+
     }, [])
-
-    const handleSubmitForm = async () => {
-        let checkRequired = true;
-        let checkFromTo = true;
-
-        formResponses.forEach(async item => {
-            if (item.required === true) {
-                if (item.type === 'multi-choice' || item.type === 'checkbox' || item.type === 'dropdown') {
-                    //Check required
-                    //some function: has >=1 true value => true; has no true value => false
-                    let checkSelect = item.content.multiChoice.result.some((giaTri) => giaTri === true);
-                    if (!checkSelect) {
-                        checkRequired = false;
-                        item.error = 'Vui lòng hoàn thành những câu hỏi bắt buộc';
-                    }
-                    else {
-                        item.error = '';
-                    }
-                }
-                else if (item.type === 'shortText') {
-                    if (item.content.shortText === '') {
-                        checkRequired = false;
-                        item.error = 'Vui lòng hoàn thành những câu hỏi bắt buộc';
-                    }
-                    else {
-                        item.error = '';
-                    }
-                }
-                else if (item.type === 'file') {
-                    if (item.content.files.length === 0) {
-                        checkRequired = false;
-                        item.error = 'Vui lòng hoàn thành những câu hỏi bắt buộc';
-                    }
-                    else {
-                        item.error = '';
-                    }
-                }
-                else if (item.type === 'date-range') {
-                    if (item.content.files.length === 0) {
-                        checkRequired = false;
-                        item.error = 'Vui lòng hoàn thành những câu hỏi bắt buộc';
-                    }
-                    else {
-                        item.error = '';
-                    }
-                }
-            }
-
-            if (item.type === 'date-range' && item.error !== '') {
-                checkFromTo = false;
-            }
-        });
-
-        console.log(formResponses)
-
-        //Success: Fill correctly required questions 
-        if (checkRequired && checkFromTo) {
-            console.log(formResponses);
-            await addResponsetoDatabase({
-                "id": "6526518a6b149bcb2510172f",
-                "formID": "651dbc9d49502243191371e3",
-                "formName": formDetail.name,
-                "username": formDetail.owner,
-                "userID": formDetail.owner,
-                "submitTime": "2023-10-11T07:40:58.1078101Z",
-                "responses": formResponses
-            });
-            setSubmit(true)
-            setHeight('100vh')
-        }
-        //Failed: Not fill required questions
-        else if (!checkRequired) {
-            setSubmit(false)
-            setRender(!render)
-        }
-    }
-
-    const handleDeleteFile = (fileName: any, ques: number, index: number) => (e) => {
-        //Call API to delete file (in aws s3)
-        deleteFile(fileName);
-
-        //delete file (in front-end)
-        formResponses[ques].content.files.splice(index, 1);
-
-        //re-render UI
-        setRender(!render);
-    }
 
     // Initial mảng FormResponses tương ứng với các Question trong Form
     // Vì render lần đâu lấy length bị lỗi -> nên dùng try catch 
@@ -332,7 +248,7 @@ function Form() {
         console.log("Error");
     }
 
-    // Lưu giá trị cho các field dạng multi-choice
+    // MULTI-CHOICE, CHECK-BOX
     const handleChange = (ques: number, index: number) => (e) => {
         //set all options to result 0
         formResponses[ques].content.multiChoice.result.fill(false);
@@ -347,7 +263,6 @@ function Form() {
         return phanTuTrue.length >= maxAllowed;
     }
 
-    // Lưu giá trị cho các field dạng checkbox
     const handleChangeCheckbox = (ques: number, index: number) => (e) => {
         //set select options to result 1
         if (formResponses[ques].content.multiChoice.result[index] === false)
@@ -374,11 +289,11 @@ function Form() {
         }
     };
 
-    //Lưu giá trị cho các field dạng shortText
+    // SHORT TEXT, EMAIL, PHONE NUMBER
     const [inputValue, setInputValue] = React.useState('');
     const [email, setEmail] = React.useState('');
     const [phone, setPhone] = React.useState('');
-    //Get value of textField after onBlur the field
+
     const saveInputValue = (ques: number) => (e) => {
         console.log(inputValue)
         switch (formResponses[ques].type) {
@@ -409,6 +324,7 @@ function Form() {
                 break;
         }
     };
+
     const [active, setActive] = useState<number>(-1);
 
     const handleActive = useCallback((ques: number) => (e) => {
@@ -446,11 +362,13 @@ function Form() {
         setActive(ques);
     }, [active, inputValue])
 
-    //handleTableText Value
+    // TABLE
     const [tableText, setTableText] = React.useState('');
+
     const handleChangeTableText = (e) => {
         setTableText(e.target.value);
     };
+
     const saveTableText = (ques: number, rowIndex: number, colIndex: number) => (e) => {
         formResponses[ques].content.table.listOfColumn[colIndex].content[rowIndex].shortText = tableText;
     };
@@ -476,8 +394,51 @@ function Form() {
         setActiveTable([ques, rowIndex, colIndex]);
     }
 
+    const addRowTable = (ques: number) => (e) => {
+        formDetail.Questions[ques].Content.Table.ListOfColumn.forEach((item, index) => {
+            if (item.Type === 'shortText') {
+                formResponses[ques].content.table.listOfColumn[index].content.push
+                    ({
+                        shortText: ''
+                    })
+            }
+            else if (item.Type === 'dropdown') {
+                let res = new Array(formDetail.Questions[ques].Content.Table.ListOfColumn[index].Content.MultiChoice.Options.length).fill(false);
 
-    //Lưu giá trị cho các field dạng Date
+                formResponses[ques].content.table.listOfColumn[index].content.push
+                    ({
+                        multiChoice: {
+                            options: item.Content.MultiChoice.Options,
+                            result: res,
+                            constraint: "",
+                            maxOptions: 1,
+                            disabled: false
+                        }
+                    })
+            }
+            else if (item.Type === 'date-single') {
+                let dateString: string = "1000-1-1";
+
+                formResponses[ques].content.table.listOfColumn[index].content.push({
+                    date: {
+                        single: {
+                            time: new Date(dateString),
+                            type: -1
+                        },
+                        range: {
+                            from: new Date(dateString),
+                            to: new Date(dateString),
+                            type: -1
+                        }
+                    }
+                })
+            }
+        })
+
+        setRender(!render)
+    };
+
+    // DATE 
     const handleChangeDate = (ques: number) => (e) => {
         formResponses[ques].content.date.single.time = e.$d;
         formResponses[ques].content.date.single.type = formDetail.Questions[ques].Content.Date;
@@ -571,8 +532,10 @@ function Form() {
         }
 
     }
-    //Lưu giá trị cho các field dạng dropdown
+
+    // DROP-DOWN 
     const [value, setValue] = useState('');
+
     const handleChangeDropdown = (ques: number) => (e) => {
         setValue(e.target.value as string);
         //Set all options to result 0
@@ -581,6 +544,7 @@ function Form() {
         //set select options to result 1
         formResponses[ques].content.multiChoice.result[e.target.value] = true;
     };
+
     const checkErrDropdown = (ques: number) => (e) => {
         if (formResponses[ques].required) {
             //Check result array is checked or not
@@ -597,46 +561,7 @@ function Form() {
         }
     }
 
-    //Handle submit form
-    const [submit, setSubmit] = useState<boolean>();
-
-    const handleFileChange = (ques: number) => async (e) => {
-        let selectedFile = e.target.files[0]
-        if (selectedFile) {
-            let fileSize = selectedFile.size / 1024;
-
-            let numOfFile = formResponses[ques].content.files.length;
-
-            let totalFileSize = formResponses[ques].content.files.reduce((total, obj) => total + obj.size, 0) / 24;
-
-            //Kiểu file không đúng
-            if (!formDetail.Questions[ques].Content.File.FileType.includes(selectedFile.type)) {
-                formResponses[ques].error = 'Sai định dạng File cho phép';
-            }
-            //Số lượng file vượt giới hạnf
-            else if (numOfFile >= formDetail.Questions[ques].Content.File.MaxFileAmount) {
-                formResponses[ques].error = 'Vượt quá số lượng File cho phép';
-            }
-            //fileSize vượt giới hạn
-            else if (totalFileSize + fileSize >= formDetail.Questions[ques].Content.File.MaxFileSize) {
-                formResponses[ques].error = 'Vượt quá dung lượng File cho phép';
-            }
-            //Thêm được bình thường
-            else {
-                const response = await uploadFileToS3(selectedFile);
-
-                formResponses[ques].content.files.push(response[0])
-
-                // Set error to blank
-                formResponses[ques].error = ''
-
-                console.log(formResponses[ques].content.files);
-            }
-            setRender(!render);
-        }
-    }
-
-    //Lưu giá trị cho các field dạng linkedData
+    // LINKED DATA 
     const handleFirstFieldChange = (ques: number) => (e) => {
         if (formResponses[ques].content.linkedData.length !== 0) {
             formResponses[ques].content.linkedData = []
@@ -674,61 +599,148 @@ function Form() {
         setRender(!render);
     };
 
-    const [height, setHeight] = useState('100%')
+    // OTP INPUT
+    const [otpArray, setOtpArray] = useState<string[]>([]);
 
-    const addRowTable = (ques: number) => (e) => {
-        formDetail.Questions[ques].Content.Table.ListOfColumn.forEach((item, index) => {
-            if (item.Type === 'shortText') {
-                formResponses[ques].content.table.listOfColumn[index].content.push
-                    ({
-                        shortText: ''
-                    })
-            }
-            else if (item.Type === 'dropdown') {
-                let res = new Array(formDetail.Questions[ques].Content.Table.ListOfColumn[index].Content.MultiChoice.Options.length).fill(false);
-
-                formResponses[ques].content.table.listOfColumn[index].content.push
-                    ({
-                        multiChoice: {
-                            options: item.Content.MultiChoice.Options,
-                            result: res,
-                            constraint: "",
-                            maxOptions: 1,
-                            disabled: false
-                        }
-                    })
-            }
-            else if (item.Type === 'date-single') {
-                let dateString: string = "1000-1-1";
-
-                formResponses[ques].content.table.listOfColumn[index].content.push({
-                    date: {
-                        single: {
-                            time: new Date(dateString),
-                            type: -1
-                        },
-                        range: {
-                            from: new Date(dateString),
-                            to: new Date(dateString),
-                            type: -1
-                        }
-                    }
-                })
-            }
-        })
-
-        setRender(!render)
+    const setOtpArrayLength = (length) => {
+        setOtpArray(Array(length).fill(''));
     };
 
-    //OTP Input
-    const [otp, setOtp] = useState('');
+    const handleSaveOTP = (index) => (e) => {
+        const newOtpArray = [...otpArray];
+        newOtpArray[index] = e;
+        setOtpArray(newOtpArray);
 
-    const handleSaveOTP = (ques: number) => (e) => {
-        setOtp(e);
-        formResponses[ques].content.OTPInput = e;
+        formResponses[index].content.OTPInput = e;
+    };
+
+    // FILE
+    const handleFileChange = (ques: number) => async (e) => {
+        let selectedFile = e.target.files[0]
+        if (selectedFile) {
+            let fileSize = selectedFile.size / 1024;
+
+            let numOfFile = formResponses[ques].content.files.length;
+
+            let totalFileSize = formResponses[ques].content.files.reduce((total, obj) => total + obj.size, 0) / 24;
+
+            //Kiểu file không đúng
+            if (!formDetail.Questions[ques].Content.File.FileType.includes(selectedFile.type)) {
+                formResponses[ques].error = 'Sai định dạng File cho phép';
+            }
+            //Số lượng file vượt giới hạnf
+            else if (numOfFile >= formDetail.Questions[ques].Content.File.MaxFileAmount) {
+                formResponses[ques].error = 'Vượt quá số lượng File cho phép';
+            }
+            //fileSize vượt giới hạn
+            else if (totalFileSize + fileSize >= formDetail.Questions[ques].Content.File.MaxFileSize) {
+                formResponses[ques].error = 'Vượt quá dung lượng File cho phép';
+            }
+            //Thêm được bình thường
+            else {
+                const response = await uploadFileToS3(selectedFile);
+
+                formResponses[ques].content.files.push(response[0])
+
+                // Set error to blank
+                formResponses[ques].error = ''
+
+                console.log(formResponses[ques].content.files);
+            }
+            setRender(!render);
+        }
     }
 
-    // console.log(otp);
+    const handleDeleteFile = (fileName: any, ques: number, index: number) => (e) => {
+        //Call API to delete file (in aws s3)
+        deleteFile(fileName);
+
+        //delete file (in front-end)
+        formResponses[ques].content.files.splice(index, 1);
+
+        //re-render UI
+        setRender(!render);
+    }
+
+    // HANDLE SUBMIT FORM
+    const [submit, setSubmit] = useState<boolean>();
+
+    const handleSubmitForm = async () => {
+        let checkRequired = true;
+        let checkFromTo = true;
+
+        formResponses.forEach(async item => {
+            if (item.required === true) {
+                if (item.type === 'multi-choice' || item.type === 'checkbox' || item.type === 'dropdown') {
+                    //Check required
+                    //some function: has >=1 true value => true; has no true value => false
+                    let checkSelect = item.content.multiChoice.result.some((giaTri) => giaTri === true);
+                    if (!checkSelect) {
+                        checkRequired = false;
+                        item.error = 'Vui lòng hoàn thành những câu hỏi bắt buộc';
+                    }
+                    else {
+                        item.error = '';
+                    }
+                }
+                else if (item.type === 'shortText') {
+                    if (item.content.shortText === '') {
+                        checkRequired = false;
+                        item.error = 'Vui lòng hoàn thành những câu hỏi bắt buộc';
+                    }
+                    else {
+                        item.error = '';
+                    }
+                }
+                else if (item.type === 'file') {
+                    if (item.content.files.length === 0) {
+                        checkRequired = false;
+                        item.error = 'Vui lòng hoàn thành những câu hỏi bắt buộc';
+                    }
+                    else {
+                        item.error = '';
+                    }
+                }
+                else if (item.type === 'date-range') {
+                    if (item.content.files.length === 0) {
+                        checkRequired = false;
+                        item.error = 'Vui lòng hoàn thành những câu hỏi bắt buộc';
+                    }
+                    else {
+                        item.error = '';
+                    }
+                }
+            }
+
+            if (item.type === 'date-range' && item.error !== '') {
+                checkFromTo = false;
+            }
+        });
+
+        console.log(formResponses)
+
+        //Success: Fill correctly required questions 
+        if (checkRequired && checkFromTo) {
+            console.log(formResponses);
+            await addResponsetoDatabase({
+                "id": "6526518a6b149bcb2510172f",
+                "formID": "651dbc9d49502243191371e3",
+                "formName": formDetail.name,
+                "username": formDetail.owner,
+                "userID": formDetail.owner,
+                "submitTime": "2023-10-11T07:40:58.1078101Z",
+                "responses": formResponses
+            });
+            setSubmit(true)
+            setHeight('100vh')
+        }
+        //Failed: Not fill required questions
+        else if (!checkRequired) {
+            setSubmit(false)
+            setRender(!render)
+        }
+    }
+
     // console.log(formResponses);
     // console.log(formDetail);
     return (
@@ -1268,11 +1280,9 @@ function Form() {
 
                                     }
                                     {formDetail.Questions[ques].Type === 'OTPInput' ?
-                                        <OtpInput
-                                            value={otp}
+                                        <OTPInput
+                                            value={otpArray[ques]}
                                             onChange={handleSaveOTP(ques)}
-                                            // onBlur={saveInputValue(ques)}
-                                            // handleBlur={saveInputValue(ques)}
                                             numInputs={formDetail.Questions[ques].Content.OtpInput}
                                             renderSeparator={<span>&nbsp;</span>}
                                             renderInput={(props) => <input {...props} />}
