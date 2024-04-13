@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable no-loop-func */
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { Box, Typography, Drawer, Avatar, IconButton, Toolbar, List, Divider, Icon, Grid } from '@mui/material'
 import Button from '@mui/material/Button';
 import InputLabel from '@mui/material/InputLabel';
@@ -9,8 +9,6 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 
-import { styled } from '@mui/material/styles';
-import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import ClearIcon from '@mui/icons-material/Clear';
 
 import Table from '@mui/material/Table';
@@ -20,8 +18,6 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import { Link } from 'react-router-dom';
-import Input from '@mui/material/Input';
 
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
@@ -44,7 +40,6 @@ import bg from "../../assets/background.png"
 
 // APIs
 import { deleteFile, uploadFileToS3 } from '../../apis/file';
-import OTPInput from 'react-otp-input';
 // import { addResponsetoDatabase } from '../../apis/responses';
 
 function Form() {
@@ -381,31 +376,75 @@ function Form() {
 
     //Lưu giá trị cho các field dạng shortText
     const [inputValue, setInputValue] = React.useState('');
-    const handleChangeInputValue = (e) => {
-        setInputValue(e.target.value);
-    };
+    const [email, setEmail] = React.useState('');
+    const [phone, setPhone] = React.useState('');
     //Get value of textField after onBlur the field
     const saveInputValue = (ques: number) => (e) => {
-        formResponses[ques].content.shortText = inputValue;
-        //Return error if active textField but don't fill
-        // if (inputValue === '') formResponses[ques].error = 'Vui lòng điền những câu hỏi bắt buộc';
-        // else formResponses[ques].error = ''
+        console.log(inputValue)
+        switch (formResponses[ques].type) {
+            case "shortText":
+                formResponses[ques].content.shortText = inputValue;
+                break;
+            case "email":
+                formResponses[ques].content.specialText = email;
 
-        //Render update UI
-        setRender(!render)
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email)) {
+                    formResponses[ques].error = 'Email không hợp lệ';
+                } else {
+                    formResponses[ques].error = '';
+                }
+                break;
+            case "phone":
+                formResponses[ques].content.specialText = phone;
+
+                const phoneNumberRegex = /(0[3|5|7|8|9])+([0-9]{8})\b/;
+                if (!phoneNumberRegex.test(phone)) {
+                    formResponses[ques].error = 'Số điện thoại không hợp lệ';
+                } else {
+                    formResponses[ques].error = '';
+                }
+                break;
+            default:
+                break;
+        }
     };
     const [active, setActive] = useState<number>(-1);
-    const handleActive = (ques: number) => (e) => {
-        //Nếu field trống thì set inputValue vễ rỗng, còn không rỗng thì set về giá trị cũ
-        if (formResponses[ques].content.shortText === '') {
-            setInputValue('')
+
+    const handleActive = useCallback((ques: number) => (e) => {
+        //If re-active 
+        if (ques === active) return;
+
+        if (formResponses[ques].type === "shortText") {
+            //Nếu field trống thì set inputValue vễ rỗng, còn không rỗng thì set về giá trị cũ
+            if (formResponses[ques].content.shortText === '') {
+                setInputValue('')
+            }
+            else {
+                setInputValue(formResponses[ques].content.shortText)
+            }
         }
-        else {
-            setInputValue(formResponses[ques].content.shortText)
+        else if (formResponses[ques].type === "email") {
+            if (formResponses[ques].content.specialText === '') {
+                setEmail('')
+            }
+            else {
+                setEmail(formResponses[ques].content.specialText)
+            }
         }
+        else if (formResponses[ques].type === 'phone') {
+            if (formResponses[ques].content.specialText === '') {
+                setPhone('')
+            }
+            else {
+                setPhone(formResponses[ques].content.specialText)
+            }
+        }
+
+        console.log(ques);
         //lưu vị trí field được active
         setActive(ques);
-    }
+    }, [active, inputValue])
 
     //handleTableText Value
     const [tableText, setTableText] = React.useState('');
@@ -417,7 +456,6 @@ function Form() {
     };
 
     const handleChangeTableDropdown = (ques: number, rowIndex: number, colIndex: number) => (e) => {
-        // console.log(e.target.value)
         //Set all options to result 0
         formResponses[ques].content.table.listOfColumn[colIndex].content[rowIndex].multiChoice.result.fill(false);
 
@@ -682,44 +720,6 @@ function Form() {
         setRender(!render)
     };
 
-    // PHONE NUMBER
-    const [phoneNumber, setPhoneNumber] = useState('');
-    const [phoneNumberError, setPhoneNumberError] = useState('');
-
-    const validatePhoneNumber = (inputPhoneNumber) => {
-        const phoneNumberRegex = /(0[3|5|7|8|9])+([0-9]{8})\b/; // Định dạng số điện thoại, ví dụ: 1234567890
-        if (!phoneNumberRegex.test(inputPhoneNumber)) {
-            return 'Số điện thoại không hợp lệ';
-        }
-        return '';
-    };
-
-    const handleBlurPhone = (ques: number) => (e) => {
-        const error = validatePhoneNumber(phoneNumber);
-        setPhoneNumberError(error);
-        //save
-        formResponses[ques].content.specialText = email;
-    };
-
-    // EMAIL
-    const [email, setEmail] = useState('');
-    const [emailError, setEmailError] = useState('');
-
-    const validateEmail = (inputEmail) => {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(inputEmail)) {
-            return 'Email không hợp lệ';
-        }
-        return '';
-    };
-
-    const handleBlurEmail = (ques: number) => (e) => {
-        const error = validateEmail(email);
-        setEmailError(error);
-
-        formResponses[ques].content.specialText = phoneNumber;
-    };
-
     //OTP Input
     const [otp, setOtp] = useState('');
 
@@ -728,14 +728,9 @@ function Form() {
         formResponses[ques].content.OTPInput = e;
     }
 
-    // useEffect(() => {
-    //     formResponses[indexOTP].content.OTPInput = otp;
-    // }, [otp])
-
-    console.log(otp);
-    console.log(formResponses);
-    console.log(formDetail);
-
+    // console.log(otp);
+    // console.log(formResponses);
+    // console.log(formDetail);
     return (
         <div>
             <Box sx={{
@@ -853,16 +848,16 @@ function Form() {
                                     {formDetail.Questions[ques].Type === 'shortText' ?
                                         <Box>
                                             <TextField
-                                                // value={inputValue}
+                                                fullWidth
                                                 value={ques === active ? inputValue : formResponses[ques].content.shortText}
-                                                onChange={handleChangeInputValue}
+                                                onChange={(e) => setInputValue(e.target.value)}
                                                 onBlur={saveInputValue(ques)}
                                                 onClick={handleActive(ques)}
-                                                sx={{ width: '100%', mb: '1px' }}
+                                                sx={{ mb: '1px' }}
                                                 id="outlined-basic"
                                                 label="Điền ngắn"
                                                 variant="outlined" />
-                                            {formResponses[ques].error !== '' ? <Alert sx={{ background: 'transparent', p: '0' }} severity="error">Vui lòng hoàn thành câu hỏi bắt buộc</Alert> : null}
+                                            {formResponses[ques].error === 'Vui lòng hoàn thành câu hỏi bắt buộc' ? <Alert sx={{ background: 'transparent', p: '0' }} severity="error">Vui lòng hoàn thành câu hỏi bắt buộc</Alert> : null}
                                         </Box>
                                         : null
                                     }
@@ -1242,28 +1237,35 @@ function Form() {
                                         </TableContainer> : null
                                     }
                                     {formDetail.Questions[ques].Type === 'phone' ?
-                                        <TextField
-                                            name='phoneNumber'
-                                            value={phoneNumber}
-                                            variant='outlined'
-                                            onBlur={handleBlurPhone(ques)}
-                                            error={!!phoneNumberError}
-                                            helperText={phoneNumberError}
-                                            onChange={(e) => setPhoneNumber(e.target.value)}
-                                        />
+                                        <Box>
+                                            <TextField
+                                                fullWidth
+                                                name='phoneNumber'
+                                                value={ques === active ? phone : formResponses[ques].content.specialText}
+                                                variant='outlined'
+                                                onChange={(e) => setPhone(e.target.value)}
+                                                onBlur={saveInputValue(ques)}
+                                                onClick={handleActive(ques)}
+                                            />
+                                            {formResponses[ques].error === 'Số điện thoại không hợp lệ' ? <Alert sx={{ background: 'transparent', p: '0' }} severity="error">Số điện thoại không hợp lệ</Alert> : null}
+                                        </Box>
                                         : null
                                     }
                                     {formDetail.Questions[ques].Type === 'email' ?
-                                        <TextField
-                                            name='email'
-                                            value={email}
-                                            variant='outlined'
-                                            onBlur={handleBlurEmail(ques)}
-                                            error={!!emailError}
-                                            helperText={emailError}
-                                            onChange={(e) => setEmail(e.target.value)}
-                                        />
+                                        <Box>
+                                            <TextField
+                                                fullWidth
+                                                name='email'
+                                                value={ques === active ? email : formResponses[ques].content.specialText}
+                                                variant='outlined'
+                                                onChange={(e) => setEmail(e.target.value)}
+                                                onBlur={saveInputValue(ques)}
+                                                onClick={handleActive(ques)}
+                                            />
+                                            {formResponses[ques].error === 'Email không hợp lệ' ? <Alert sx={{ background: 'transparent', p: '0' }} severity="error">Email không hợp lệ</Alert> : null}
+                                        </Box>
                                         : null
+
                                     }
                                     {formDetail.Questions[ques].Type === 'OTPInput' ?
                                         <OtpInput
@@ -1272,7 +1274,7 @@ function Form() {
                                             // onBlur={saveInputValue(ques)}
                                             // handleBlur={saveInputValue(ques)}
                                             numInputs={formDetail.Questions[ques].Content.OtpInput}
-                                            renderSeparator={<span>-</span>}
+                                            renderSeparator={<span>&nbsp;</span>}
                                             renderInput={(props) => <input {...props} />}
                                             inputStyle={{ width: '32px', height: '32px', border: '1px solid gray', borderRadius: '5px' }}
                                         />
