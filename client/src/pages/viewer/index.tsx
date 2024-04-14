@@ -38,9 +38,14 @@ import OTPInput from '../../components/otp-input/otp-input';
 import { Response, ResultMultiChoice, ResultShortText, ResultDate, ResultLinkedData, ResultFile, ResultTable, ResultSpecialText, ResultOTPText } from './interface';
 import bg from "../../assets/background.png"
 
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
+
 // APIs
 import { deleteFile, uploadFileToS3 } from '../../apis/file';
 // import { addResponsetoDatabase } from '../../apis/responses';
+
+
 
 function Form() {
     // render: use to re-render after create or delete form
@@ -361,6 +366,22 @@ function Form() {
         //lưu vị trí field được active
         setActive(ques);
     }, [active, inputValue])
+
+    // LONG TEXT - TEXT EDITOR
+    const [valueLongText, setValueLongText] = useState<string[]>([]);
+
+    const setLongTextLength = (length) => {
+        setValueLongText(Array(length).fill(''));
+    };
+
+    const handleValueLongText = (index) => (e) => {
+
+        const newValueLongText = [...valueLongText];
+        newValueLongText[index] = e;
+        setValueLongText(newValueLongText);
+
+        formResponses[index].content.shortText = e;
+    }
 
     // TABLE
     const [tableText, setTableText] = React.useState('');
@@ -869,6 +890,16 @@ function Form() {
                                                 id="outlined-basic"
                                                 label="Điền ngắn"
                                                 variant="outlined" />
+                                            {formResponses[ques].error === 'Vui lòng hoàn thành câu hỏi bắt buộc' ? <Alert sx={{ background: 'transparent', p: '0' }} severity="error">Vui lòng hoàn thành câu hỏi bắt buộc</Alert> : null}
+                                        </Box>
+                                        : null
+                                    }
+                                    {formDetail.Questions[ques].Type === 'longText' ?
+                                        <Box>
+                                            <ReactQuill
+                                                theme="snow"
+                                                value={valueLongText[ques]}
+                                                onChange={handleValueLongText(ques)} />
                                             {formResponses[ques].error === 'Vui lòng hoàn thành câu hỏi bắt buộc' ? <Alert sx={{ background: 'transparent', p: '0' }} severity="error">Vui lòng hoàn thành câu hỏi bắt buộc</Alert> : null}
                                         </Box>
                                         : null

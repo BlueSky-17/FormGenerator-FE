@@ -46,6 +46,7 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import TextField from "@mui/material/TextField";
 import { useParams } from "react-router-dom";
 import bg from '../../../../assets/background.png'
+import DOMPurify from 'dompurify';
 
 import {
   Response,
@@ -59,6 +60,7 @@ import {
 import { stringify } from "querystring";
 import PropTypes from "prop-types";
 import { Content } from "../interface";
+import COLORS from "../../../../constants/colors";
 
 interface FormResponseProps {
   Answer: any;
@@ -72,21 +74,16 @@ const FormResponse: React.FC<FormResponseProps> = ({ Answer, Form }) => {
 
   useEffect(() => {
     setFormDetail(Form);
-  }, [Form]); 
+  }, [Form]);
 
-  console.log(bg);
+  console.log(formResponses);
 
   return (
     <div>
       <Box
         sx={{
-          // backgroundColor: "#E9F2F4",
-          backgroundImage: `url(${bg})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          border: "2px solid #DEDEDE",
-          // height: { height },
+          backgroundColor: "#white",
+          paddingY: '10px',
         }}
       >
         <Box
@@ -102,7 +99,7 @@ const FormResponse: React.FC<FormResponseProps> = ({ Answer, Form }) => {
           <Box
             sx={{
               textAlign: "center",
-              backgroundColor: "#008272",
+              backgroundColor: COLORS.darkBlue,
               paddingY: "30px",
               borderRadius: "10px 10px 0 0",
             }}
@@ -140,7 +137,7 @@ const FormResponse: React.FC<FormResponseProps> = ({ Answer, Form }) => {
                   <Box sx={{ display: "flex" }}>
                     <Typography
                       sx={{
-                        color: "#008272",
+                        color: COLORS.darkBlue,
                         justifySelft: "left",
                         paddingTop: "10px",
                         fontWeight: 500,
@@ -264,6 +261,54 @@ const FormResponse: React.FC<FormResponseProps> = ({ Answer, Form }) => {
                           disabled
                           defaultValue={formResponses[ques].Content.ShortText}
                         />
+                      </Box>
+                    ) : null}
+                    {formDetail.Questions[ques].Type === "phone" ? (
+                      <Box>
+                        <TextField
+                          sx={{ width: "100%", mb: "1px" }}
+                          id="outlined-basic"
+                          variant="outlined"
+                          disabled
+                          defaultValue={formResponses[ques].Content.SpecialText}
+                        />
+                      </Box>
+                    ) : null}
+                    {formDetail.Questions[ques].Type === "email" ? (
+                      <Box>
+                        <TextField
+                          sx={{ width: "100%", mb: "1px" }}
+                          id="outlined-basic"
+                          variant="outlined"
+                          disabled
+                          defaultValue={formResponses[ques].Content.SpecialText}
+                        />
+                      </Box>
+                    ) : null}
+                    {formDetail.Questions[ques].Type === "OTPInput" ? (
+                      <Box>
+                        <TextField
+                          sx={{ width: "100%", mb: "1px" }}
+                          id="outlined-basic"
+                          variant="outlined"
+                          disabled
+                          defaultValue={formResponses[ques].Content.OTPInput}
+                        />
+                      </Box>
+                    ) : null}
+                    {formDetail.Questions[ques].Type === "longText" ? (
+                      <Box>
+                        <Typography
+                          sx={{
+                            border: "2px solid #DEDEDE",
+                            borderRadius: "10px",
+                            paddingX: '10px'
+                          }}
+                          dangerouslySetInnerHTML={{
+                            __html:
+                              DOMPurify.sanitize(formResponses[ques].Content.ShortText)
+                          }}>
+                        </Typography>
                       </Box>
                     ) : null}
                     {formDetail.Questions[ques].Type === "date-single" ? (
