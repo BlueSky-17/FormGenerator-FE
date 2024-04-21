@@ -67,7 +67,7 @@ function DetailForm() {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + JSON.parse(sessionStorage.getItem('token') as string)?.accessToken
+                'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem('token') as string)?.accessToken
             }
         })
             .then(data => data.json())
@@ -83,7 +83,7 @@ function DetailForm() {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + JSON.parse(sessionStorage.getItem('token') as string)?.accessToken
+                'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem('token') as string)?.accessToken
             }
         })
             .then(data => data.json())
@@ -101,7 +101,7 @@ function DetailForm() {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + JSON.parse(sessionStorage.getItem('token') as string)?.accessToken
+                    'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem('token') as string)?.accessToken
                 },
                 body: JSON.stringify(updateData),
             });

@@ -29,14 +29,14 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 function History() {
     const [history, setHistory] = useState<any>([])
 
-    const GetHistoryAPI_URL = `http://localhost:8080/get-all-response/${JSON.parse(sessionStorage.getItem('token') as string)?.user.ID}`;
+    const GetHistoryAPI_URL = `http://localhost:8080/get-all-response/${JSON.parse(localStorage.getItem('token') as string)?.user.ID}`;
 
     useEffect(() => {
         fetch(GetHistoryAPI_URL, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + JSON.parse(sessionStorage.getItem('token') as string)?.accessToken
+                'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem('token') as string)?.accessToken
             }
         })
             .then(data => data.json())

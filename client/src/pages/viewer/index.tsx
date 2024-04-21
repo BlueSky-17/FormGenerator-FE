@@ -47,7 +47,7 @@ import { deleteFile, uploadFileToS3 } from '../../apis/file';
 
 
 
-function Form() {
+function FormViewer() {
     // render: use to re-render after create or delete form
     const [render, setRender] = useState(false);
     const [height, setHeight] = useState('100%')
@@ -65,7 +65,7 @@ function Form() {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + JSON.parse(sessionStorage.getItem('token') as string)?.accessToken
+                    'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem('token') as string)?.accessToken
                 },
                 body: JSON.stringify(data)
             });
@@ -86,7 +86,7 @@ function Form() {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + JSON.parse(sessionStorage.getItem('token') as string)?.accessToken
+                'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem('token') as string)?.accessToken
             }
         })
             .then(data => data.json())
@@ -740,6 +740,8 @@ function Form() {
 
         console.log(formResponses)
 
+        const tokenString = localStorage.getItem('token');
+
         //Success: Fill correctly required questions 
         if (checkRequired && checkFromTo) {
             console.log(formResponses);
@@ -747,8 +749,8 @@ function Form() {
                 "id": "6526518a6b149bcb2510172f",
                 "formID": "651dbc9d49502243191371e3",
                 "formName": formDetail.name,
-                "username": formDetail.owner,
-                "userID": formDetail.owner,
+                "username": tokenString ? JSON.parse(tokenString).user.FirstName + " " + JSON.parse(tokenString).user.LastName : "",
+                "userID": tokenString ? JSON.parse(tokenString).user.ID : "",
                 "submitTime": "2023-10-11T07:40:58.1078101Z",
                 "responses": formResponses
             });
@@ -1350,4 +1352,4 @@ function Form() {
     )
 }
 
-export default Form
+export default FormViewer

@@ -15,7 +15,7 @@ export const uploadFileToS3 = async (files: File) => {
     const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
-            'Authorization': 'Bearer ' + JSON.parse(sessionStorage.getItem('token') as string)?.accessToken
+            'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem('token') as string)?.accessToken
         },
         body: formData,
     });
@@ -38,7 +38,7 @@ export const deleteFile = async (fileName) => {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + JSON.parse(sessionStorage.getItem('token') as string)?.accessToken
+                'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem('token') as string)?.accessToken
             }
         });
 

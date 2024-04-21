@@ -20,7 +20,7 @@ function Profile() {
     const ProfileAPI_URL = `http://localhost:8080/profile`;
 
     useEffect(() => {
-        setProfile(JSON.parse(sessionStorage.getItem('token') as string)?.user)
+        setProfile(JSON.parse(localStorage.getItem('token') as string)?.user)
     }, [])
 
     console.log(profile);

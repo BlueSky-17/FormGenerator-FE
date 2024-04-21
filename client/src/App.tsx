@@ -2,7 +2,7 @@ import React from 'react';
 import HomePage from './pages/home/home.page';
 import MyForms from './pages/home/MyForms';
 import DetailForm from './pages/home/DetailForm';
-import Form from './pages/viewer';
+import FormViewer from './pages/viewer';
 import SignInSide from './pages/SignIn';
 import SignUp from './pages/SignUp';
 import { Route, BrowserRouter, Routes, Navigate } from 'react-router-dom';
@@ -15,11 +15,11 @@ import HistoryDetail from './pages/history/detail';
 
 function App() {
   function setToken(userToken: any) {
-    sessionStorage.setItem('token', JSON.stringify(userToken));
+    localStorage.setItem('token', JSON.stringify(userToken));
   }
 
   function getToken() {
-    const tokenString = sessionStorage.getItem('token');
+    const tokenString = localStorage.getItem('token');
     // if (tokenString) {
     //   const userToken = JSON.parse(tokenString);
     //   return userToken?.accessToken;
@@ -33,9 +33,7 @@ function App() {
     }
   }
 
-
   const token = getToken();
-
 
   return (
     <div className="wrapper">
@@ -99,7 +97,7 @@ function App() {
               </HomePage>
             }
           />
-          <Route path="/form/:formID/view" element={<Form />}
+          <Route path="/form/:formID/view" element={<FormViewer />}
           />
           {/* <Route path="/signin" element={<SignInSide setToken={setToken} />} /> */}
         </Routes>

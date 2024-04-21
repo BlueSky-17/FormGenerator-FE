@@ -55,11 +55,11 @@ function MyForms() {
 
     //API GET: fetch forms by UserId
     useEffect(() => {
-        fetch(`http://localhost:8080/forms/${JSON.parse(sessionStorage.getItem('token') as string)?.user.ID}?name=${keyword}&page=${currentPage}`, {
+        fetch(`http://localhost:8080/forms/${JSON.parse(localStorage.getItem('token') as string)?.user.ID}?name=${keyword}&page=${currentPage}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + JSON.parse(sessionStorage.getItem('token') as string)?.accessToken
+                'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem('token') as string)?.accessToken
             }
         })
             .then(data => data.json())
@@ -81,7 +81,7 @@ function MyForms() {
                     "description": description,
                     "imagePath": ""
                 },
-                "owner": JSON.parse(sessionStorage.getItem('token') as string)?.user.ID,
+                "owner": JSON.parse(localStorage.getItem('token') as string)?.user.ID,
                 "answersCounter": 0,
                 "latestModified": "2023-10-14T12:34:56Z",
                 "createDate": "2023-10-14T12:34:56Z",
@@ -178,7 +178,7 @@ function MyForms() {
                                         </TableCell>
                                         <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="left">{form.name}</TableCell>
                                         <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="center">
-                                            {form.owner === JSON.parse(sessionStorage.getItem('token') as string)?.user.ID ? 'tôi' : 'tôi'}
+                                            {form.owner === JSON.parse(localStorage.getItem('token') as string)?.user.ID ? 'tôi' : 'tôi'}
                                         </TableCell>
                                         <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="center">{form.AnswersCounter}</TableCell>
                                         <TableCell sx={{ padding: 1 }} align="center">

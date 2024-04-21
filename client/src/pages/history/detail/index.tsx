@@ -21,14 +21,14 @@ function HistoryDetail() {
 
     const FormDetailAPI_URL = `http://localhost:8080/form/${formID}`;
 
-    const ResponseAPI_URL = `http://localhost:8080/get-response/${formID}/${JSON.parse(sessionStorage.getItem('token') as string)?.user.ID}`
+    const ResponseAPI_URL = `http://localhost:8080/get-response/${formID}/${JSON.parse(localStorage.getItem('token') as string)?.user.ID}`
 
     useEffect(() => {
         fetch(FormDetailAPI_URL, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + JSON.parse(sessionStorage.getItem('token') as string)?.accessToken
+                'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem('token') as string)?.accessToken
             }
         })
             .then(data => data.json())
@@ -43,7 +43,7 @@ function HistoryDetail() {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + JSON.parse(sessionStorage.getItem('token') as string)?.accessToken
+                'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem('token') as string)?.accessToken
             }
         })
             .then(data => data.json())

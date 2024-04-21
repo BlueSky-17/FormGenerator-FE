@@ -103,18 +103,18 @@ interface LayoutProps {
 
 function HomePage({ children }: LayoutProps) {
 
-    const tokenString = sessionStorage.getItem('token')
+    const tokenString = localStorage.getItem('token')
     const userToken = JSON.parse(tokenString as string);
 
-    // if (sessionStorage.getItem('token')) {
-    //     const tokenString = sessionStorage.getItem('token')
+    // if (localStorage.getItem('token')) {
+    //     const tokenString = localStorage.getItem('token')
 
     //     if (tokenString) {
     //         const userToken = JSON.parse(tokenString as string);
     //         console.log(userToken)
     //     }
     // }
-    // JSON.parse(sessionStorage.getItem('token'))
+    // JSON.parse(localStorage.getItem('token'))
 
     const theme = useTheme();
     const [open, setOpen] = React.useState(false);
@@ -132,8 +132,8 @@ function HomePage({ children }: LayoutProps) {
     const navigate: any = useNavigate();
 
     const handleLogout = () => {
-        // Clear the token from sessionStorage or perform any other logout actions
-        sessionStorage.removeItem('token');
+        // Clear the token from localStorage or perform any other logout actions
+        localStorage.removeItem('token');
 
         // Redirect the user to the login page (you can change the path)
         navigate('/signin');
