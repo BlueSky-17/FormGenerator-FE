@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Box, Typography, TextField, Drawer, Avatar, IconButton, Toolbar, List, Divider, Icon, Modal } from '@mui/material'
 import { styled, useTheme, alpha } from '@mui/material/styles';
 import Button from '@mui/material/Button';
-import COLORS from '../../constants/colors';
+import COLORS from '../../../constants/colors';
 
 const DrawerHeader = styled('div')(({ theme }) => ({
     display: 'flex',

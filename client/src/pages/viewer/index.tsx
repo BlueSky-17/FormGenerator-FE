@@ -43,6 +43,8 @@ import 'react-quill/dist/quill.snow.css';
 
 // APIs
 import { deleteFile, uploadFileToS3 } from '../../apis/file';
+import Error404 from '../../components/error-page/404';
+import LoadingPage from '../../components/loading-page/loading';
 // import { addResponsetoDatabase } from '../../apis/responses';
 
 
@@ -51,6 +53,9 @@ function FormViewer() {
     // render: use to re-render after create or delete form
     const [render, setRender] = useState(false);
     const [height, setHeight] = useState('100%')
+
+    const [loading, setLoading] = useState<boolean>(true);
+    const [notFound, setNotFound] = useState<boolean>(false);
 
     const [formDetail, setFormDetail] = useState<any>({})
     const [formResponses, setFormResponse] = useState<any[]>([])
@@ -89,10 +94,20 @@ function FormViewer() {
                 'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem('token') as string)?.accessToken
             }
         })
-            .then(data => data.json())
+            .then(response => {
+                if (!response.ok) {
+                    setLoading(false);
+                    setNotFound(true);
+                    // throw new Error('Server returned ' + response.status);
+                }
+                return response.json();
+            })
             .then(formDetail => {
                 setFormDetail(formDetail);
-                setOtpArrayLength(formDetail.Questions.length);
+                setLoading(false);
+                if (formDetail.Questions) setOtpArrayLength(formDetail.Questions.length);
+                
+                setLoading(false);
             })
 
     }, [])
@@ -762,6 +777,14 @@ function FormViewer() {
             setSubmit(false)
             setRender(!render)
         }
+    }
+
+    if (loading) {
+        return <LoadingPage />
+    }
+
+    if (notFound) {
+        return <Error404 />
     }
 
     // console.log(formResponses);

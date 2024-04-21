@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { Box, Typography, TextField, Drawer, Avatar, IconButton, Toolbar, List, Divider, Icon, Modal } from '@mui/material'
 import { styled, useTheme, alpha } from '@mui/material/styles';
 import Button from '@mui/material/Button';
-import COLORS from '../../constants/colors';
+import COLORS from '../../../constants/colors';
 
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -13,7 +13,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 
-import { SearchIconWrapper, Search, StyledInputBase } from '../home/MyForms/searchBar';
+import { SearchIconWrapper, Search, StyledInputBase } from '../MyForms/searchBar';
 
 import SearchIcon from '@mui/icons-material/Search';
 

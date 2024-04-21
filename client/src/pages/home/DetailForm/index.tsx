@@ -35,6 +35,10 @@ import EditModal from './editmodal';
 import CircleButton from '../../../components/custom-button/circleButton';
 import AcceptButton from '../../../components/custom-button/acceptButton';
 
+import { Navigate } from 'react-router-dom';
+import Error404 from '../../../components/error-page/404';
+import LoadingPage from '../../../components/loading-page/loading';
+
 const DrawerHeader = styled('div')(({ theme }) => ({
     display: 'flex',
     alignItems: 'center',
@@ -48,6 +52,9 @@ function DetailForm() {
     const [render, setRender] = useState(false)
     const [formDetail, setFormDetail] = useState<any>({})
     const [formResponses, setFormResponses] = useState<any>({})
+
+    const [loading, setLoading] = useState<boolean>(true);
+    const [notFound, setNotFound] = useState<boolean>(false);
 
     const FormDetailAPI_URL = `http://localhost:8080/form/${useParams()?.formID}`;
 
@@ -70,11 +77,24 @@ function DetailForm() {
                 'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem('token') as string)?.accessToken
             }
         })
-            .then(data => data.json())
+            .then(response => {
+                if (!response.ok) {
+                    setLoading(false);
+                    setNotFound(true);
+                    // throw new Error('Server returned ' + response.status);
+                }
+                return response.json();
+            })
             .then(formDetail => {
                 setFormDetail(formDetail);
                 setFormState(formDetail.formState);
+                setLoading(false);
             })
+        // .catch(error => {
+        //     // Xử lý lỗi ở đây, ví dụ: hiển thị thông báo lỗi cho người dùng
+        //     console.error('Error fetching form details:', error);
+        //     return <Error404 />
+        // })
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
@@ -474,7 +494,7 @@ function DetailForm() {
         else if (formDetail.Questions[ques].Type === "table") {
             setColumnList(formDetail.Questions[ques].Content.Table.ListOfColumn)
         }
-        else if (formDetail.Questions[ques].Type === "OTPInput"){
+        else if (formDetail.Questions[ques].Type === "OTPInput") {
             setOTPNumber(formDetail.Questions[ques].Content.OtpInput)
         }
 
@@ -521,7 +541,15 @@ function DetailForm() {
 
     const [OTPNumber, setOTPNumber] = useState<number>(12);
 
-    console.log(formDetail);
+    // console.log(formDetail);
+
+    if (loading) {
+        return <LoadingPage />
+    }
+
+    if (notFound) {
+        return <Error404 />
+    }
 
     return (
         <Box>

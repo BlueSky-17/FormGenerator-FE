@@ -31,6 +31,8 @@ import { modalStyle } from '../home.page';
 import CircleButton from '../../../components/custom-button/circleButton';
 import AcceptButton from '../../../components/custom-button/acceptButton';
 import CancelButton from '../../../components/custom-button/cancelButton';
+import LoadingPage from '../../../components/loading-page/loading';
+import Error404 from '../../../components/error-page/404';
 
 const DrawerHeader = styled('div')(({ theme }) => ({
     display: 'flex',
@@ -43,6 +45,8 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 
 function MyForms() {
     const [forms, setForms] = useState<any[]>([])
+    const [loading, setLoading] = useState<boolean>(true);
+    const [notFound, setNotFound] = useState<boolean>(false);
 
     // Page Pagination
     const [currentPage, setCurrentPage] = React.useState<number | undefined>(1);
@@ -62,9 +66,17 @@ function MyForms() {
                 'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem('token') as string)?.accessToken
             }
         })
-            .then(data => data.json())
+        .then(response => {
+            if (!response.ok) {
+                setLoading(false);
+                setNotFound(true);
+                // throw new Error('Server returned ' + response.status);
+            }
+            return response.json();
+        })
             .then(forms => {
                 setForms(forms);
+                setLoading(false);
             })
     }, [currentPage, keyword])
 
@@ -125,6 +137,14 @@ function MyForms() {
     const editForm = (id: string, typeView: string) => (event: any) => {
         navigate('/form/' + id, { state: typeView });
     };
+
+    if (loading) {
+        return <LoadingPage />
+    }
+
+    if (notFound) {
+        return <Error404 />
+    }
 
     return (
         <Box>

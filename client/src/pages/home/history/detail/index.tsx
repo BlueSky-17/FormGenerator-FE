@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Box, Divider, Typography, styled } from '@mui/material'
-import FormResponse from '../../home/Responses/viewFormResponse'
+import FormResponse from '../../Responses/viewFormResponse'
 import { useLocation, useParams } from 'react-router-dom';
 
 const DrawerHeader = styled('div')(({ theme }) => ({
