@@ -38,6 +38,7 @@ import AcceptButton from '../../../components/custom-button/acceptButton';
 import { Navigate } from 'react-router-dom';
 import Error404 from '../../../components/error-page/404';
 import LoadingPage from '../../../components/loading-page/loading';
+import HomePage from '../home.page';
 
 const DrawerHeader = styled('div')(({ theme }) => ({
     display: 'flex',
@@ -178,7 +179,7 @@ function DetailForm() {
     const location = useLocation();
     const data = location.state;
 
-    const [typeView, setTypeView] = useState(data); //ViewEdit or ViewResponses
+    const [typeView, setTypeView] = useState(data ? data : 'ViewEdit'); //ViewEdit or ViewResponses
     const changeToViewEdit = () => setTypeView('ViewEdit')
     const changeToViewResponses = () => setTypeView('ViewResponses')
 
@@ -552,260 +553,262 @@ function DetailForm() {
     }
 
     return (
-        <Box>
-            <DrawerHeader />
-            <Box sx={{ backgroundColor: 'white', borderRadius: '15px' }}>
+        <HomePage>
+            <Box>
+                <DrawerHeader />
+                <Box sx={{ backgroundColor: 'white', borderRadius: '15px' }}>
 
-                {/*Header of Form: Title & Settings*/}
-                <Box sx={{ display: 'flex' }}>
-                    <Typography sx={{ color: '#364F6B', padding: '12px', fontWeight: 600 }} variant="h4" noWrap component="div">
-                        {Object.keys(formDetail).length !== 0 ? formDetail.header.Title : null}
+                    {/*Header of Form: Title & Settings*/}
+                    <Box sx={{ display: 'flex' }}>
+                        <Typography sx={{ color: '#364F6B', padding: '12px', fontWeight: 600 }} variant="h4" noWrap component="div">
+                            {Object.keys(formDetail).length !== 0 ? formDetail.header.Title : null}
+                        </Typography>
+                        <Box sx={{ flexGrow: 1 }} />
+
+                        <IconButton
+                            onClick={handleClick}
+                            sx={{
+                                color: '#364F6B',
+                                backgroundColor: 'white',
+                                margin: '5px',
+                            }}>
+                            <SettingsIcon />
+                        </IconButton>
+                        <Popover
+                            open={open_settings}
+                            anchorEl={anchorEl}
+                            onClose={handleCloseSetting}
+                            anchorOrigin={{
+                                vertical: 'bottom',
+                                horizontal: 'right',
+                            }}
+                        >
+                            <Button
+                                onClick={viewForm}
+                                sx={{ p: 2, fontWeight: 500, color: 'black', textTransform: 'initial', fontSize: '15px' }}
+                            >
+                                Xem trước
+                            </Button>
+                            <Divider />
+                            <Button
+                                onClick={handleOpenEditModal}
+                                sx={{ p: 2, fontWeight: 500, color: 'black', textTransform: 'initial', fontSize: '15px' }}>
+                                Sửa chủ đề
+                            </Button>
+                            <Divider />
+                            {
+                                formState ?
+                                    <Button
+                                        onClick={confirmFormState("closeForm")}
+                                        sx={{ p: 2, fontWeight: 500, color: 'black', textTransform: 'initial', fontSize: '15px' }}>Đóng Form
+                                    </Button> :
+                                    <Button
+                                        onClick={confirmFormState("openForm")}
+                                        sx={{ p: 2, fontWeight: 500, color: 'black', textTransform: 'initial', fontSize: '15px' }}>Mở Form
+                                    </Button>
+                            }
+                        </Popover>
+                    </Box>
+
+                    <Divider />
+
+                    {/* Form Description */}
+                    <Typography sx={{ marginY: '10px', paddingLeft: '12px', }} variant='body1' component="div">
+                        {Object.keys(formDetail).length !== 0 ? formDetail.header.Description : null}
                     </Typography>
-                    <Box sx={{ flexGrow: 1 }} />
 
-                    <IconButton
-                        onClick={handleClick}
-                        sx={{
-                            color: '#364F6B',
-                            backgroundColor: 'white',
-                            margin: '5px',
-                        }}>
-                        <SettingsIcon />
-                    </IconButton>
-                    <Popover
-                        open={open_settings}
-                        anchorEl={anchorEl}
-                        onClose={handleCloseSetting}
-                        anchorOrigin={{
-                            vertical: 'bottom',
-                            horizontal: 'right',
-                        }}
-                    >
-                        <Button
-                            onClick={viewForm}
-                            sx={{ p: 2, fontWeight: 500, color: 'black', textTransform: 'initial', fontSize: '15px' }}
-                        >
-                            Xem trước
-                        </Button>
-                        <Divider />
-                        <Button
-                            onClick={handleOpenEditModal}
-                            sx={{ p: 2, fontWeight: 500, color: 'black', textTransform: 'initial', fontSize: '15px' }}>
-                            Sửa chủ đề
-                        </Button>
-                        <Divider />
-                        {
-                            formState ?
-                                <Button
-                                    onClick={confirmFormState("closeForm")}
-                                    sx={{ p: 2, fontWeight: 500, color: 'black', textTransform: 'initial', fontSize: '15px' }}>Đóng Form
-                                </Button> :
-                                <Button
-                                    onClick={confirmFormState("openForm")}
-                                    sx={{ p: 2, fontWeight: 500, color: 'black', textTransform: 'initial', fontSize: '15px' }}>Mở Form
-                                </Button>
-                        }
-                    </Popover>
-                </Box>
+                    <Divider />
 
-                <Divider />
+                    {/*Tabs: Chỉnh sửa & Xem phản hồi*/}
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '3px', borderBottom: "10px solid #364F6B" }}>
+                        {typeView === 'ViewEdit' &&
+                            <Button
+                                sx={{
+                                    backgroundColor: '#364F6B', color: 'white', border: '2px solid #364F6B', borderRadius: '10px', margin: '7px', paddingX: '15px',
+                                    '&:hover': {
+                                        backgroundColor: '#364F6B', // Màu nền thay đổi khi hover
+                                        color: 'white'
+                                    },
+                                }}
+                            >
+                                Chỉnh sửa
+                            </Button>}
+                        {typeView === 'ViewResponses' &&
+                            <Button
+                                sx={{
+                                    color: '#364F6B', backgroundColor: 'white', border: '2px solid #364F6B', borderRadius: '10px', margin: '7px', paddingX: '15px',
+                                }}
+                                onClick={changeToViewEdit}
+                            >
+                                Chỉnh sửa
+                            </Button>}
+                        {typeView === 'ViewEdit' &&
+                            <Button
+                                sx={{
+                                    color: '#364F6B', backgroundColor: 'white', border: '2px solid #364F6B', borderRadius: '10px', margin: '7px', paddingX: '15px'
+                                }}
+                                onClick={changeToViewResponses}
+                            >
+                                Xem phản hồi
+                            </Button>}
+                        {typeView === 'ViewResponses' &&
+                            <Button
+                                sx={{
+                                    backgroundColor: '#364F6B', color: 'white', border: '2px solid #364F6B', borderRadius: '10px', margin: '7px', paddingX: '15px',
+                                    '&:hover': {
+                                        backgroundColor: '#364F6B', // Màu nền thay đổi khi hover
+                                        color: 'white'
+                                    },
+                                }}
+                            >
+                                Xem phản hồi
+                            </Button>}
+                    </Box>
 
-                {/* Form Description */}
-                <Typography sx={{ marginY: '10px', paddingLeft: '12px', }} variant='body1' component="div">
-                    {Object.keys(formDetail).length !== 0 ? formDetail.header.Description : null}
-                </Typography>
-
-                <Divider />
-
-                {/*Tabs: Chỉnh sửa & Xem phản hồi*/}
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '3px', borderBottom: "10px solid #364F6B" }}>
+                    {/* Body of Form */}
                     {typeView === 'ViewEdit' &&
-                        <Button
-                            sx={{
-                                backgroundColor: '#364F6B', color: 'white', border: '2px solid #364F6B', borderRadius: '10px', margin: '7px', paddingX: '15px',
-                                '&:hover': {
-                                    backgroundColor: '#364F6B', // Màu nền thay đổi khi hover
-                                    color: 'white'
-                                },
-                            }}
-                        >
-                            Chỉnh sửa
-                        </Button>}
-                    {typeView === 'ViewResponses' &&
-                        <Button
-                            sx={{
-                                color: '#364F6B', backgroundColor: 'white', border: '2px solid #364F6B', borderRadius: '10px', margin: '7px', paddingX: '15px',
-                            }}
-                            onClick={changeToViewEdit}
-                        >
-                            Chỉnh sửa
-                        </Button>}
-                    {typeView === 'ViewEdit' &&
-                        <Button
-                            sx={{
-                                color: '#364F6B', backgroundColor: 'white', border: '2px solid #364F6B', borderRadius: '10px', margin: '7px', paddingX: '15px'
-                            }}
-                            onClick={changeToViewResponses}
-                        >
-                            Xem phản hồi
-                        </Button>}
-                    {typeView === 'ViewResponses' &&
-                        <Button
-                            sx={{
-                                backgroundColor: '#364F6B', color: 'white', border: '2px solid #364F6B', borderRadius: '10px', margin: '7px', paddingX: '15px',
-                                '&:hover': {
-                                    backgroundColor: '#364F6B', // Màu nền thay đổi khi hover
-                                    color: 'white'
-                                },
-                            }}
-                        >
-                            Xem phản hồi
-                        </Button>}
-                </Box>
+                        <Box>
+                            <TableContainer component={Paper} sx={{ marginTop: '10px', height: '50vh', overflowY: 'scroll' }}>
+                                <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell sx={{ padding: 1, paddingLeft: 5, fontWeight: 800, fontSize: '1rem' }} align="left">STT</TableCell>
+                                            <TableCell sx={{ padding: 1, fontWeight: 800, fontSize: '1rem' }} align="left">Tiêu đề</TableCell>
+                                            <TableCell sx={{ padding: 1, fontWeight: 800, fontSize: '1rem' }} align="left">Dạng</TableCell>
+                                            <TableCell sx={{ padding: 1, fontWeight: 800, fontSize: '1rem' }} align="left">Ghi chú</TableCell>
+                                            <TableCell sx={{ padding: 1, fontWeight: 800, fontSize: '1rem' }} align="center">Thao tác</TableCell>
+                                        </TableRow >
+                                    </TableHead>
+                                    <TableBody>
+                                        {formDetail.Questions !== undefined ? formDetail.QuestionOrder.map((ques, index) => (
+                                            <TableRow
+                                                key={index}
+                                                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                                            >
+                                                <TableCell sx={{ padding: 1, paddingLeft: 5, fontWeight: 500, fontSize: '1.05rem' }} component="th" scope="row" align="left">
+                                                    {index + 1}
+                                                </TableCell>
+                                                <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="left">{formDetail.Questions[ques].Question}</TableCell>
+                                                <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="left">{jsonData[formDetail.Questions[ques].Type]}</TableCell>
+                                                <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="left">{formDetail.Questions[ques].Description}</TableCell>
+                                                <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="center">
+                                                    <CircleButton tooltip='Chỉnh sửa' onClick={editQuestion(ques, index)} children={<EditIcon />} />
+                                                    <CircleButton tooltip='Sao chép' onClick={handleDuplicate(ques, index)} children={<ContentCopyIcon />} />
+                                                    <CircleButton tooltip='Di chuyển lên' onClick={handleSwapUp(ques, index)} children={<ArrowCircleUpIcon />} />
+                                                    <CircleButton tooltip='Di chuyển xuống' onClick={handleSwapDown(ques, index)} children={<ArrowCircleDownIcon />} />
+                                                    <CircleButton tooltip='Xóa' onClick={handleDeleteQuestion(ques)} children={<DeleteIcon />} />
+                                                </TableCell>
+                                            </TableRow>
+                                        )) : null
+                                        }
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
 
-                {/* Body of Form */}
-                {typeView === 'ViewEdit' &&
-                    <Box>
-                        <TableContainer component={Paper} sx={{ marginTop: '10px', height: '50vh', overflowY: 'scroll' }}>
-                            <Table sx={{ minWidth: 650 }} aria-label="simple table">
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell sx={{ padding: 1, paddingLeft: 5, fontWeight: 800, fontSize: '1rem' }} align="left">STT</TableCell>
-                                        <TableCell sx={{ padding: 1, fontWeight: 800, fontSize: '1rem' }} align="left">Tiêu đề</TableCell>
-                                        <TableCell sx={{ padding: 1, fontWeight: 800, fontSize: '1rem' }} align="left">Dạng</TableCell>
-                                        <TableCell sx={{ padding: 1, fontWeight: 800, fontSize: '1rem' }} align="left">Ghi chú</TableCell>
-                                        <TableCell sx={{ padding: 1, fontWeight: 800, fontSize: '1rem' }} align="center">Thao tác</TableCell>
-                                    </TableRow >
-                                </TableHead>
-                                <TableBody>
-                                    {formDetail.Questions !== undefined ? formDetail.QuestionOrder.map((ques, index) => (
-                                        <TableRow
-                                            key={index}
-                                            sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                                        >
-                                            <TableCell sx={{ padding: 1, paddingLeft: 5, fontWeight: 500, fontSize: '1.05rem' }} component="th" scope="row" align="left">
-                                                {index + 1}
-                                            </TableCell>
-                                            <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="left">{formDetail.Questions[ques].Question}</TableCell>
-                                            <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="left">{jsonData[formDetail.Questions[ques].Type]}</TableCell>
-                                            <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="left">{formDetail.Questions[ques].Description}</TableCell>
-                                            <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="center">
-                                                <CircleButton tooltip='Chỉnh sửa' onClick={editQuestion(ques, index)} children={<EditIcon />} />
-                                                <CircleButton tooltip='Sao chép' onClick={handleDuplicate(ques, index)} children={<ContentCopyIcon />} />
-                                                <CircleButton tooltip='Di chuyển lên' onClick={handleSwapUp(ques, index)} children={<ArrowCircleUpIcon />} />
-                                                <CircleButton tooltip='Di chuyển xuống' onClick={handleSwapDown(ques, index)} children={<ArrowCircleDownIcon />} />
-                                                <CircleButton tooltip='Xóa' onClick={handleDeleteQuestion(ques)} children={<DeleteIcon />} />
-                                            </TableCell>
-                                        </TableRow>
-                                    )) : null
-                                    }
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
+                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <AcceptButton title='Thêm câu hỏi' onClick={handleOpen} style={{ marginTop: '15px' }} />
+                                {hasChange ?
+                                    <AcceptButton title='Lưu thay đổi' onClick={confirmSaveChange} style={{ marginTop: '15px' }} /> :
+                                    <AcceptButton title='Lưu thay đổi' disabled={true} onClick={confirmSaveChange} style={{ marginTop: '15px', backgroundColor: 'gray' }} />}
+                            </Box>
+                        </Box>}
+                </Box >
 
-                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <AcceptButton title='Thêm câu hỏi' onClick={handleOpen} style={{ marginTop: '15px' }} />
-                            {hasChange ?
-                                <AcceptButton title='Lưu thay đổi' onClick={confirmSaveChange} style={{ marginTop: '15px' }} /> :
-                                <AcceptButton title='Lưu thay đổi' disabled={true} onClick={confirmSaveChange} style={{ marginTop: '15px', backgroundColor: 'gray' }} />}
-                        </Box>
-                    </Box>}
+                {typeView === 'ViewResponses' &&
+                    <Responses form={formDetail} responses={formResponses} />
+                }
+
+                <MainModal
+                    open={open}
+                    setOpen={setOpen}
+                    formDetail={formDetail}
+                    type={type}
+                    setType={setType}
+                    tempType={tempType}
+                    setTempType={setTempType}
+                    titleQuestion={titleQuestion}
+                    setTitleQuestion={setTitleQuestion}
+                    required={required}
+                    setRequired={setRequired}
+
+                    constraint={constraint}
+                    handleConstraint={handleConstraint}
+                    setConstraint={setConstraint}
+                    maxOptions={maxOptions}
+                    handleMaxOptions={handleMaxOptions}
+                    setMaxOptions={setMaxOptions}
+
+                    columnList={columnList}
+                    setColumnList={setColumnList}
+                    columnType={columnType}
+                    setColumnType={setColumnType}
+                    handleColumnType={handleColumnType}
+
+                    maxFileAmount={maxFileAmount}
+                    setMaxFileAmount={setMaxFileAmount}
+                    handleMaxFileAmount={handleMaxFileAmount}
+                    maxFileSize={maxFileSize}
+                    setMaxFileSize={setMaxFileSize}
+                    handleMaxFileSize={handleMaxFileSize}
+                    fileType={fileType}
+                    setFileType={setFileType}
+
+                    dateNum={dateNum}
+                    setDateNum={setDateNum}
+                    handleDateNum={handleDateNum}
+
+                    excelData={excelData}
+                    setExcelData={setExcelData}
+                    fields={fields}
+                    myObject={myObject}
+                    handleSubOpen={handleSubOpen}
+                    optionList={optionList}
+                    setOptionList={setOptionList}
+                    quesEdit={quesEdit}
+                    setQuesEdit={setQuesEdit}
+
+                    indexOptionTable={indexOptionTable}
+                    setIndexOptionTable={setIndexOptionTable}
+
+                    setHasChange={setHasChange}
+
+                    OTPNumber={OTPNumber}
+                    setOTPNumber={setOTPNumber}
+                />
+
+                <SubModal
+                    subopen={subopen}
+                    handleSubClose={handleSubClose}
+                    excelData={excelData}
+                    type={type}
+                    setExcelData={setExcelData}
+                    handleProcessRowUpdate={handleProcessRowUpdate}
+                    columns={columns}
+                    handleSaveLinkedData={handleSaveLinkedData}
+                    inputText={inputText}
+                    setInputText={setInputText}
+                    handleInputText={handleInputText}
+                    convertTextToOptionList={convertTextToOptionList}
+
+                    handleCloseForm={handleCloseForm}
+                    handleOpenForm={handleOpenForm}
+
+                    saveChange={saveChange}
+
+                    solveOptionTable={solveOptionTable}
+                />
+
+                <EditModal
+                    openEditModal={openEditModal}
+                    setOpenEditModal={setOpenEditModal}
+                    formDetail={formDetail}
+                    updateObjectInDatabase={updateObjectInDatabase}
+                    setRender={setRender}
+                    render={render}
+                />
+
             </Box >
-
-            {typeView === 'ViewResponses' &&
-                <Responses form={formDetail} responses={formResponses} />
-            }
-
-            <MainModal
-                open={open}
-                setOpen={setOpen}
-                formDetail={formDetail}
-                type={type}
-                setType={setType}
-                tempType={tempType}
-                setTempType={setTempType}
-                titleQuestion={titleQuestion}
-                setTitleQuestion={setTitleQuestion}
-                required={required}
-                setRequired={setRequired}
-
-                constraint={constraint}
-                handleConstraint={handleConstraint}
-                setConstraint={setConstraint}
-                maxOptions={maxOptions}
-                handleMaxOptions={handleMaxOptions}
-                setMaxOptions={setMaxOptions}
-
-                columnList={columnList}
-                setColumnList={setColumnList}
-                columnType={columnType}
-                setColumnType={setColumnType}
-                handleColumnType={handleColumnType}
-
-                maxFileAmount={maxFileAmount}
-                setMaxFileAmount={setMaxFileAmount}
-                handleMaxFileAmount={handleMaxFileAmount}
-                maxFileSize={maxFileSize}
-                setMaxFileSize={setMaxFileSize}
-                handleMaxFileSize={handleMaxFileSize}
-                fileType={fileType}
-                setFileType={setFileType}
-
-                dateNum={dateNum}
-                setDateNum={setDateNum}
-                handleDateNum={handleDateNum}
-
-                excelData={excelData}
-                setExcelData={setExcelData}
-                fields={fields}
-                myObject={myObject}
-                handleSubOpen={handleSubOpen}
-                optionList={optionList}
-                setOptionList={setOptionList}
-                quesEdit={quesEdit}
-                setQuesEdit={setQuesEdit}
-
-                indexOptionTable={indexOptionTable}
-                setIndexOptionTable={setIndexOptionTable}
-
-                setHasChange={setHasChange}
-
-                OTPNumber={OTPNumber}
-                setOTPNumber={setOTPNumber}
-            />
-
-            <SubModal
-                subopen={subopen}
-                handleSubClose={handleSubClose}
-                excelData={excelData}
-                type={type}
-                setExcelData={setExcelData}
-                handleProcessRowUpdate={handleProcessRowUpdate}
-                columns={columns}
-                handleSaveLinkedData={handleSaveLinkedData}
-                inputText={inputText}
-                setInputText={setInputText}
-                handleInputText={handleInputText}
-                convertTextToOptionList={convertTextToOptionList}
-
-                handleCloseForm={handleCloseForm}
-                handleOpenForm={handleOpenForm}
-
-                saveChange={saveChange}
-
-                solveOptionTable={solveOptionTable}
-            />
-
-            <EditModal
-                openEditModal={openEditModal}
-                setOpenEditModal={setOpenEditModal}
-                formDetail={formDetail}
-                updateObjectInDatabase={updateObjectInDatabase}
-                setRender={setRender}
-                render={render}
-            />
-
-        </Box >
+        </HomePage>
     )
 }
 

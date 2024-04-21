@@ -92,10 +92,7 @@ function App() {
           <Route
             path="/form/:formID"
             element={
-              <HomePage>
                 <DetailForm />
-                {/* <DetailForm getToken={getToken} /> */}
-              </HomePage>
             }
           />
           <Route path="/form/:formID/view" element={<FormViewer />}
