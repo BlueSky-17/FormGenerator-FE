@@ -1,0 +1,15 @@
+{
+    "shortText": "Điền ngắn",
+    "longText": "Điền dài",
+    "multi-choice": "Trắc nghiệm",
+    "checkbox": "Ô đánh dấu",
+    "dropdown": "Menu thả xuống",
+    "date-single": "Mốc thời gian",
+    "date-range": "Khoảng thời gian",
+    "linkedData": "Dữ liệu liên kết",
+    "file": "File",
+    "table": "Bảng",
+    "email": "Email",
+    "phone": "Số điện thoại",
+    "OTPInput": "OTP Input"
+}
