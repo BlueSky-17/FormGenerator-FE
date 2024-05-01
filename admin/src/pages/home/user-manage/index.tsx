@@ -8,6 +8,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import EditIcon from '@mui/icons-material/Edit';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import DeleteIcon from '@mui/icons-material/Delete';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -26,7 +27,7 @@ import { useParams } from 'react-router-dom';
 // import { createForm, deleteForm } from '../../../apis/form';
 
 //component đã được styled
-// import { SearchIconWrapper, Search, StyledInputBase } from './searchBar';
+import { SearchIconWrapper, Search, StyledInputBase } from './searchBar';
 import { modalStyle } from '../home.page';
 import CircleButton from '../../../components/custom-button/circleButton';
 import AcceptButton from '../../../components/custom-button/acceptButton';
@@ -34,6 +35,7 @@ import CancelButton from '../../../components/custom-button/cancelButton';
 import LoadingPage from '../../../components/loading-page/loading';
 import Error404 from '../../../components/error-page/404';
 import SettingsIcon from '@mui/icons-material/Settings';
+import EditModal from './editmodal';
 
 const DrawerHeader = styled('div')(({ theme }) => ({
     display: 'flex',
@@ -48,6 +50,14 @@ function UserManage() {
     const [users, setUsers] = useState<any[]>([])
     const [loading, setLoading] = useState<boolean>(true);
     const [notFound, setNotFound] = useState<boolean>(false);
+
+    const [open, setOpen] = useState(false)
+    const [selectID, setSelectID] = useState('')
+
+    const handleOpenEditUser = (id: string) => {
+        setOpen(true)
+        setSelectID(id)
+    }
 
     // Page Pagination
     const [currentPage, setCurrentPage] = React.useState<number | undefined>(1);
@@ -103,6 +113,26 @@ function UserManage() {
                 </Typography>
                 <Divider />
 
+                <Box sx={{ display: 'flex', alignItems: 'center', padding: '10px', marginRight: '20px' }}>
+                    <Search sx={{ border: '2px solid #DEDEDE' }}>
+                        <SearchIconWrapper>
+                            <SearchIcon />
+                        </SearchIconWrapper>
+                        <StyledInputBase
+                            onChange={(e) => {
+                                setKeyword(e.target.value)
+                            }}
+                            placeholder="Tìm kiếm…"
+                            inputProps={{ 'aria-label': 'search' }}
+                        />
+                    </Search>
+                    <Box sx={{ flexGrow: 1 }} />
+
+                    <Typography sx={{ fontWeight: 800, fontSize: '1rem' }}> Tổng số người dùng: <b style={{ fontSize: '24px' }}>{users.length}</b></Typography>
+
+                    {/* <AcceptButton title='Tạo Biểu mẫu' onClick={openModalAdd} /> */}
+                </Box>
+
                 <Divider />
                 <Box sx={{ minHeight: 420 }}>
                     <TableContainer component={Paper}>
@@ -115,8 +145,7 @@ function UserManage() {
                                     <TableCell sx={{ padding: 1, width: '10%', fontWeight: 800, fontSize: '1rem' }} align="center">Form sở hữu</TableCell>
                                     <TableCell sx={{ padding: 1, width: '10%', fontWeight: 800, fontSize: '1rem' }} align="center">Form đã điền</TableCell>
                                     <TableCell sx={{ padding: 1, width: '15%', fontWeight: 800, fontSize: '1rem' }} align="center">Tình trạng</TableCell>
-                                    {/* <TableCell sx={{ padding: 1, width: '15%', fontWeight: 800, fontSize: '1rem' }} align="center">Thao tác</TableCell> */}
-                                    <TableCell sx={{ padding: 1, width: '5%', fontWeight: 800, fontSize: '1rem' }} align="center"></TableCell>
+                                    <TableCell sx={{ padding: 1, width: '15%', fontWeight: 800, fontSize: '1rem' }} align="center">Thao tác</TableCell>
                                 </TableRow >
                             </TableHead>
                             <TableBody>
@@ -130,9 +159,6 @@ function UserManage() {
                                         </TableCell>
                                         <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="left">{user.UserName}</TableCell>
                                         <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="left">{user.FirstName} {user.LastName}</TableCell>
-                                        {/* <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="center">
-                                            {user.owner === JSON.parse(localStorage.getItem('token') as string)?.user.ID ? 'tôi' : 'tôi'}
-                                        </TableCell> */}
                                         <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="center">15</TableCell>
                                         <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="center">8</TableCell>
                                         <TableCell sx={{ padding: 1 }} align="center">
@@ -155,23 +181,11 @@ function UserManage() {
                                                     </Typography>
                                                 </Button>}
                                         </TableCell>
-                                        {/* <TableCell sx={{ padding: 1 }} align="center">
-                                            <CircleButton tooltip='Chỉnh sửa' onClick={editForm(form.id, "ViewEdit")} children={<EditIcon />} />
-
-                                            <CircleButton tooltip='Xem phản hồi' onClick={editForm(form.id, "ViewResponses")} children={<VisibilityIcon />} />
-
-                                            <CircleButton tooltip='Xóa biểu mẫu' onClick={openModalDelete(form.id)} children={<DeleteIcon />} />
-                                        </TableCell> */}
-                                        <TableCell>
-                                            <IconButton
-                                                // onClick={handleClick}
-                                                sx={{
-                                                    color: '#176B87',
-                                                    backgroundColor: 'white',
-                                                    margin: '5px',
-                                                }}>
-                                                <SettingsIcon/>
-                                            </IconButton>
+                                        <TableCell sx={{ padding: 1 }} align="center">
+                                            <CircleButton tooltip='Chỉnh sửa' onClick={(event) => handleOpenEditUser(user.ID)} children={<EditIcon />} />
+                                            {!user.Disable ? <CircleButton tooltip='Vô hiệu hóa' onClick={() => { }} children={<VisibilityOffIcon />} /> :
+                                                <CircleButton tooltip='Hồi phục' onClick={() => { }} children={<VisibilityIcon />} />
+                                            }
                                         </TableCell>
                                     </TableRow>
                                 ))}
@@ -185,6 +199,17 @@ function UserManage() {
                         <Pagination count={5} page={currentPage} onChange={handleChangePagination} color="primary" />
                     </Stack>
                 </Box>
+
+                <EditModal
+                    open={open}
+                    setOpen={setOpen}
+                    users={users}
+                    selectID={selectID}
+                // formDetail={formDetail}
+                // updateObjectInDatabase={updateObjectInDatabase}
+                // setRender={setRender}
+                // render={render}
+                />
             </Box>
         </Box>
     )

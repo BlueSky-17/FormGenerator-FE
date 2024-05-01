@@ -1,14 +1,14 @@
 import { IconButton, Tooltip } from '@mui/material';
-import React, { memo, FC } from 'react';
+import React, { memo, FC, ReactElement, MouseEventHandler } from 'react';
 import COLORS from '../../constants/colors';
 
 export type CustomButtonProps = {
-    title: any;
+    children: ReactElement;
     tooltip?: string;
-    onClick: () => void;
+    onClick: MouseEventHandler<HTMLButtonElement>;
 };
 
-const CircleButton: FC<CustomButtonProps> = memo(({ title, onClick, tooltip }) => {
+const CircleButton: FC<CustomButtonProps> = memo(({ children, onClick, tooltip }) => {
     return (
         <Tooltip
             title={tooltip}
@@ -38,7 +38,7 @@ const CircleButton: FC<CustomButtonProps> = memo(({ title, onClick, tooltip }) =
                     },
                 }}
             >
-                {title}
+                {children}
             </IconButton>
         </Tooltip>
     );
