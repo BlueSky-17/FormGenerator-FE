@@ -33,6 +33,7 @@ import AcceptButton from '../../../components/custom-button/acceptButton';
 import CancelButton from '../../../components/custom-button/cancelButton';
 import LoadingPage from '../../../components/loading-page/loading';
 import Error404 from '../../../components/error-page/404';
+import SettingsIcon from '@mui/icons-material/Settings';
 
 const DrawerHeader = styled('div')(({ theme }) => ({
     display: 'flex',
@@ -44,7 +45,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 }));
 
 function UserManage() {
-    const [forms, setForms] = useState<any[]>([])
+    const [users, setUsers] = useState<any[]>([])
     const [loading, setLoading] = useState<boolean>(true);
     const [notFound, setNotFound] = useState<boolean>(false);
 
@@ -59,26 +60,29 @@ function UserManage() {
 
     //API GET: fetch forms by UserId
     useEffect(() => {
-        fetch(`http://localhost:8080/forms/${JSON.parse(localStorage.getItem('token') as string)?.user.ID}?name=${keyword}&page=${currentPage}`, {
+        fetch(`http://localhost:8080/user`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem('token') as string)?.accessToken
+                'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem('token') as string)?.accessToken,
+                'Role': 'admin'
             }
         })
-        .then(response => {
-            if (!response.ok) {
-                setLoading(false);
-                setNotFound(true);
-                // throw new Error('Server returned ' + response.status);
-            }
-            return response.json();
-        })
-            .then(forms => {
-                setForms(forms);
+            .then(response => {
+                if (!response.ok) {
+                    setLoading(false);
+                    setNotFound(true);
+
+                    console.log(response)
+                    // throw new Error('Server returned ' + response.status);
+                }
+                return response.json();
+            })
+            .then(users => {
+                setUsers(users);
                 setLoading(false);
             })
-    }, [currentPage, keyword])
+    }, [])
 
     if (loading) {
         return <LoadingPage />
@@ -87,6 +91,8 @@ function UserManage() {
     if (notFound) {
         return <Error404 />
     }
+
+    console.log(users)
 
     return (
         <Box>
@@ -104,15 +110,17 @@ function UserManage() {
                             <TableHead>
                                 <TableRow >
                                     <TableCell sx={{ padding: 1, width: '5%', paddingLeft: 5, fontWeight: 800, fontSize: '1rem' }} align="left">STT</TableCell>
-                                    <TableCell sx={{ padding: 1, width: '20%', fontWeight: 800, fontSize: '1rem' }} align="left">Người dùng</TableCell>
+                                    <TableCell sx={{ padding: 1, width: '20%', fontWeight: 800, fontSize: '1rem' }} align="left">Tài khoản</TableCell>
+                                    <TableCell sx={{ padding: 1, width: '10%', fontWeight: 800, fontSize: '1rem' }} align="left">Họ tên</TableCell>
                                     <TableCell sx={{ padding: 1, width: '10%', fontWeight: 800, fontSize: '1rem' }} align="center">Form sở hữu</TableCell>
                                     <TableCell sx={{ padding: 1, width: '10%', fontWeight: 800, fontSize: '1rem' }} align="center">Form đã điền</TableCell>
                                     <TableCell sx={{ padding: 1, width: '15%', fontWeight: 800, fontSize: '1rem' }} align="center">Tình trạng</TableCell>
-                                    <TableCell sx={{ padding: 1, width: '15%', fontWeight: 800, fontSize: '1rem' }} align="center">Thao tác</TableCell>
+                                    {/* <TableCell sx={{ padding: 1, width: '15%', fontWeight: 800, fontSize: '1rem' }} align="center">Thao tác</TableCell> */}
+                                    <TableCell sx={{ padding: 1, width: '5%', fontWeight: 800, fontSize: '1rem' }} align="center"></TableCell>
                                 </TableRow >
                             </TableHead>
                             <TableBody>
-                                {forms && forms.map((form, index) => (
+                                {users && users.map((user, index) => (
                                     <TableRow
                                         key={index}
                                         sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
@@ -120,19 +128,21 @@ function UserManage() {
                                         <TableCell sx={{ padding: 1, paddingLeft: 5, fontWeight: 500, fontSize: '1.05rem' }} component="th" scope="row" align="left">
                                             {index + 1}
                                         </TableCell>
-                                        <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="left">{form.name}</TableCell>
-                                        <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="center">
-                                            {form.owner === JSON.parse(localStorage.getItem('token') as string)?.user.ID ? 'tôi' : 'tôi'}
-                                        </TableCell>
-                                        <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="center">{form.AnswersCounter}</TableCell>
+                                        <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="left">{user.UserName}</TableCell>
+                                        <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="left">{user.FirstName} {user.LastName}</TableCell>
+                                        {/* <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="center">
+                                            {user.owner === JSON.parse(localStorage.getItem('token') as string)?.user.ID ? 'tôi' : 'tôi'}
+                                        </TableCell> */}
+                                        <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="center">15</TableCell>
+                                        <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="center">8</TableCell>
                                         <TableCell sx={{ padding: 1 }} align="center">
-                                            {form.formState ?
+                                            {!user.Disabled ?
                                                 <Button sx={{
                                                     backgroundColor: '#176B87',
                                                     margin: '10px',
                                                 }} disabled>
                                                     <Typography sx={{ color: 'white', paddingX: '5px', paddingY: '2px' }} variant="body2" noWrap component="div">
-                                                        Đang mở
+                                                        HOẠT ĐỘNG
                                                     </Typography>
                                                 </Button>
                                                 :
@@ -141,16 +151,27 @@ function UserManage() {
                                                     margin: '10px',
                                                 }} disabled>
                                                     <Typography sx={{ color: 'white', paddingX: '5px', paddingY: '2px' }} variant="body2" noWrap component="div">
-                                                        Đã đóng
+                                                        NGƯNG HOẠT ĐỘNG
                                                     </Typography>
                                                 </Button>}
                                         </TableCell>
-                                        <TableCell sx={{ padding: 1 }} align="center">
-                                            {/* <CircleButton tooltip='Chỉnh sửa' onClick={editForm(form.id, "ViewEdit")} children={<EditIcon />} />
+                                        {/* <TableCell sx={{ padding: 1 }} align="center">
+                                            <CircleButton tooltip='Chỉnh sửa' onClick={editForm(form.id, "ViewEdit")} children={<EditIcon />} />
 
                                             <CircleButton tooltip='Xem phản hồi' onClick={editForm(form.id, "ViewResponses")} children={<VisibilityIcon />} />
 
-                                            <CircleButton tooltip='Xóa biểu mẫu' onClick={openModalDelete(form.id)} children={<DeleteIcon />} /> */}
+                                            <CircleButton tooltip='Xóa biểu mẫu' onClick={openModalDelete(form.id)} children={<DeleteIcon />} />
+                                        </TableCell> */}
+                                        <TableCell>
+                                            <IconButton
+                                                // onClick={handleClick}
+                                                sx={{
+                                                    color: '#176B87',
+                                                    backgroundColor: 'white',
+                                                    margin: '5px',
+                                                }}>
+                                                <SettingsIcon/>
+                                            </IconButton>
                                         </TableCell>
                                     </TableRow>
                                 ))}
