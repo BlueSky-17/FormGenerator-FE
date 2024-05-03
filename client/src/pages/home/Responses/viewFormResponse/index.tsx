@@ -52,7 +52,7 @@ const FormResponse: React.FC<FormResponseProps> = ({ Answer, Form }) => {
   const [formResponses, setFormResponse] = useState<any[]>(Answer.Responses);
 
   useEffect(() => {
-    setFormDetail(Form);
+    setFormDetail(Form)
   }, [Form]);
 
   console.log(formResponses);

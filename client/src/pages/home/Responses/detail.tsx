@@ -23,6 +23,7 @@ function Detail(props) {
                     <Box sx={{ backgroundColor: 'red', borderRadius: '15px', marginTop: '15px' }}>
                         {/* Xài hàm map với mảng response để display tất cả câu hỏi */}
                         <FormResponse
+                            key={props.indexDetail}
                             Answer={props.responses[props.indexDetail - 1]}
                             Form={props.form}
                         />
