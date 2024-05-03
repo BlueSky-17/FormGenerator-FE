@@ -5,8 +5,6 @@ import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import CssBaseline from '@mui/material/CssBaseline';
 import MenuIcon from '@mui/icons-material/Menu';
 import Button from '@mui/material/Button';
-import Badge from '@mui/material/Badge';
-import InputBase from '@mui/material/InputBase';
 import { Link, useNavigate } from 'react-router-dom';
 import Popover from '@mui/material/Popover';
 
@@ -16,12 +14,9 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import HomeIcon from '@mui/icons-material/Home';
 import InfoIcon from '@mui/icons-material/Info';
 import HistoryIcon from '@mui/icons-material/History';
 import ArticleIcon from '@mui/icons-material/Article';
-import NotificationsIcon from '@mui/icons-material/Notifications';
-import LogoutIcon from '@mui/icons-material/Logout';
 
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
@@ -32,71 +27,6 @@ import avatarimage from "../../assets/avatar.jpg"
 import logodrawer from "../../assets/logo.png"
 // import TempDrawer from './TempDrawer'
 import "./home.style.css";
-
-const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
-    open?: boolean;
-}>(({ theme, open }) => ({
-    flexGrow: 1,
-    padding: theme.spacing(3),
-    transition: theme.transitions.create('margin', {
-        easing: theme.transitions.easing.sharp,
-        duration: theme.transitions.duration.leavingScreen,
-    }),
-    marginLeft: `-${drawerWidth}px`,
-    ...(open && {
-        transition: theme.transitions.create('margin', {
-            easing: theme.transitions.easing.easeOut,
-            duration: theme.transitions.duration.enteringScreen,
-        }),
-        marginLeft: 0,
-    }),
-}));
-
-interface AppBarProps extends MuiAppBarProps {
-    open?: boolean;
-}
-
-export const modalStyle = {
-    position: 'absolute' as 'absolute',
-    top: '30%',
-    left: '50%',
-    transform: 'translate(-50%, -30%)',
-    width: 700,
-    bgcolor: 'background.paper',
-    border: '1px solid #000',
-    borderRadius: '15px',
-    boxShadow: 24,
-    p: 4,
-};
-
-const AppBar = styled(MuiAppBar, {
-    shouldForwardProp: (prop) => prop !== 'open',
-})<AppBarProps>(({ theme, open }) => ({
-    transition: theme.transitions.create(['margin', 'width'], {
-        easing: theme.transitions.easing.sharp,
-        duration: theme.transitions.duration.leavingScreen,
-    }),
-    ...(open && {
-        width: `calc(100% - ${drawerWidth}px)`,
-        marginLeft: `${drawerWidth}px`,
-        transition: theme.transitions.create(['margin', 'width'], {
-            easing: theme.transitions.easing.easeOut,
-            duration: theme.transitions.duration.enteringScreen,
-        }),
-    }),
-}));
-
-//Setting for Drawer
-const drawerWidth = 300;
-
-const DrawerHeader = styled('div')(({ theme }) => ({
-    display: 'flex',
-    alignItems: 'center',
-    padding: theme.spacing(0, 1),
-    // necessary for content to be below app bar
-    ...theme.mixins.toolbar,
-    justifyContent: 'flex-end',
-}));
 interface LayoutProps {
     children: ReactNode;
 }
@@ -144,7 +74,7 @@ function HomePage({ children }: LayoutProps) {
     }
 
     return (
-        <Box sx={{ display: 'flex', witdh: '100vw' }}>
+        <Box sx={{ display: 'flex', witdh: '100dvw', height: '100dvh' }}>
             <CssBaseline />
             <AppBar position="fixed" open={open}>
                 <Toolbar sx={{ backgroundColor: 'white' }}>
@@ -216,9 +146,6 @@ function HomePage({ children }: LayoutProps) {
                                 <img src={logodrawer} alt="no_img" height={55} />
                             </Link>
                         </Box>
-                        {/* <Typography sx={{ color: 'white', marginRight: '40px' }} variant="h5" noWrap component="div">
-                            My  Logo
-                        </Typography> */}
                         <IconButton onClick={handleDrawerClose}>
                             {theme.direction === 'ltr' ? <ChevronLeftIcon sx={{ color: 'white' }} /> : <ChevronRightIcon sx={{ color: 'white' }} />}
                         </IconButton>
@@ -254,3 +181,68 @@ function HomePage({ children }: LayoutProps) {
 }
 
 export default HomePage;
+
+const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
+    open?: boolean;
+}>(({ theme, open }) => ({
+    flexGrow: 1,
+    padding: theme.spacing(3),
+    transition: theme.transitions.create('margin', {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.leavingScreen,
+    }),
+    marginLeft: `-${drawerWidth}px`,
+    ...(open && {
+        transition: theme.transitions.create('margin', {
+            easing: theme.transitions.easing.easeOut,
+            duration: theme.transitions.duration.enteringScreen,
+        }),
+        marginLeft: 0,
+    }),
+}));
+
+interface AppBarProps extends MuiAppBarProps {
+    open?: boolean;
+}
+
+export const modalStyle = {
+    position: 'absolute' as 'absolute',
+    top: '30%',
+    left: '50%',
+    transform: 'translate(-50%, -30%)',
+    width: 700,
+    bgcolor: 'background.paper',
+    border: '1px solid #000',
+    borderRadius: '15px',
+    boxShadow: 24,
+    p: 4,
+};
+
+const AppBar = styled(MuiAppBar, {
+    shouldForwardProp: (prop) => prop !== 'open',
+})<AppBarProps>(({ theme, open }) => ({
+    transition: theme.transitions.create(['margin', 'width'], {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.leavingScreen,
+    }),
+    ...(open && {
+        width: `calc(100% - ${drawerWidth}px)`,
+        marginLeft: `${drawerWidth}px`,
+        transition: theme.transitions.create(['margin', 'width'], {
+            easing: theme.transitions.easing.easeOut,
+            duration: theme.transitions.duration.enteringScreen,
+        }),
+    }),
+}));
+
+//Setting for Drawer
+const drawerWidth = 300;
+
+const DrawerHeader = styled('div')(({ theme }) => ({
+    display: 'flex',
+    alignItems: 'center',
+    padding: theme.spacing(0, 1),
+    // necessary for content to be below app bar
+    ...theme.mixins.toolbar,
+    justifyContent: 'flex-end',
+}));
