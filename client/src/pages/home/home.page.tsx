@@ -74,7 +74,7 @@ function HomePage({ children }: LayoutProps) {
     }
 
     return (
-        <Box sx={{ display: 'flex', witdh: '100dvw', height: '100dvh' }}>
+        <Box sx={{ display: 'flex', witdh: '100dvw', minHeight: '100dvh' }}>
             <CssBaseline />
             <AppBar position="fixed" open={open}>
                 <Toolbar sx={{ backgroundColor: 'white' }}>
@@ -173,7 +173,7 @@ function HomePage({ children }: LayoutProps) {
                 </Box>
             </Drawer >
 
-            <Main sx={{ backgroundColor: '#EBEBEB' }} open={open}>
+            <Main sx={{ backgroundColor: '#EBEBEB', display: 'flex', flexDirection: 'column' }} open={open}>
                 {children}
             </Main>
         </Box >

@@ -16,23 +16,12 @@ import Detail from './detail';
 import { Answer } from './interface';
 import { Question } from '../DetailForm/interface';
 
-const DrawerHeader = styled('div')(({ theme }) => ({
-    display: 'flex',
-    alignItems: 'center',
-    padding: theme.spacing(0, 1),
-    // necessary for content to be below app bar
-    ...theme.mixins.toolbar,
-    justifyContent: 'flex-end',
-}));
 
 function Responses(props) {
     //Set Tab
     const [tab, setTab] = React.useState(0);
     const handleChangeTabs = (event: React.SyntheticEvent, newValue: number) => {
-        setTab(newValue);
-
-        if (newValue === 1) setDetail(true);
-        else setDetail(false);
+        setTab(newValue)
     };
 
     const [responses, setFormResponse] = useState<Answer[]>([]);
@@ -43,8 +32,6 @@ function Responses(props) {
         setFormDetail(props.form);
     }, [props.responses, props.form]);
 
-
-    const [detail, setDetail] = useState(false);
 
     const [indexDetail, setIndexDetail] = useState(1);
     const handleIndexDetail = (e) => setIndexDetail(e.target.value);
@@ -67,14 +54,14 @@ function Responses(props) {
     //handle create excel File
     const ExcelGenerator = () => {
         const generateExcelFile = async () => {
-          // Create a new workbook and add a worksheet
-          const workbook = new ExcelJS.Workbook();
-          const worksheet = workbook.addWorksheet('Sheet 1');
-    
-            
+            // Create a new workbook and add a worksheet
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Sheet 1');
+
+
             let containTable: boolean = false
-            for(let ques of formDetail.Questions){
-                if(ques.Type === 'table') containTable = true;
+            for (let ques of formDetail.Questions) {
+                if (ques.Type === 'table') containTable = true;
             }
 
             // Add data to the worksheet
@@ -92,19 +79,19 @@ function Responses(props) {
             columns.push({
                 header: "Người dùng",
                 key: "username",
-                width: 20 
-            }) 
+                width: 20
+            })
             worksheet.getCell('A1').value = 'Thời gian'
             worksheet.getCell('B1').value = 'Người dùng'
-            if(containTable){
+            if (containTable) {
                 worksheet.mergeCells('A1:A2')
                 worksheet.mergeCells('B1:B2')
             }
-            
+
             let count = 2
-            for(let i in formDetail.QuestionOrder){
+            for (let i in formDetail.QuestionOrder) {
                 let question: any = formDetail.Questions[i];
-                if(question.Type === 'table'){
+                if (question.Type === 'table') {
                     let tables = question.Content.Table.ListOfColumn
                     worksheet.mergeCells(1, count + 1, 1, count + tables.length)
                     worksheet.getCell(1, count + 1).value = "Danh sách công tác";
@@ -127,11 +114,11 @@ function Responses(props) {
                 let rowData: any = []
                 let countR: number = 2
                 rowData.push(response.SubmitTime, response.Username)
-                for(let curr of response.Responses){
-                    if(curr.Type == 'shortText'){
-                        rowData[countR + curr.Index] =  `${curr.Content.ShortText}`
-                    } else if(curr.Type === 'multi-choice' || curr.Type === 'checkbox' || curr.Type === 'dropdown'){
-                        let s : string = ''
+                for (let curr of response.Responses) {
+                    if (curr.Type == 'shortText') {
+                        rowData[countR + curr.Index] = `${curr.Content.ShortText}`
+                    } else if (curr.Type === 'multi-choice' || curr.Type === 'checkbox' || curr.Type === 'dropdown') {
+                        let s: string = ''
                         let flag: boolean = true
                         for (let j = 0; j < curr.Content.MultiChoice.Result.length; j++) {
                             if (curr.Content.MultiChoice.Result[j] === true) {
@@ -141,25 +128,24 @@ function Responses(props) {
                                 } else s += `;${curr.Content.MultiChoice.Options[j]}`
                             }
                         }
-                        rowData[countR + curr.Index] =  s
+                        rowData[countR + curr.Index] = s
                     }
-                    else if(curr.Type === "file"){
-                        let s : string = ''
+                    else if (curr.Type === "file") {
+                        let s: string = ''
                         let flag: boolean = true
-                        for(let j = 0; j < curr.Content.Files.length; j++) {
-                            if(flag){
+                        for (let j = 0; j < curr.Content.Files.length; j++) {
+                            if (flag) {
                                 s += `${curr.Content.Files[j].fileURL}`
                                 flag = false
                             } else s += `;${curr.Content.Files[j].fileURL}`
                         }
                         rowData[countR + curr.Index] = s
                     }
-                    else if(curr.Type === "date-single"){
-                        rowData[countR + curr.Index] =  `${curr.Content.Date.Single.Time}`
+                    else if (curr.Type === "date-single") {
+                        rowData[countR + curr.Index] = `${curr.Content.Date.Single.Time}`
                     }
-                    else if(curr.Type === "date-range")
-                    {
-                        rowData[countR + curr.Index] =  `${curr.Content.Date.Range.From} - ${curr.Content.Date.Range.To}` 
+                    else if (curr.Type === "date-range") {
+                        rowData[countR + curr.Index] = `${curr.Content.Date.Range.From} - ${curr.Content.Date.Range.To}`
                     }
                 }
                 worksheet.addRow(rowData);
@@ -181,24 +167,31 @@ function Responses(props) {
         generateExcelFile();
     };
 
-
+    console.log(responses)
 
     return (
-        <div>
-            <Box sx={{ backgroundColor: 'white', borderRadius: '15px', marginTop: '15px' }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography sx={{ color: '#364F6B', padding: '20px', fontWeight: 500 }} variant="h5" noWrap component="div">{responses === null ? 0 : responses.length} câu trả lời</Typography>
-                    <Button sx={{ margin: '20px', fontWeight: 500, textTransform: 'initial', fontSize: '15px' }}
-                        onClick={ExcelGenerator}
-                    >Liên kết với trang tính</Button>
-                </Box>
-                <Tabs value={tab} onChange={handleChangeTabs} centered>
-                    <Tab sx={{ textTransform: 'initial', fontSize: '17px' }} label="Thống kê" />
-                    <Tab sx={{ textTransform: 'initial', fontSize: '17px' }} label="Cá nhân" />
-                </Tabs>
-                {detail &&
-                    <Box>
-                        <Divider />
+        <Box sx={{ display: 'flex', flexDirection: 'column', backgroundColor: 'white', borderBottomLeftRadius: '15px', borderBottomRightRadius: '15px', height: '100%' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', paddingX: '20px' }}>
+                <Typography sx={{ color: '#364F6B', paddingTop: '20px', fontWeight: 500 }} variant="h5" noWrap component="div">{responses === null ? 0 : responses.length} câu trả lời</Typography>
+                <Button sx={{ fontWeight: 500, textTransform: 'initial', fontSize: '15px' }}
+                    onClick={ExcelGenerator}
+                >Liên kết với trang tính</Button>
+            </Box>
+            <Tabs value={tab} onChange={handleChangeTabs} centered>
+                <Tab sx={{ textTransform: 'initial', fontSize: '17px' }} label="Thống kê" />
+                <Tab sx={{ textTransform: 'initial', fontSize: '17px' }} label="Cá nhân" />
+            </Tabs>
+            <Divider />
+
+            {/* Thống kê */}
+            {tab === 0 &&
+                <Summary responses={responses} form={formDetail} />
+            }
+
+            {/* Cá nhân */}
+            {tab === 1 &&
+                <Box sx={{ height: '100%' }}>
+                    {responses.length > 0 ?
                         <Box sx={{ display: 'flex', justifyContent: 'center', alignContent: 'center', padding: '5px' }}>
                             <IconButton onClick={decreaseIndex}>
                                 <NavigateBeforeIcon />
@@ -215,20 +208,11 @@ function Responses(props) {
                             <IconButton>
                                 <NavigateNextIcon onClick={increaseIndex} />
                             </IconButton>
-                        </Box>
-                    </Box>
-                }
-            </Box >
-
-            {tab === 0 &&
-                <Summary responses={responses} form={formDetail}/>
+                        </Box> : null}
+                    <Detail responses={responses} indexDetail={indexDetail} form={formDetail} />
+                </Box>
             }
-
-            {tab === 1 &&
-                <Detail responses={responses} indexDetail={indexDetail} form={formDetail}/>
-            }
-
-        </div>
+        </Box >
     )
 }
 

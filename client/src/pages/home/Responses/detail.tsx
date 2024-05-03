@@ -15,16 +15,22 @@ function Detail(props) {
     console.log(props.form);
 
     return (
-        <Box>{
-            props.responses.length > 0 ?
-                <Box sx={{ backgroundColor: 'white', borderRadius: '15px', marginTop: '15px' }}>
-                    {/* Xài hàm map với mảng response để display tất cả câu hỏi */}
-                    <FormResponse 
-                        Answer={props.responses[props.indexDetail - 1]}
-                        Form={props.form}
-                    />
-                </Box > : null
-        }
+        <Box sx={{
+            height: props.responses.length > 0 ? '' : '100%'
+        }}>
+            {
+                props.responses.length > 0 ?
+                    <Box sx={{ backgroundColor: 'red', borderRadius: '15px', marginTop: '15px' }}>
+                        {/* Xài hàm map với mảng response để display tất cả câu hỏi */}
+                        <FormResponse
+                            Answer={props.responses[props.indexDetail - 1]}
+                            Form={props.form}
+                        />
+                    </Box > :
+                    <Box sx={{ display: 'flex', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
+                        <Typography sx={{ color: '#364F6B', fontWeight: 500 }}>Biểu mẫu chưa có phản hồi.</Typography>
+                    </Box>
+            }
         </Box>
     )
 }
