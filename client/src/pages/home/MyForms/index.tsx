@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useReducer, useLayoutEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-// MUI COMPONENT
+// MUI COMPONENTs
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -69,6 +69,29 @@ function MyForms() {
             })
     }, [currentPage, keyword])
 
+    // Temp: get Form.length to page pagination (not affect the number of renders)
+    const [formsLength, setFormsLength] = useState([])
+    useEffect(() => {
+        fetch(`http://localhost:8080/forms/${JSON.parse(localStorage.getItem('token') as string)?.user.ID}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem('token') as string)?.accessToken
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    setLoading(false);
+                    setNotFound(true);
+                }
+                return response.json();
+            })
+            .then(formsLength => {
+                if (formsLength !== null) setFormsLength(formsLength);
+                setLoading(false);
+            })
+    }, [])
+
     const handleCreateForm = async () => {
         // Close modal
         dispatch(setModal({ modal: '', isOpen: false }))
@@ -135,6 +158,9 @@ function MyForms() {
         return <Error404 />
     }
 
+    console.log(formsLength.length)
+    console.log(Math.ceil(formsLength.length / 5))
+
     return (
         <Box style={{ height: '100%', display: 'flex', width: '100%', paddingTop: '70px' }}>
             <Box sx={{ display: 'flex', flexDirection: 'column', backgroundColor: 'white', border: "2px solid #DEDEDE", height: '100%', width: '100%' }}>
@@ -165,7 +191,7 @@ function MyForms() {
                 <Box sx={{ height: '100%' }}>
                     {forms.length === 0 ?
                         <Box sx={{ display: 'flex', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
-                            <Typography sx={{color: '#364F6B', fontWeight: 500}}>Bạn hiện chưa sở hữu biểu mẫu nào.</Typography>
+                            <Typography sx={{ color: '#364F6B', fontWeight: 500 }}>Bạn hiện chưa sở hữu biểu mẫu nào.</Typography>
                         </Box> :
                         <TableContainer component={Paper}>
                             <Table sx={{ minWidth: 650 }} aria-label="simple table">
@@ -229,7 +255,7 @@ function MyForms() {
 
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'end', m: 2 }}>
                     <Stack spacing={2}>
-                        <Pagination count={5} page={currentPage} onChange={handleChangePagination} color="primary" />
+                        <Pagination count={Math.ceil(formsLength.length / 5)} page={currentPage} onChange={handleChangePagination} color="primary" />
                     </Stack>
                 </Box>
             </Box>

@@ -1,29 +1,14 @@
 import React, { useState, useEffect, useReducer, useLayoutEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { Box, Typography, TextField, Drawer, Avatar, IconButton, Toolbar, List, Divider, Icon, Modal } from '@mui/material'
 import { styled, useTheme, alpha } from '@mui/material/styles';
-import Button from '@mui/material/Button';
 import COLORS from '../../../constants/colors';
-
-const DrawerHeader = styled('div')(({ theme }) => ({
-    display: 'flex',
-    alignItems: 'center',
-    padding: theme.spacing(0, 1),
-    // necessary for content to be below app bar
-    ...theme.mixins.toolbar,
-    justifyContent: 'flex-end',
-}));
 
 function Profile() {
     const [profile, setProfile] = useState<any>({})
 
-    const ProfileAPI_URL = `http://localhost:8080/profile`;
-
     useEffect(() => {
         setProfile(JSON.parse(localStorage.getItem('token') as string)?.user)
     }, [])
-
-    console.log(profile);
 
     return (
         <Box>
@@ -43,9 +28,8 @@ function Profile() {
                             <TextField
                                 disabled
                                 fullWidth
+                                sx={{ borderRadius: '10px', overflow:'hidden' }}
                                 variant="filled"
-                                id="outlined-disabled"
-                                // label="Disabled"
                                 value={profile.FirstName}
                             />
                         </Box>
@@ -56,8 +40,7 @@ function Profile() {
                                 disabled
                                 fullWidth
                                 variant="filled"
-                                id="outlined-disabled"
-                                // label="Disabled"
+                                sx={{ borderRadius: '10px', overflow:'hidden' }}
                                 value={profile.Email}
                             />
                         </Box>
@@ -68,8 +51,7 @@ function Profile() {
                                 disabled
                                 fullWidth
                                 variant="filled"
-                                id="outlined-disabled"
-                                // label="Disabled"
+                                sx={{ borderRadius: '10px', overflow:'hidden' }}
                                 value={profile.Role === 'user' ? 'Người dùng' : 'Quản trị viên'}
                             />
                         </Box>
@@ -81,3 +63,12 @@ function Profile() {
 }
 
 export default Profile
+
+const DrawerHeader = styled('div')(({ theme }) => ({
+    display: 'flex',
+    alignItems: 'center',
+    padding: theme.spacing(0, 1),
+    // necessary for content to be below app bar
+    ...theme.mixins.toolbar,
+    justifyContent: 'flex-end',
+}));

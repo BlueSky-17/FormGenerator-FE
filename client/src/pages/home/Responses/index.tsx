@@ -3,7 +3,6 @@ import { useParams } from 'react-router-dom';
 import { useMemo } from 'react';
 import * as ExcelJS from 'exceljs';
 import { Box, Typography, TextField, Drawer, Avatar, IconButton, Toolbar, List, Divider, Icon, Modal, Grid, Switch } from '@mui/material'
-import { styled, useTheme, alpha } from '@mui/material/styles';
 import Button from '@mui/material/Button';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
@@ -15,7 +14,6 @@ import Summary from './summary';
 import Detail from './detail';
 import { Answer } from './interface';
 import { Question } from '../DetailForm/interface';
-
 
 function Responses(props) {
     //Set Tab
@@ -34,7 +32,6 @@ function Responses(props) {
 
 
     const [indexDetail, setIndexDetail] = useState(1);
-    const handleIndexDetail = (e) => setIndexDetail(e.target.value);
     const decreaseIndex = () => {
         if (indexDetail === 1) return;
         else {
@@ -196,15 +193,7 @@ function Responses(props) {
                             <IconButton onClick={decreaseIndex}>
                                 <NavigateBeforeIcon />
                             </IconButton>
-                            <TextField
-                                disabled
-                                sx={{ width: '20px' }}
-                                value={indexDetail}
-                                onChange={handleIndexDetail}
-                                id="standard-basic"
-                                variant="standard"
-                            />
-                            <Typography sx={{ padding: '5px' }}>/ {responses.length}</Typography>
+                            <Typography sx={{ paddingX: '5px', paddingTop:'5px' }}>{indexDetail} / {responses.length}</Typography>
                             <IconButton>
                                 <NavigateNextIcon onClick={increaseIndex} />
                             </IconButton>

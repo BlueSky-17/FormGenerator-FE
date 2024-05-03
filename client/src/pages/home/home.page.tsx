@@ -58,15 +58,16 @@ function HomePage({ children }: LayoutProps) {
 
     const open_avatar = Boolean(anchorEl);
     const id = open_avatar ? 'simple-popover' : undefined;
-
     const navigate: any = useNavigate();
 
     const handleLogout = () => {
-        // Clear the token from localStorage or perform any other logout actions
         localStorage.removeItem('token');
-
-        // Redirect the user to the login page (you can change the path)
         navigate('/signin');
+    }
+
+    const handleNavToProfifle = () => {
+        navigate('/profile')
+        handleClose()
     }
 
     const navSideBar = (path: string) => (e) => {
@@ -89,16 +90,16 @@ function HomePage({ children }: LayoutProps) {
 
                     <Box sx={{ flexGrow: 1 }} />
 
-                    <Box sx={{ marginRight: '15px' }}>
+                    <Box sx={{ marginRight: '10px' }}>
                         <Typography sx={{ fontWeight: 700, color: '#364F6B' }} variant="subtitle1" color="black" noWrap component="div">
-                            {userToken.user.FirstName} {userToken.user.LastName}
+                            {userToken.user.LastName} {userToken.user.FirstName}
                         </Typography>
                     </Box>
 
                     <IconButton size='small' aria-describedby={id} onClick={handleClick}>
                         {userToken.user.AvatarPath ?
                             <img style={{ borderRadius: '100%', height: '45px' }} alt='Avatar' src={userToken.user.AvatarPath} referrerPolicy="no-referrer" /> :
-                            <img style={{ borderRadius: '100%', height: '45px' }} alt='Avatar' src={avatarimage} referrerPolicy="no-referrer" />}
+                            <Avatar src='' alt='' />}
                     </IconButton>
                     <Popover
                         id={id}
@@ -111,6 +112,7 @@ function HomePage({ children }: LayoutProps) {
                         }}
                     >
                         <Button
+                            onClick={handleNavToProfifle}
                             sx={{ p: 2, fontWeight: 500, color: 'black' }}
                         >
                             Thông tin cá nhân

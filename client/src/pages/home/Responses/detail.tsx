@@ -1,18 +1,8 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useParams } from 'react-router-dom';
-import { Box, Typography, Drawer, Avatar, IconButton, Toolbar, List, Divider, Icon, Modal, Grid, Switch } from '@mui/material'
-import { styled, useTheme, alpha } from '@mui/material/styles';
-import Button from '@mui/material/Button';
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
+import { Box, Typography } from '@mui/material'
 import FormResponse from './viewFormResponse'
 
 function Detail(props) {
-    console.log(props.indexDetail - 1)
-    console.log(props.responses[props.indexDetail - 1])
-
-    console.log(props.form);
 
     return (
         <Box sx={{
