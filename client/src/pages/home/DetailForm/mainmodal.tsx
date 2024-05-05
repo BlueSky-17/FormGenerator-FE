@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useLayoutEffect } from 'react'
+import React, { useState } from 'react'
 
-import { Box, Typography, Drawer, Avatar, IconButton, Toolbar, List, Divider, Icon, Modal, Grid, Switch } from '@mui/material'
+import { Box, Typography, IconButton, Modal, Grid } from '@mui/material'
 import Button from '@mui/material/Button';
 
 import ClearIcon from '@mui/icons-material/Clear';
@@ -16,12 +16,10 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
-import { useParams } from 'react-router-dom';
-import Alert, { AlertProps } from '@mui/material/Alert';
+import Alert from '@mui/material/Alert';
 
 import { Question, ShortText, MultiChoice, Date, LinkedData, File, Table, SpecialText, OTPInput } from './interface';
 import * as XLSX from 'xlsx'
-import { LensBlur } from '@mui/icons-material';
 import AcceptButton from '../../../components/custom-button/acceptButton';
 import CancelButton from '../../../components/custom-button/cancelButton';
 
@@ -219,7 +217,7 @@ export function MainModal(props) {
             }
             else if (props.type === 'OTPInput') {
                 props.formDetail.Questions[props.quesEdit].Content.OtpInput = Number(props.OTPNumber);
-                console.log(typeof(props.formDetail.Questions[props.quesEdit].Content.OtpInput))
+                console.log(typeof (props.formDetail.Questions[props.quesEdit].Content.OtpInput))
             }
 
             props.setHasChange(true);
@@ -526,22 +524,22 @@ export function MainModal(props) {
     };
 
     const changeType = (label) => {
-        if (label == '0') {
+        if (label === '0') {
             props.setType('shortText')
         }
-        else if (label == '1') {
+        else if (label === '1') {
             props.setType('multi-choice')
         }
-        else if (label == '2') {
+        else if (label === '2') {
             props.setType('checkbox')
         }
-        else if (label == '3') {
+        else if (label === '3') {
             props.setType('table')
         }
-        else if (label == '4') {
+        else if (label === '4') {
             props.setType('linkedData')
         }
-        else if (label == '5') {
+        else if (label === '5') {
             props.setType('date-single')
         }
         else if (label == '6') {
@@ -552,9 +550,6 @@ export function MainModal(props) {
     const handleOTPNumber = (event) => {
         props.setOTPNumber(event.target.value);
     }
-
-    console.log(props.type)
-    console.log(props.OTPNumber)
 
     return (
         <div>

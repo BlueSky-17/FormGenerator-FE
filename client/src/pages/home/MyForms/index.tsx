@@ -15,7 +15,7 @@ import Pagination from '@mui/material/Pagination';
 import Stack from '@mui/material/Stack';
 
 // APIs
-import { createForm, deleteForm } from '../../../apis/form';
+import { deleteForm } from '../../../apis/form';
 
 // REDUX
 import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
@@ -129,9 +129,6 @@ function MyForms() {
     if (notFound) {
         return <Error404 />
     }
-
-    console.log(formsLength.length)
-    console.log(Math.ceil(formsLength.length / 5))
 
     return (
         <Box style={{ height: '100%', display: 'flex', width: '100%', paddingTop: '70px' }}>
