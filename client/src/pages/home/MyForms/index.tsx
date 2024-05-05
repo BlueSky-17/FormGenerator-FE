@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useReducer, useLayoutEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 // MUI COMPONENTs
@@ -9,34 +9,39 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import { Box, Typography, TextField, Drawer, Avatar, IconButton, Toolbar, List, Divider, Icon, Modal } from '@mui/material'
+import { Box, Typography, Divider } from '@mui/material'
 import Button from '@mui/material/Button';
 import Pagination from '@mui/material/Pagination';
 import Stack from '@mui/material/Stack';
 
-// REDUX
-import { initialState, actions, reducer, setName, setDescription, setModal } from '../../../reducers/formReducer'
+// APIs
 import { createForm, deleteForm } from '../../../apis/form';
 
-// ICON
+// REDUX
+import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
+import { setModal } from '../../../redux/reducers/form.reducer';
+
+// ICONs
 import SearchIcon from '@mui/icons-material/Search';
 import EditIcon from '@mui/icons-material/Edit';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-// COMPONENT
+// COMPONENTs
 import { SearchIconWrapper, Search, StyledInputBase } from './searchBar';
-import { modalStyle } from '../home.page';
 import CircleButton from '../../../components/custom-button/circleButton';
 import AcceptButton from '../../../components/custom-button/acceptButton';
-import CancelButton from '../../../components/custom-button/cancelButton';
 import LoadingPage from '../../../components/loading-page/loading';
 import Error404 from '../../../components/error-page/404';
+import ModalAdd from './modalAdd';
 
 function MyForms() {
     const [forms, setForms] = useState<any[]>([])
     const [loading, setLoading] = useState<boolean>(true);
     const [notFound, setNotFound] = useState<boolean>(false);
+
+    const formState = useAppSelector((state) => state.formReducer)
+    const dispatch = useAppDispatch()
 
     // Page Pagination
     const [currentPage, setCurrentPage] = React.useState<number | undefined>(1);
@@ -92,36 +97,6 @@ function MyForms() {
             })
     }, [])
 
-    const handleCreateForm = async () => {
-        // Close modal
-        dispatch(setModal({ modal: '', isOpen: false }))
-
-        // Call API POST to create a new form
-        const dataFromServer = await createForm(
-            {
-                "name": name,
-                "header": {
-                    "title": name,
-                    "description": description,
-                    "imagePath": ""
-                },
-                "owner": JSON.parse(localStorage.getItem('token') as string)?.user.ID,
-                "answersCounter": 0,
-                "latestModified": "2023-10-14T12:34:56Z",
-                "createDate": "2023-10-14T12:34:56Z",
-                "closedDate": "2023-10-14T12:34:56Z",
-                "Questions": [],
-                "QuestionOrder": []
-            }
-        )
-
-        navigate('/form/' + dataFromServer.newID, { state: 'ViewEdit' });
-
-        // Return default value of Create Modal
-        dispatch(setName(''));
-        dispatch(setDescription(''));
-    }
-
     const handleDeleteForm = async () => {
         // Close modal
         dispatch(setModal({ modal: '', isOpen: false }))
@@ -133,8 +108,6 @@ function MyForms() {
     }
 
     // Modal ADD + DELETE Form
-    const [state, dispatch] = useReducer(reducer, initialState);
-    const { name, description, modal, isOpen } = state;
     const [formID, setFormID] = useState(''); // Get formID to delete form
 
     const openModalAdd = () => dispatch(setModal({ modal: 'add', isOpen: true }))
@@ -142,7 +115,6 @@ function MyForms() {
         dispatch(setModal({ modal: 'delete', isOpen: true }))
         setFormID(formID);
     }
-    const handleCloseModal = () => dispatch(setModal({ modal: '', isOpen: false }))
 
     // Navigate when click edit form
     const navigate = useNavigate();
@@ -261,7 +233,11 @@ function MyForms() {
             </Box>
 
             {/* Modal create form */}
-            <Modal
+            <ModalAdd
+                handleDeleteForm={handleDeleteForm}
+            >
+            </ModalAdd>
+            {/* <Modal
                 open={isOpen}
                 aria-labelledby="modal-modal-title"
                 aria-describedby="modal-modal-description"
@@ -318,7 +294,7 @@ function MyForms() {
                             : null
                     }
                 </Box>
-            </Modal>
+            </Modal> */}
         </Box>
     )
 }

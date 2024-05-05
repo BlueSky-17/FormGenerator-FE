@@ -4,6 +4,10 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { initializeApp } from 'firebase/app';
+
+import { store } from './redux/store'
+import { Provider } from 'react-redux'
+
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
@@ -21,9 +25,11 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 root.render(
+  <Provider store={store}>
     <React.StrictMode>
       <App />
     </React.StrictMode>
+  </Provider>
 );
 
 // If you want to start measuring performance in your app, pass a function
