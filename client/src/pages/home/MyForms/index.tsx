@@ -110,7 +110,7 @@ function MyForms() {
     // Modal ADD + DELETE Form
     const [formID, setFormID] = useState(''); // Get formID to delete form
 
-    const openModalAdd = () => dispatch(setModal({ modal: 'add', isOpen: true }))
+    const openModalAdd = () => dispatch(setModal({ modal: 'select', isOpen: true }))
     const openModalDelete = (formID: string) => (e) => {
         dispatch(setModal({ modal: 'delete', isOpen: true }))
         setFormID(formID);
