@@ -9,112 +9,128 @@ import { UndoRounded } from '@mui/icons-material';
 import AcceptButton from '../../../components/custom-button/acceptButton';
 import CancelButton from '../../../components/custom-button/cancelButton';
 import { modalStyle } from '../home.page';
+import COLORS from '../../../constants/colors';
+import { updateUser } from '../../../apis/user';
 
-// interface User {
-//     ID: number;
-//     UserName: string;
-//     Email: string;
-//     Role: 'admin' | 'user';
-// }
+interface User {
+    ID: number
+    UserName: string
+    Email: string
+    Role: 'admin' | 'user'
+    Password: string
+    FirstName: string
+    LastName: string
+    AvataPath: string
+    Disabled: boolean
+}
 
 export function EditModal(props: any) {
 
-    // const [user, setUser] = useState<User>({
-    //     ID: 0,
-    //     UserName: '',
-    //     Email: '',
-    //     Role: 'user'
-    // })
+    const [user, setUser] = useState<User>({
+        ID: 0,
+        UserName: '',
+        Email: '',
+        Role: 'user',
+        Password: '',
+        FirstName: '',
+        LastName: '',
+        AvataPath: '',
+        Disabled: false
+    })
 
-    const [name, setName] = useState<string>('');
-    const [description, setDescription] = useState('');
-
-    // useEffect(() => {
-    //     const selectUser = props.users.find((us: { ID: any; }) => us.ID === props.selectID)
-
-    //     if (props.selectID !== '') setUser(selectUser)
-
-    // // eslint-disable-next-line react-hooks/exhaustive-deps
-    // }, [props.selectID])
-
-    //get init value of name & description form (avoid undefined)
-    // useEffect(() => {
-    //     if (props.formDetail.name) {
-    //         setName(props.formDetail.name);
-    //         setDescription(props.formDetail.header.Description)
-    //     }
-    //     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // }, [props.formDetail.name]);
-
-    const handleName = (e: any) => {
-        setName(e.target.value);
-    }
-
-    const handleDescription = (e: any) => {
-        setDescription(e.target.value);
-    }
     const closeEditModal = () => {
         props.setOpen(false);
     }
 
-    const saveEditModal = () => {
-        props.updateObjectInDatabase({
-            "name": name,
-            "header": {
-                "title": name,
-                "description": description,
-                "imagePath": ""
-            }
-        })
+    useEffect(() => {
+        const selectUser = props.users.find((user: { ID: any; }) => user.ID === props.selectID)
+        setUser(selectUser)
+    }, [props.selectID])
+
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        const data = new FormData(event.currentTarget);
+
+        updateUser(
+            {
+                "username": data.get('username') as string,
+                "email": data.get('email') as string,
+                "firstName": data.get('firstname') as string,
+                "lastName": data.get('lastname') as string,
+            },
+            props.selectID
+        )
 
         window.location.reload();
         closeEditModal()
     }
+
     return (
         <div>
-            <Modal
+            {user ? <Modal
                 open={props.open}
                 aria-labelledby="modal-modal-title"
                 aria-describedby="modal-modal-description"
             >
-                <Box>
-                    <Box sx={modalStyle}>
-                        <Typography variant='h6' component="div">
-                            Thông tin người dùng
-                        </Typography>
+                <Box sx={modalStyle}>
+                    <Typography variant='h6' component="div">
+                        Chỉnh sửa thông tin người dùng
+                    </Typography>
 
-                        <Box component="form" sx={{ marginY: '10px', display: 'flex', flexDirection: 'column' }}>
-                            <Typography variant='subtitle1' component="div">
-                                <b>Tài khoản</b>
-                            </Typography>
+                    <Box component="form" noValidate onSubmit={handleSubmit} sx={{ marginY: '10px', display: 'flex', flexDirection: 'column' }}>
+                        <TextField
+                            margin="normal"
+                            defaultValue={user.UserName}
+                            id="username"
+                            label="Username"
+                            name="username"
+                            autoComplete="username"
+                            autoFocus
+                        />
+                        <TextField
+                            margin="normal"
+                            defaultValue={user.Email}
+                            fullWidth
+                            id="email"
+                            label="Email"
+                            name="email"
+                            autoComplete="email"
+                            autoFocus
+                        />
+                        <Box sx={{ display: 'flex', flexDirection: 'row', gap: '10px' }}>
                             <TextField
+                                margin="normal"
+                                defaultValue={user.FirstName}
                                 required
-                                value={name}
-                                // onChange={handleName}
-                                sx={{ margin: '10px', width: '100%' }}
-                                variant="outlined"
-                                placeholder='Tên form'
+                                fullWidth
+                                id="firstname"
+                                name="firstname"
+                                autoComplete="firstname"
+                                autoFocus
                             />
-                            <Typography variant='subtitle1' component="div">
-                                <b>Họ và tên</b>
-                            </Typography>
                             <TextField
+                                margin="normal"
+                                defaultValue={user.LastName}
                                 required
-                                value={description}
-                                onChange={handleDescription}
-                                sx={{ margin: '10px', width: '100%' }}
-                                variant="outlined"
-                                placeholder='Mô tả'
+                                fullWidth
+                                id="lastname"
+                                name="lastname"
+                                autoComplete="lastname"
+                                autoFocus
                             />
                         </Box>
-
-                        <Box sx={{ display: 'flex', flexDirection: 'row-reverse' }} >
-                            <AcceptButton title='Xác nhận' onClick={saveEditModal} />
+                        <Box sx={{ display: 'flex', flexDirection: 'row-reverse' }}>
                             <CancelButton title='Hủy' onClick={closeEditModal} />
+                            <Button
+                                type="submit"
+                                sx={{ margin: '10px', borderRadius: '10px', backgroundColor: COLORS.darkBlue, color: 'white', '&:hover': { backgroundColor: COLORS.darkBlue, color: 'white', opacity: '0.8' } }}
+                            >
+                                Xác nhận
+                            </Button>
                         </Box>
                     </Box>
                 </Box>
-            </Modal>
+            </Modal> : null}
         </div>
     )
 }

@@ -183,9 +183,7 @@ function UserManage() {
                         </Table>
                     </TableContainer>
                 </Box>
-
-                <Box></Box>
-
+                
                 <EditModal
                     open={open}
                     setOpen={setOpen}
