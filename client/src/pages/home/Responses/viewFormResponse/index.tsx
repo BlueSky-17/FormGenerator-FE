@@ -111,29 +111,30 @@ const FormResponse: React.FC<FormResponseProps> = ({ Answer, Form }) => {
             ? formDetail.QuestionOrder.map((ques, index) => (
               <Box key={index} sx={{ marginY: "15px" }}>
                 {/* Câu hỏi */}
-                {formResponses[ques] ? <Box sx={{ display: "flex" }}>
-                  <Typography
-                    sx={{
-                      color: COLORS.darkBlue,
-                      justifySelft: "left",
-                      paddingTop: "10px",
-                      fontWeight: 500,
-                    }}
-                    variant="h5"
-                    noWrap
-                    component="div"
-                  >
-                    {index + 1}. {formDetail.Questions[ques].Question}
-                  </Typography>
-                  {formDetail.Questions[ques].Required && (
-                    <Typography sx={{ color: "red", fontSize: "18px" }}>
-                      *
+                {formResponses[ques] ?
+                  <Box sx={{ display: "flex" }}>
+                    <Typography
+                      sx={{
+                        color: COLORS.darkBlue,
+                        justifySelft: "left",
+                        paddingTop: "10px",
+                        fontWeight: 500,
+                      }}
+                      variant="h5"
+                      noWrap
+                      component="div"
+                    >
+                      {index + 1}. {formDetail.Questions[ques].Question}
                     </Typography>
-                  )}
-                </Box>:null}
+                    {formDetail.Questions[ques].Required && (
+                      <Typography sx={{ color: "red", fontSize: "18px" }}>
+                        *
+                      </Typography>
+                    )}
+                  </Box> : null}
 
                 {/* Nội dung | Dạng câu hỏi */}
-                <Box
+                {formResponses[ques] ? <Box
                   sx={{
                     display: "flex",
                     flexDirection: "column",
@@ -628,7 +629,7 @@ const FormResponse: React.FC<FormResponseProps> = ({ Answer, Form }) => {
                       </Table>
                     </TableContainer>
                   )}
-                </Box>
+                </Box> : null}
               </Box>
             ))
             : null}
