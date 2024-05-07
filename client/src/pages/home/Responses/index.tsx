@@ -186,7 +186,7 @@ function Responses(props) {
             }
 
             {/* Cá nhân */}
-            {tab === 1 &&
+            {tab === 1 && 
                 <Box sx={{ height: '100%' }}>
                     {responses.length > 0 ?
                         <Box sx={{ display: 'flex', justifyContent: 'center', alignContent: 'center', padding: '5px' }}>

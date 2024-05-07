@@ -111,7 +111,7 @@ const FormResponse: React.FC<FormResponseProps> = ({ Answer, Form }) => {
             ? formDetail.QuestionOrder.map((ques, index) => (
               <Box key={index} sx={{ marginY: "15px" }}>
                 {/* Câu hỏi */}
-                <Box sx={{ display: "flex" }}>
+                {formResponses[ques] ? <Box sx={{ display: "flex" }}>
                   <Typography
                     sx={{
                       color: COLORS.darkBlue,
@@ -130,7 +130,7 @@ const FormResponse: React.FC<FormResponseProps> = ({ Answer, Form }) => {
                       *
                     </Typography>
                   )}
-                </Box>
+                </Box>:null}
 
                 {/* Nội dung | Dạng câu hỏi */}
                 <Box
@@ -192,7 +192,7 @@ const FormResponse: React.FC<FormResponseProps> = ({ Answer, Form }) => {
                       </FormControl>
                     </Box>
                   ) : null}
-                  {formDetail.Questions[ques].Type === "checkbox" ? (
+                  {formDetail.Questions[ques].Type === "checkbox" && formResponses[ques] ? (
                     <Box>
                       {formResponses[ques].Content.MultiChoice
                         .Constraint === "at-most" ? (
