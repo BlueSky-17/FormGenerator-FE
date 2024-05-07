@@ -148,8 +148,6 @@ function Responses(props) {
                 worksheet.addRow(rowData);
             };
 
-
-
             const buffer = await workbook.xlsx.writeBuffer();
 
             // Create a Blob from the buffer
@@ -163,8 +161,6 @@ function Responses(props) {
         };
         generateExcelFile();
     };
-
-    console.log(responses)
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', backgroundColor: 'white', borderBottomLeftRadius: '15px', borderBottomRightRadius: '15px', height: '100%' }}>
@@ -182,7 +178,7 @@ function Responses(props) {
 
             {/* Thống kê */}
             {tab === 0 &&
-                <Summary responses={responses} form={formDetail} />
+                <Summary key={responses} responses={responses} form={formDetail} />
             }
 
             {/* Cá nhân */}

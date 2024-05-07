@@ -102,14 +102,12 @@ function Summary(props) {
             })
         }
     }, [])
-
-    console.log(props.responses)
-
+    
     return (
         <Box sx={{ height: '100%' }}>
             {props.responses.length > 0 && hasSummary
                 ? props.responses[0].Responses.map((res, index) => (
-                    <Box>
+                    <Box key={index}>
                         {(res.Type === 'multi-choice' || res.Type === 'checkbox' || res.Type === 'dropdown') ? (
                             <Box key={index} sx={{ backgroundColor: 'white', borderRadius: '15px', marginTop: '15px', paddingBottom: '5px' }}>
                                 <Box sx={{ marginBottom: '15px' }}>
