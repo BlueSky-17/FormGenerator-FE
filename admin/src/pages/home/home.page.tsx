@@ -181,12 +181,6 @@ function HomePage({ children }: LayoutProps) {
                         }}
                     >
                         <Button
-                            sx={{ p: 2, fontWeight: 500, color: 'black' }}
-                        >
-                            Thông tin cá nhân
-                        </Button>
-                        <Divider />
-                        <Button
                             onClick={handleLogout}
                             sx={{ p: 2, fontWeight: 500, color: 'black' }}
                         >
@@ -216,9 +210,6 @@ function HomePage({ children }: LayoutProps) {
                                 <img src={logodrawer} alt="no_img" height={55} />
                             </Link>
                         </Box>
-                        {/* <Typography sx={{ color: 'white', marginRight: '40px' }} variant="h5" noWrap component="div">
-                            My  Logo
-                        </Typography> */}
                         <IconButton onClick={handleDrawerClose}>
                             {theme.direction === 'ltr' ? <ChevronLeftIcon sx={{ color: 'white' }} /> : <ChevronRightIcon sx={{ color: 'white' }} />}
                         </IconButton>
@@ -246,7 +237,7 @@ function HomePage({ children }: LayoutProps) {
                 </Box>
             </Drawer >
 
-            <Main sx={{ backgroundColor: '#EBEBEB' }} open={open}>
+            <Main sx={{display:'flex', backgroundColor: '#EBEBEB', height:'100dvh' }} open={open}>
                 {children}
             </Main>
         </Box >

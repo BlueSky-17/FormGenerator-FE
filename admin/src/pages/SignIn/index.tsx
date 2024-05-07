@@ -102,7 +102,7 @@ export default function SignInSide({ setToken }) {
         backgroundColor: '#364F6B',
         display: 'flex',
         alignItems: 'center',
-        position: 'relative'
+        position: 'relative',
       }}
       >
         <Box sx={{
@@ -110,7 +110,7 @@ export default function SignInSide({ setToken }) {
           borderRadius: '20px',
           boxShadow: '0px 4px 4px 0px rgba(0, 0, 0, 0.25)',
           width: '85%',
-          height: '70%',
+          height: '55%',
           flexShrink: 0,
           position: 'absolute',
           left: '-15%'
@@ -166,50 +166,6 @@ export default function SignInSide({ setToken }) {
               >
                 Đăng nhập
               </Button>
-              <Button
-                // type="submit"
-                fullWidth
-                variant="contained"
-                sx={{
-                  mt: 1, 
-                  mb: 2, 
-                  textTransform: 'initial', 
-                  color: 'black', 
-                  backgroundColor: 'white', 
-                  '&:hover': {
-                    backgroundColor: 'white', // Màu nền thay đổi khi hover
-                  },
-                }}
-              >
-                <CardMedia
-                  component="img"
-                  image={google}
-                  alt="google logo"
-                  sx={{
-                    height: '15px',
-                    width: '15px',
-                    paddingRight: '10px'
-                  }}
-                />
-                Đăng nhập bằng Google
-              </Button>
-              <Grid container>
-                <Grid item xs>
-                  <Typography variant="body2">
-                    <Link to="/signin">
-                      Bạn quên mật khẩu?
-                    </Link>
-                  </Typography>
-                </Grid>
-                <Grid item >
-                  <Typography variant="body2">
-                    Bạn chưa có tài khoản?
-                    <Link to='/signup'>
-                      {"Đăng ký ngay"}
-                    </Link>
-                  </Typography>
-                </Grid>
-              </Grid>
             </Box>
           </Box>
         </Box>

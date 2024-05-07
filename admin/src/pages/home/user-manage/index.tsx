@@ -37,15 +37,6 @@ import Error404 from '../../../components/error-page/404';
 import SettingsIcon from '@mui/icons-material/Settings';
 import EditModal from './editmodal';
 
-const DrawerHeader = styled('div')(({ theme }) => ({
-    display: 'flex',
-    alignItems: 'center',
-    padding: theme.spacing(0, 1),
-    // necessary for content to be below app bar
-    ...theme.mixins.toolbar,
-    justifyContent: 'flex-end',
-}));
-
 function UserManage() {
     const [users, setUsers] = useState<any[]>([])
     const [loading, setLoading] = useState<boolean>(true);
@@ -75,7 +66,7 @@ function UserManage() {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem('token') as string)?.accessToken,
-                'Role': 'admin'
+                'Role': JSON.parse(localStorage.getItem('token') as string)?.user.Role
             }
         })
             .then(response => {
@@ -105,15 +96,14 @@ function UserManage() {
     console.log(users)
 
     return (
-        <Box>
-            <DrawerHeader />
-            <Box sx={{ backgroundColor: 'white', border: "2px solid #DEDEDE", paddingTop: '5px' }}>
-                <Typography sx={{ color: '#364F6B', padding: '15px', fontWeight: 600 }} variant="h6" noWrap component="div">
+        <Box style={{ height: '100%', display: 'flex', width: '100%', paddingTop: '70px' }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', backgroundColor: 'white', border: "2px solid #DEDEDE", height: '100%', width: '100%' }}>
+                <Typography sx={{ color: '#364F6B', fontWeight: 600, padding: '10px', paddingLeft: '15px' }} variant="h6">
                     QUẢN LÝ NGƯỜI DÙNG
                 </Typography>
                 <Divider />
 
-                <Box sx={{ display: 'flex', alignItems: 'center', padding: '10px', marginRight: '20px' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', padding: '10px', marginRight: '20px', paddingLeft: '15px' }}>
                     <Search sx={{ border: '2px solid #DEDEDE' }}>
                         <SearchIconWrapper>
                             <SearchIcon />
@@ -134,9 +124,9 @@ function UserManage() {
                 </Box>
 
                 <Divider />
-                <Box sx={{ minHeight: 420 }}>
-                    <TableContainer component={Paper}>
-                        <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                <Box sx={{ height: '100%', backgroundColor:'blue', overflow:'hidden' }}>
+                    <TableContainer sx={{ height: '100%', display: 'flex', overflowX: 'hidden', overflowY:'scroll' }} component={Paper}>
+                        <Table aria-label="simple table">
                             <TableHead>
                                 <TableRow >
                                     <TableCell sx={{ padding: 1, width: '5%', paddingLeft: 5, fontWeight: 800, fontSize: '1rem' }} align="left">STT</TableCell>
@@ -194,11 +184,7 @@ function UserManage() {
                     </TableContainer>
                 </Box>
 
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'end', m: 2 }}>
-                    <Stack spacing={2}>
-                        <Pagination count={5} page={currentPage} onChange={handleChangePagination} color="primary" />
-                    </Stack>
-                </Box>
+                <Box></Box>
 
                 <EditModal
                     open={open}
