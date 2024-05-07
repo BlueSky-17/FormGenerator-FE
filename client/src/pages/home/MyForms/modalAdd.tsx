@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 // MUI COMPONENTs
-import { Box, Typography, TextField, Modal, Button } from '@mui/material'
+import { Box, Typography, TextField, Modal, Button, Divider } from '@mui/material'
 
 // APIs
 import { createForm, } from '../../../apis/form';
@@ -16,8 +16,15 @@ import { setName, setDescription, setModal } from '../../../redux/reducers/form.
 import AcceptButton from '../../../components/custom-button/acceptButton';
 import CancelButton from '../../../components/custom-button/cancelButton';
 import SelectButton from '../../../components/custom-button/selectButton';
+import InputFileUpload from '../../../components/custom-button/fileUploadButton';
+import COLORS from '../../../constants/colors';
+import { error } from 'console';
 
 type ADD_TYPE = 'manual' | 'describe' | 'image' | 'data'
+
+export type FileAttribute = {
+    name: string
+} | undefined
 
 function ModalAdd(props) {
     const navigate = useNavigate();
@@ -59,6 +66,12 @@ function ModalAdd(props) {
     }
 
     const handleCloseModal = () => dispatch(setModal({ modal: '', isOpen: false }))
+
+    const [fileImage, setFileImage] = useState<FileAttribute>();
+
+    const [fileData, setFileData] = useState<FileAttribute>();
+
+    const [errorFile, setErrorFile] = useState<string>('');
 
     return (
         <Modal
@@ -132,7 +145,15 @@ function ModalAdd(props) {
                                 <Box component="form" sx={{ marginY: '10px', display: 'flex', flexDirection: 'column' }}>
                                     <Typography variant='subtitle1' component="div">
                                         <b>Nhập file </b>
-                                        <span style={{ color: 'gray' }}>(Chỉ chấp nhận file .pdf .png .jpg)</span>
+                                    </Typography>
+                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <InputFileUpload setFileProps={setFileImage} setErrorFile={setErrorFile} requiredType={['image/png', '', 'application/pdf', 'image/jpeg']} />
+                                        <Typography style={{ color: COLORS.darkBlue, fontWeight: '500' }}>{fileImage ? fileImage.name : errorFile !== '' ? <span style={{ color: '#E3242B' }}>{errorFile}</span> : 'Chưa có file được thêm'}</Typography>
+                                    </Box>
+                                    <Divider sx={{ marginY: '10px' }} />
+                                    <Typography variant='subtitle1' component="div" sx={{ display: 'flex', flexDirection: 'column' }}>
+                                        <span style={{ color: 'gray' }}>Chỉ chấp nhận file .pdf .png .jpg</span>
+                                        <span style={{ color: 'gray' }}>Kích thước giới hạn: 5MB</span>
                                     </Typography>
                                 </Box>
                                 : null
@@ -142,7 +163,15 @@ function ModalAdd(props) {
                                 <Box component="form" sx={{ marginY: '10px', display: 'flex', flexDirection: 'column' }}>
                                     <Typography variant='subtitle1' component="div">
                                         <b>Nhập file </b>
-                                        <span style={{ color: 'gray' }}>(Chỉ chấp nhận file .xlsx)</span>
+                                    </Typography>
+                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <InputFileUpload setFileProps={setFileData} setErrorFile={setErrorFile} requiredType={['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']} />
+                                        <Typography style={{ color: COLORS.darkBlue, fontWeight: '500' }}>{fileData ? fileData.name : errorFile !== '' ? <span style={{ color: '#E3242B' }}>{errorFile}</span> : 'Chưa có file được thêm'}</Typography>
+                                    </Box>
+                                    <Divider sx={{ marginY: '10px' }} />
+                                    <Typography variant='subtitle1' component="div" sx={{ display: 'flex', flexDirection: 'column' }}>
+                                        <span style={{ color: 'gray' }}>Chỉ chấp nhận file .xlsx</span>
+                                        <span style={{ color: 'gray' }}>Kích thước giới hạn: 5MB</span>
                                     </Typography>
                                 </Box>
                                 : null
