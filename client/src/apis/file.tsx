@@ -56,3 +56,33 @@ export const deleteFile = async (fileName) => {
         console.error('Lỗi khi gửi yêu cầu DELETE:', error);
     }
 };
+
+export const generateFormByDataSheet = async (file: File) => {
+    const formData = new FormData();
+
+    // files.map((file) => (formData.append('files', file)
+    // ))
+    formData.append('file', file)
+
+    const apiUrl = 'http://localhost:8080/generator/sheet';
+
+    // Gửi yêu cầu POST sử dụng fetch
+    const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+            'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem('token') as string)?.accessToken
+        },
+        body: formData,
+    });
+
+    // Kiểm tra nếu yêu cầu thành công (status code 2xx)
+    if (response.ok) {
+        const responseData = await response.json();
+        console.log('Server Response:', responseData);
+        return responseData;
+    } else {
+        // Xử lý lỗi nếu có
+        const errorData = await response.json();
+        console.error('Server Error:', errorData);
+    }
+};

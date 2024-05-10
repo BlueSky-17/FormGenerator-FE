@@ -2,12 +2,12 @@ import * as React from 'react';
 import { styled } from '@mui/material/styles';
 import Button from '@mui/material/Button';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import { FileAttribute } from '../../pages/home/MyForms/modalAdd';
 import COLORS from '../../constants/colors';
 import SelectType from '../select-type/select-type';
+import { generateFormByDataSheet } from '../../apis/file';
 
 type InputFileProps = {
-    setFileProps: (file: FileAttribute) => void
+    setFileProps: (file: File) => void
     setErrorFile: (error: string) => void
     requiredType: string[]
 }
@@ -19,14 +19,12 @@ export default function InputFileUpload({ setErrorFile, setFileProps, requiredTy
 
         if (!requiredType.includes(selectedFile.type)) {
             setErrorFile('Không đúng định dạng file!')
-            setFileProps(undefined)
             return;
         }
 
         // 5000000 byte ~ 5 MB
         if (selectedFile.size > 5000000) {
             setErrorFile('Kích thước file vượt quá giới hạn!')
-            setFileProps(undefined)
             return;
         }
 

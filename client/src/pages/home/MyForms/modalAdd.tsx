@@ -19,12 +19,9 @@ import SelectButton from '../../../components/custom-button/selectButton';
 import InputFileUpload from '../../../components/custom-button/fileUploadButton';
 import COLORS from '../../../constants/colors';
 import { error } from 'console';
+import { generateFormByDataSheet } from '../../../apis/file';
 
 type ADD_TYPE = 'manual' | 'describe' | 'image' | 'data'
-
-export type FileAttribute = {
-    name: string
-} | undefined
 
 function ModalAdd(props) {
     const navigate = useNavigate();
@@ -39,37 +36,48 @@ function ModalAdd(props) {
         // Close modal
         dispatch(setModal({ modal: '', isOpen: false }))
 
-        // Call API POST to create a new form
-        const dataFromServer = await createForm(
-            {
-                "name": formState.name,
-                "header": {
-                    "title": formState.name,
-                    "description": formState.description,
-                    "imagePath": ""
-                },
-                "owner": JSON.parse(localStorage.getItem('token') as string)?.user.ID,
-                "answersCounter": 0,
-                "latestModified": "2023-10-14T12:34:56Z",
-                "createDate": "2023-10-14T12:34:56Z",
-                "closedDate": "2023-10-14T12:34:56Z",
-                "Questions": [],
-                "QuestionOrder": []
+        if (addType === 'manual') {
+            // Call API POST to create a new form
+            const dataFromServer = await createForm(
+                {
+                    "name": formState.name,
+                    "header": {
+                        "title": formState.name,
+                        "description": formState.description,
+                        "imagePath": ""
+                    },
+                    "owner": JSON.parse(localStorage.getItem('token') as string)?.user.ID,
+                    "answersCounter": 0,
+                    "latestModified": "2023-10-14T12:34:56Z",
+                    "createDate": "2023-10-14T12:34:56Z",
+                    "closedDate": "2023-10-14T12:34:56Z",
+                    "Questions": [],
+                    "QuestionOrder": []
+                }
+            )
+
+            navigate('/form/' + dataFromServer.newID, { state: 'ViewEdit' });
+
+            // Return default value of Create Modal
+            dispatch(setName(''));
+            dispatch(setDescription(''));
+        }
+        else if (addType === 'data') {
+            if (fileData) {
+                const dataFromServer = await generateFormByDataSheet(fileData)
+                
+                navigate('/form/' + dataFromServer.id, { state: 'ViewEdit' });
             }
-        )
+        }
 
-        navigate('/form/' + dataFromServer.newID, { state: 'ViewEdit' });
 
-        // Return default value of Create Modal
-        dispatch(setName(''));
-        dispatch(setDescription(''));
     }
 
     const handleCloseModal = () => dispatch(setModal({ modal: '', isOpen: false }))
 
-    const [fileImage, setFileImage] = useState<FileAttribute>();
+    const [fileImage, setFileImage] = useState<File>();
 
-    const [fileData, setFileData] = useState<FileAttribute>();
+    const [fileData, setFileData] = useState<File>();
 
     const [errorFile, setErrorFile] = useState<string>('');
 
@@ -171,7 +179,6 @@ function ModalAdd(props) {
                                     <Divider sx={{ marginY: '10px' }} />
                                     <Typography variant='subtitle1' component="div" sx={{ display: 'flex', flexDirection: 'column' }}>
                                         <span style={{ color: 'gray' }}>Chỉ chấp nhận file .xlsx</span>
-                                        <span style={{ color: 'gray' }}>Kích thước giới hạn: 5MB</span>
                                     </Typography>
                                 </Box>
                                 : null
