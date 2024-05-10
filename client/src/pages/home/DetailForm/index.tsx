@@ -269,13 +269,16 @@ function DetailForm() {
             // Lấy mảng các field (keys) 
             const rest = Object.keys(excelData[0])
             const lastElement = rest.pop(); //Xóa property id ở cuối mảng
-            for (let i = 0; i < rest.length; ++i) {
-                columns.push({
-                    field: rest[i],
-                    headerName: rest[i],
-                    width: 150,
-                    editable: true,
-                })
+
+            if (columns.length === 0) {
+                for (let i = 0; i < rest.length; ++i) {
+                    columns.push({
+                        field: rest[i],
+                        headerName: rest[i],
+                        width: 150,
+                        editable: true,
+                    })
+                }
             }
 
             setFields(rest); // fields: ['Tính','Huyện','Xã']
@@ -311,7 +314,6 @@ function DetailForm() {
             return accumulator;
         }, []);
 
-
         const tempObject = {};
 
         uniqueValues.forEach(item => {
@@ -327,7 +329,6 @@ function DetailForm() {
             }
             return accumulator;
         }, []);
-
 
         uniqueValues2.forEach(item => {
             excelData.forEach(item2 => {
@@ -346,8 +347,6 @@ function DetailForm() {
             return accumulator;
         }, []);
 
-        console.log(uniqueValues3)
-
         uniqueValues3.forEach(item => {
             excelData.forEach(item3 => {
                 // console.log(Object.is(tempObject[item3[arr]][item3[arr2]],null))
@@ -358,8 +357,6 @@ function DetailForm() {
             }
             )
         });
-
-        console.log(tempObject)
 
         setMyObject(tempObject);
     }
@@ -555,11 +552,11 @@ function DetailForm() {
     return (
         <HomePage>
             {/* <DrawerHeader /> */}
-            <Box sx={{ backgroundColor: 'white', borderRadius: '15px', width:'100%', marginTop:'60px' }}>
+            <Box sx={{ backgroundColor: 'white', borderRadius: '15px', width: '100%', marginTop: '70px' }}>
 
                 {/*Header of Form: Title & Settings*/}
-                <Box sx={{ display: 'flex', width:'100%' }}>
-                    <Typography sx={{ color: '#364F6B', padding: '12px', fontWeight: 600, maxWidth: '70%' }} variant="h4" noWrap component="div">
+                <Box sx={{ display: 'flex', width: '100%' }}>
+                    <Typography sx={{ color: '#364F6B', padding: '12px', fontWeight: 600, maxWidth: '50%' }} variant="h4" noWrap component="div">
                         {Object.keys(formDetail).length !== 0 ? formDetail.header.Title : null}
                     </Typography>
                     <Box sx={{ flexGrow: 1 }} />
@@ -687,7 +684,7 @@ function DetailForm() {
                                             <TableCell sx={{ padding: 1, paddingLeft: 5, fontWeight: 500, fontSize: '1.05rem' }} component="th" scope="row" align="left">
                                                 {index + 1}
                                             </TableCell>
-                                            <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem', maxWidth:'400px', textOverflow: 'ellipsis', overflow:'hidden' }} align="left">{formDetail.Questions[ques].Question}</TableCell>
+                                            <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem', maxWidth: '400px', textOverflow: 'ellipsis', overflow: 'hidden' }} align="left">{formDetail.Questions[ques].Question}</TableCell>
                                             <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="left">{jsonData[formDetail.Questions[ques].Type]}</TableCell>
                                             <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="left">{formDetail.Questions[ques].Description}</TableCell>
                                             <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="center">

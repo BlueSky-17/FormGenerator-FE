@@ -212,6 +212,10 @@ export function MainModal(props) {
             else if (props.type === 'date-single' || props.type === 'date-range') {
                 props.formDetail.Questions[props.quesEdit].Content.Date = props.dateNum;
             }
+            else if (props.type === 'linkedData') {
+                props.formDetail.Questions[props.quesEdit].Content.LinkedData.ImportedLink = props.fields;
+                props.formDetail.Questions[props.quesEdit].Content.LinkedData.ListOfOptions = props.myObject;
+            }
             else if (props.type === 'table') {
                 props.formDetail.Questions[props.quesEdit].Content.Table.ListOfColumn = props.columnList;
             }
@@ -415,7 +419,6 @@ export function MainModal(props) {
         props.handleSubOpen()
         props.setIndexOptionTable(index)
 
-        console.log(index);
     }
 
     //Handle type of file
