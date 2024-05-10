@@ -52,7 +52,7 @@ export default function SignInSide({ setToken }) {
           setLoginState(false)
         }
         else if (response.status === 401) {
-          //
+          setLoginState(false)
         }
       })
   }

@@ -167,7 +167,7 @@ function MyForms() {
                                 <TableHead>
                                     <TableRow >
                                         <TableCell sx={{ padding: 1, width: '5%', paddingLeft: 5, fontWeight: 800, fontSize: '1rem' }} align="left">STT</TableCell>
-                                        <TableCell sx={{ padding: 1, width: '20%', fontWeight: 800, fontSize: '1rem' }} align="left">Người biểu mẫu</TableCell>
+                                        <TableCell sx={{ padding: 1, width: '20%', fontWeight: 800, fontSize: '1rem' }} align="left">Tên biểu mẫu</TableCell>
                                         <TableCell sx={{ padding: 1, width: '10%', fontWeight: 800, fontSize: '1rem' }} align="center">Người sở hữu</TableCell>
                                         <TableCell sx={{ padding: 1, width: '10%', fontWeight: 800, fontSize: '1rem' }} align="center">Phản hồi</TableCell>
                                         <TableCell sx={{ padding: 1, width: '15%', fontWeight: 800, fontSize: '1rem' }} align="center">Tình trạng</TableCell>
@@ -183,7 +183,7 @@ function MyForms() {
                                             <TableCell sx={{ padding: 1, paddingLeft: 5, fontWeight: 500, fontSize: '1.05rem' }} component="th" scope="row" align="left">
                                                 {index + 1}
                                             </TableCell>
-                                            <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="left">{form.name}</TableCell>
+                                            <TableCell  sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="left">{form.name}</TableCell>
                                             <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="center">
                                                 {form.owner === JSON.parse(localStorage.getItem('token') as string)?.user.ID ? 'tôi' : 'tôi'}
                                             </TableCell>
@@ -232,66 +232,7 @@ function MyForms() {
             {/* Modal create form */}
             <ModalAdd
                 handleDeleteForm={handleDeleteForm}
-            >
-            </ModalAdd>
-            {/* <Modal
-                open={isOpen}
-                aria-labelledby="modal-modal-title"
-                aria-describedby="modal-modal-description"
-            >
-                <Box>
-                    {
-                        modal === 'add' ?
-                            <Box sx={modalStyle}>
-                                <Typography variant='h6' component="div">
-                                    Vui lòng điền thông tin form
-                                </Typography>
-
-                                <Box component="form" sx={{ marginY: '10px', display: 'flex', flexDirection: 'column' }}>
-                                    <Typography variant='subtitle1' component="div">
-                                        <b>Tên form</b>
-                                    </Typography>
-                                    <TextField
-                                        required
-                                        value={name}
-                                        onChange={e => { dispatch(setName(e.target.value)) }}
-                                        sx={{ margin: '10px', width: '100%' }}
-                                        variant="outlined"
-                                        placeholder='Tên form'
-                                    />
-                                    <Typography variant='subtitle1' component="div">
-                                        <b>Mô tả</b>
-                                    </Typography>
-                                    <TextField
-                                        required
-                                        value={description}
-                                        onChange={e => { dispatch(setDescription(e.target.value)) }}
-                                        sx={{ margin: '10px', width: '100%' }}
-                                        variant="outlined"
-                                        placeholder='Mô tả'
-                                    />
-                                </Box>
-
-                                <Box sx={{ display: 'flex', flexDirection: 'row-reverse' }} >
-                                    <AcceptButton title='Xác nhận' onClick={handleCreateForm} />
-                                    <CancelButton title='Hủy' onClick={handleCloseModal} />
-                                </Box>
-                            </Box>
-                            : null}
-                    {
-                        modal === 'delete' ?
-                            <Box sx={{ ...modalStyle }}>
-                                <Typography variant='h5'><b>Xác nhận xóa form?</b></Typography>
-
-                                <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'right' }} >
-                                    <AcceptButton title='Xác nhận' onClick={handleDeleteForm} />
-                                    <CancelButton title='Hủy' onClick={handleCloseModal} />
-                                </Box>
-                            </Box>
-                            : null
-                    }
-                </Box>
-            </Modal> */}
+            />
         </Box>
     )
 }

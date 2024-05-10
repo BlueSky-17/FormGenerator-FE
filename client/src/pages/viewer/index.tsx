@@ -106,7 +106,7 @@ function FormViewer() {
                 setFormDetail(formDetail);
                 setLoading(false);
                 if (formDetail.Questions) setOtpArrayLength(formDetail.Questions.length);
-                
+
                 setLoading(false);
             })
 
@@ -1128,7 +1128,7 @@ function FormViewer() {
                                     }
                                     {formDetail.Questions[ques].Type === 'linkedData' ?
                                         <Grid container spacing={2}>
-                                            {formDetail.Questions[ques].Content.LinkedData.ImportedLink.map((field, index) => (
+                                            {formDetail.Questions[ques].Content.LinkedData.ImportedLink ? formDetail.Questions[ques].Content.LinkedData.ImportedLink.map((field, index) => (
                                                 <Grid item xs={4} key={field}>
                                                     {index === 0 ?
                                                         <FormControl fullWidth>
@@ -1195,7 +1195,7 @@ function FormViewer() {
                                                         : null
                                                     }
                                                 </Grid>
-                                            ))
+                                            )):null
                                             }
                                         </Grid>
                                         : null

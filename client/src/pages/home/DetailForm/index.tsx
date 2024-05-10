@@ -554,12 +554,12 @@ function DetailForm() {
 
     return (
         <HomePage>
-            <DrawerHeader />
-            <Box sx={{ backgroundColor: 'white', borderRadius: '15px' }}>
+            {/* <DrawerHeader /> */}
+            <Box sx={{ backgroundColor: 'white', borderRadius: '15px', width:'100%', marginTop:'60px' }}>
 
                 {/*Header of Form: Title & Settings*/}
-                <Box sx={{ display: 'flex' }}>
-                    <Typography sx={{ color: '#364F6B', padding: '12px', fontWeight: 600 }} variant="h4" noWrap component="div">
+                <Box sx={{ display: 'flex', width:'100%' }}>
+                    <Typography sx={{ color: '#364F6B', padding: '12px', fontWeight: 600, maxWidth: '70%' }} variant="h4" noWrap component="div">
                         {Object.keys(formDetail).length !== 0 ? formDetail.header.Title : null}
                     </Typography>
                     <Box sx={{ flexGrow: 1 }} />
@@ -687,7 +687,7 @@ function DetailForm() {
                                             <TableCell sx={{ padding: 1, paddingLeft: 5, fontWeight: 500, fontSize: '1.05rem' }} component="th" scope="row" align="left">
                                                 {index + 1}
                                             </TableCell>
-                                            <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="left">{formDetail.Questions[ques].Question}</TableCell>
+                                            <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem', maxWidth:'400px', textOverflow: 'ellipsis', overflow:'hidden' }} align="left">{formDetail.Questions[ques].Question}</TableCell>
                                             <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="left">{jsonData[formDetail.Questions[ques].Type]}</TableCell>
                                             <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="left">{formDetail.Questions[ques].Description}</TableCell>
                                             <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="center">
