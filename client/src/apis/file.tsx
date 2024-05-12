@@ -6,7 +6,7 @@ export const uploadFileToS3 = async (files: File) => {
     // ))
     formData.append('files', files)
 
-    const apiUrl = 'http://localhost:8080/upload-to-s3';
+    const apiUrl = process.env.REACT_APP_ROOT_URL + '/upload-to-s3';
 
     // console.log(file);
     console.log(formData)
@@ -34,7 +34,7 @@ export const uploadFileToS3 = async (files: File) => {
 
 export const deleteFile = async (fileName) => {
     try {
-        const response = await fetch('http://localhost:8080/delete-from-s3' + `/${fileName}`, {
+        const response = await fetch(process.env.REACT_APP_ROOT_URL + '/delete-from-s3' + `/${fileName}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
@@ -64,7 +64,7 @@ export const generateFormByDataSheet = async (file: File) => {
     // ))
     formData.append('file', file)
 
-    const apiUrl = 'http://localhost:8080/generator/sheet';
+    const apiUrl = process.env.REACT_APP_ROOT_URL + '/generator/sheet';
 
     // Gửi yêu cầu POST sử dụng fetch
     const response = await fetch(apiUrl, {

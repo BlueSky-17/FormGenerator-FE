@@ -60,9 +60,9 @@ function FormViewer() {
     const [formDetail, setFormDetail] = useState<any>({})
     const [formResponses, setFormResponse] = useState<any[]>([])
 
-    const FormDetailAPI_URL = `http://localhost:8080/form/${useParams()?.formID}`;
+    const FormDetailAPI_URL = process.env.REACT_APP_ROOT_URL + `/form/${useParams()?.formID}`;
 
-    const ResponsesAPI_URL = `http://localhost:8080/form-response/${useParams()?.formID}`
+    const ResponsesAPI_URL = process.env.REACT_APP_ROOT_URL  + `/form-response/${useParams()?.formID}`
 
     const addResponsetoDatabase = async (data) => {
         try {

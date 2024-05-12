@@ -36,7 +36,7 @@ export default function SignInSide({ setToken }) {
 
   //@ts-ignore
   async function loginUser(credentials) {
-    return fetch('http://localhost:8080/login', {
+    return fetch(process.env.PUBLIC_URL + '/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

@@ -19,9 +19,9 @@ function HistoryDetail() {
     const [formDetail, setFormDetail] = useState<any>({});
     const [formResponses, setFormResponse] = useState<any>({});
 
-    const FormDetailAPI_URL = `http://localhost:8080/form/${formID}`;
+    const FormDetailAPI_URL = process.env.REACT_APP_ROOT_URL + `/form/${formID}`;
 
-    const ResponseAPI_URL = `http://localhost:8080/get-response/${formID}/${JSON.parse(localStorage.getItem('token') as string)?.user.ID}`
+    const ResponseAPI_URL = process.env.REACT_APP_ROOT_URL + `/get-response/${formID}/${JSON.parse(localStorage.getItem('token') as string)?.user.ID}`
 
     useEffect(() => {
         fetch(FormDetailAPI_URL, {

@@ -29,7 +29,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 function History() {
     const [history, setHistory] = useState<any>([])
 
-    const GetHistoryAPI_URL = `http://localhost:8080/get-all-response/${JSON.parse(localStorage.getItem('token') as string)?.user.ID}`;
+    const GetHistoryAPI_URL = process.env.REACT_APP_ROOT_URL + `/get-all-response/${JSON.parse(localStorage.getItem('token') as string)?.user.ID}`;
 
     useEffect(() => {
         fetch(GetHistoryAPI_URL, {
