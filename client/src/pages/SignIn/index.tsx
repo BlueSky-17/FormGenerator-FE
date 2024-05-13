@@ -161,10 +161,10 @@ export default function SignInSide({ setToken }) {
       >
         <Box sx={{
           backgroundColor: '#EAEAEA',
+          padding: '20px',
           borderRadius: '20px',
           boxShadow: '0px 4px 4px 0px rgba(0, 0, 0, 0.25)',
           width: '85%',
-          height: '70%',
           flexShrink: 0,
           position: 'absolute',
           left: '-15%'
@@ -172,7 +172,8 @@ export default function SignInSide({ setToken }) {
         >
           <Box
             sx={{
-              my: 4,
+              mb: 4,
+              mt: 2,
               mx: 4,
               display: 'flex',
               flexDirection: 'column',
@@ -258,7 +259,7 @@ export default function SignInSide({ setToken }) {
                 </Grid>
                 <Grid item >
                   <Typography variant="body2">
-                    Bạn chưa có tài khoản?
+                    Bạn chưa có tài khoản?&nbsp;
                     <Link to='/signup'>
                       {"Đăng ký ngay"}
                     </Link>
