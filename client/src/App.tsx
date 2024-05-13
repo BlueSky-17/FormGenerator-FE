@@ -13,6 +13,7 @@ import History from './pages/home/history';
 import HistoryDetail from './pages/home/history/detail';
 import Error404 from './components/error-page/404';
 import Error403 from './components/error-page/403';
+import UserManage from './pages/user-manage';
 
 function App() {
   function setToken(userToken: any) {
@@ -45,7 +46,7 @@ function App() {
               path="*"
               element={<Navigate to="/signin" />}
             />
-          ) : (<Route
+          ) : token.user.Role === 'user' ? (<Route
             path="/"
             element={
               <HomePage>
@@ -53,7 +54,15 @@ function App() {
                 {/* <MyForms getToken={getToken} /> */}
               </HomePage>
             }
-          />)}
+          />) : <Route
+            path="/"
+            element={
+              <HomePage>
+                <UserManage />
+                {/* <MyForms getToken={getToken} /> */}
+              </HomePage>
+            }
+          />}
           <Route path="/signup" element={<SignUp setToken={setToken} />} />
           <Route path="/signin" element={<SignInSide setToken={setToken} />} />
           <Route path="/profile" element={
@@ -92,14 +101,23 @@ function App() {
           <Route
             path="/form/:formID"
             element={
-                <DetailForm />
+              <DetailForm />
             }
           />
           <Route path="/form/:formID/view" element={<FormViewer />}
           />
+          <Route
+            path="/user-management"
+            element={
+              <HomePage>
+                <UserManage />
+                {/* <MyForms getToken={getToken} /> */}
+              </HomePage>
+            }
+          />
           <Route path="*" element={<Error404 />} />
           {/* <Route element={<Error403 />} */}
-          
+
           {/* <Route path="/signin" element={<SignInSide setToken={setToken} />} /> */}
         </Routes>
       </BrowserRouter>

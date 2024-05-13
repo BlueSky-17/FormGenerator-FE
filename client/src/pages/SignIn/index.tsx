@@ -83,22 +83,22 @@ export default function SignInSide({ setToken }) {
     // debugger
     const auth = getAuth();
     const provider = new GoogleAuthProvider();
-  
+
     try {
       const result = await signInWithPopup(auth, provider);
-  
+
       // Get user information from the result
       const googleUser = result.user;
-  
+
       // Call googleLoginHandle with user information
       const token = await googleLoginHandle({
-          Email: googleUser.email,
-          FirstName: googleUser.displayName,
-          AvatarPath: googleUser.photoURL,
-          Role: 'user'
+        Email: googleUser.email,
+        FirstName: googleUser.displayName,
+        AvatarPath: googleUser.photoURL,
+        Role: 'user'
       });
       console.log(googleUser)
-       
+
       // Set the token
       setToken(token);
       if (token !== undefined) nav('/myforms');
@@ -120,7 +120,9 @@ export default function SignInSide({ setToken }) {
       setToken(token); //token là accessToken, refreshToken và userInfo
 
       // if has token, nav to HomePage
-      if (token !== undefined) nav('/myforms');
+      if (token === undefined) return;
+      else if (token.user.Role === 'user') { nav('/myforms'); }
+      else { nav('/user-management'); }
     }
     catch (error) {
       console.log(error)
@@ -223,11 +225,11 @@ export default function SignInSide({ setToken }) {
                 fullWidth
                 variant="contained"
                 sx={{
-                  mt: 1, 
-                  mb: 2, 
-                  textTransform: 'initial', 
-                  color: 'black', 
-                  backgroundColor: 'white', 
+                  mt: 1,
+                  mb: 2,
+                  textTransform: 'initial',
+                  color: 'black',
+                  backgroundColor: 'white',
                   '&:hover': {
                     backgroundColor: 'white', // Màu nền thay đổi khi hover
                   },
