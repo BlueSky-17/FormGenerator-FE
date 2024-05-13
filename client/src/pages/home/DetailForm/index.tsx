@@ -57,11 +57,11 @@ function DetailForm() {
     const [loading, setLoading] = useState<boolean>(true);
     const [notFound, setNotFound] = useState<boolean>(false);
 
-    const FormDetailAPI_URL = process.env.REACT_APP_ROOT_URL + `/form/${useParams()?.formID}`;
+    const FormDetailAPI_URL = process.env.REACT_APP_ROOT_URL + `form/${useParams()?.formID}`;
 
-    const UpdateFormAPI_URL = process.env.REACT_APP_ROOT_URL + `/update-form/${useParams()?.formID}`;
+    const UpdateFormAPI_URL = process.env.REACT_APP_ROOT_URL + `update-form/${useParams()?.formID}`;
 
-    const ResponsesAPI_URL = process.env.REACT_APP_ROOT_URL + `/get-response/${useParams()?.formID}`;
+    const ResponsesAPI_URL = process.env.REACT_APP_ROOT_URL + `get-response/${useParams()?.formID}`;
 
     const [openEditModal, setOpenEditModal] = useState(false)
 

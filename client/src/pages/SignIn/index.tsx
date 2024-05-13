@@ -37,7 +37,7 @@ export default function SignInSide({ setToken }) {
 
   //@ts-ignore
   async function loginUser(credentials) {
-    return fetch(process.env.REACT_APP_ROOT_URL + '/login', {
+    return fetch(process.env.REACT_APP_ROOT_URL + 'login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -57,7 +57,7 @@ export default function SignInSide({ setToken }) {
       })
   }
   async function googleLoginHandle(credentials) {
-    return fetch(process.env.REACT_APP_ROOT_URL + '/login/google', {
+    return fetch(process.env.REACT_APP_ROOT_URL + 'login/google', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
