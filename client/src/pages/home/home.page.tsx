@@ -17,6 +17,7 @@ import ListItemText from '@mui/material/ListItemText';
 import InfoIcon from '@mui/icons-material/Info';
 import HistoryIcon from '@mui/icons-material/History';
 import ArticleIcon from '@mui/icons-material/Article';
+import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
@@ -154,7 +155,8 @@ function HomePage({ children }: LayoutProps) {
                     </DrawerHeader>
                     <Divider />
                     <List>
-                        {[{ id: 1, text: 'Thông tin cá nhân', path: '/profile' }, { id: 2, text: 'Biểu mẫu của tôi', path: '/myforms' }, { id: 3, text: 'Lịch sử điền form', path: '/history' }].map((item) => (
+                        {/* Role: User */}
+                        {userToken.user.Role === 'user' ? [{ id: 1, text: 'Thông tin cá nhân', path: '/profile' }, { id: 2, text: 'Biểu mẫu của tôi', path: '/myforms' }, { id: 3, text: 'Lịch sử điền form', path: '/history' }].map((item) => (
                             <ListItem key={item.id} onClick={navSideBar(item.path)} sx={{ paddingY: '5px' }} disablePadding>
                                 <ListItemButton>
                                     <ListItemIcon sx={{ marginLeft: '25px' }}>
@@ -169,13 +171,28 @@ function HomePage({ children }: LayoutProps) {
                                     </ListItemText>
                                 </ListItemButton>
                             </ListItem>
-                        ))}
+                        )) :
+                            [{ id: 1, text: 'Thông tin cá nhân', path: '/profile' }, { id: 2, text: 'Quản lý người dùng', path: '/user-management' }].map((item, index) => (
+                                <ListItem key={index} onClick={navSideBar(item.path)} sx={{ paddingY: '5px' }} disablePadding>
+                                    <ListItemButton>
+                                        <ListItemIcon sx={{ marginLeft: '25px' }}>
+                                            {item.id === 1 ? <InfoIcon sx={{ color: 'white' }} /> : ''}
+                                            {item.id === 2 ? <PeopleAltIcon sx={{ color: 'white' }} /> : ''}
+                                        </ListItemIcon>
+                                        <ListItemText>
+                                            <Typography sx={{ fontWeight: 400, fontSize: '1.1rem', color: 'white' }}>
+                                                {item.text}
+                                            </Typography>
+                                        </ListItemText>
+                                    </ListItemButton>
+                                </ListItem>
+                            ))}
                     </List>
                     <Divider />
                 </Box>
             </Drawer >
 
-            <Main sx={{ backgroundColor: '#EBEBEB', display: 'flex', flexDirection: 'column', width:'100dvw' }} open={open}>
+            <Main sx={{ backgroundColor: '#EBEBEB', display: 'flex', flexDirection: 'column', width: '100dvw' }} open={open}>
                 {children}
             </Main>
         </Box >

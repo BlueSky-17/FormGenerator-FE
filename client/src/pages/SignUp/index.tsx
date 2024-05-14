@@ -81,107 +81,106 @@ export default function SignUpSide({ setToken }) {
   };
 
   const [inputValue, setInputValue] = React.useState('');
-    const handleChangeInputValue = (e) => {
-        setInputValue(e.target.value);
-    };
-    const [firstNameError, setFirstNameError] = React.useState('');
-    const [lastNameError, setLastNameError] = React.useState('');
-    const [usernameError, setUsernameError] = React.useState('');
-    const [emailError, setEmailError] = React.useState('');
-    const [passwordError, setPasswordError] = React.useState('');
-    const [rePasswordError, setRePasswordError] = React.useState('');
-    const [password, setPassword] = React.useState('');
-    //Get value of textField after onBlur the field
+  const handleChangeInputValue = (e) => {
+    setInputValue(e.target.value);
+  };
+  const [firstNameError, setFirstNameError] = React.useState('');
+  const [lastNameError, setLastNameError] = React.useState('');
+  const [usernameError, setUsernameError] = React.useState('');
+  const [emailError, setEmailError] = React.useState('');
+  const [passwordError, setPasswordError] = React.useState('');
+  const [rePasswordError, setRePasswordError] = React.useState('');
+  const [password, setPassword] = React.useState('');
+  //Get value of textField after onBlur the field
 
-    const saveInputValue = (field: string) => (e) => {
-        //Return error if active textField but don't fill
-        if (inputValue === ''){
-          switch (field) {
-            case 'firstName':
-              {
-                setFirstNameError('Vui lòng nhập tên');
-                break;
-              }
-            case 'lastName':
-              {
-                setLastNameError('Vui lòng nhập họ và tên lót');
-                break;
-              }
-            case 'username':
-              {
-                setUsernameError('Vui lòng nhập tên đăng nhập');
-                break;
-              }
-            case 'email':
-              {
-                setEmailError('Vui lòng nhập email');
-                break;
-              }
-            case 'password':
-              {
-                setPasswordError('Vui lòng nhập mật khẩu');
-                setRePasswordError('');
-                break;
-              }
-            case 'rePassword':
-              {
-                if(password)
-                  setRePasswordError('Vui lòng xác nhận lại mật khẩu');
-                else{
-                  setRePasswordError('');
-                }
-                break;
-              }
-            default:
-              break;
+  const saveInputValue = (field: string) => (e) => {
+    //Return error if active textField but don't fill
+    if (inputValue === '') {
+      switch (field) {
+        case 'firstName':
+          {
+            setFirstNameError('Vui lòng nhập tên');
+            break;
           }
-        }
-        else
-        {
-          switch (field) {
-            case 'firstName':
-              {
-                setFirstNameError('');
-                break;
-              }
-            case 'lastName':
-              {
-                setLastNameError('');
-                break;
-              }
-            case 'username':
-              {
-                setUsernameError('');
-                break;
-              }
-            case 'email':
-              {
-                setEmailError('');
-                break;
-              }
-            case 'password':
-              {
-                setPasswordError('');
-                setPassword(inputValue);
-                break;
-              }
-            case 'rePassword':
-              {
-                if(password !== inputValue){
-                  setRePasswordError('Mật khẩu không khớp')
-                }
-                else{
-                  setRePasswordError('');
-                }
-                break;
-              }
-            default:
-              break;
+        case 'lastName':
+          {
+            setLastNameError('Vui lòng nhập họ và tên lót');
+            break;
           }
-        }
-        setInputValue('');
-    };
-    
+        case 'username':
+          {
+            setUsernameError('Vui lòng nhập tên đăng nhập');
+            break;
+          }
+        case 'email':
+          {
+            setEmailError('Vui lòng nhập email');
+            break;
+          }
+        case 'password':
+          {
+            setPasswordError('Vui lòng nhập mật khẩu');
+            setRePasswordError('');
+            break;
+          }
+        case 'rePassword':
+          {
+            if (password)
+              setRePasswordError('Vui lòng xác nhận lại mật khẩu');
+            else {
+              setRePasswordError('');
+            }
+            break;
+          }
+        default:
+          break;
+      }
+    }
+    else {
+      switch (field) {
+        case 'firstName':
+          {
+            setFirstNameError('');
+            break;
+          }
+        case 'lastName':
+          {
+            setLastNameError('');
+            break;
+          }
+        case 'username':
+          {
+            setUsernameError('');
+            break;
+          }
+        case 'email':
+          {
+            setEmailError('');
+            break;
+          }
+        case 'password':
+          {
+            setPasswordError('');
+            setPassword(inputValue);
+            break;
+          }
+        case 'rePassword':
+          {
+            if (password !== inputValue) {
+              setRePasswordError('Mật khẩu không khớp')
+            }
+            else {
+              setRePasswordError('');
+            }
+            break;
+          }
+        default:
+          break;
+      }
+    }
+    setInputValue('');
+  };
+
 
 
   return (
@@ -223,17 +222,18 @@ export default function SignUpSide({ setToken }) {
             borderRadius: "20px",
             boxShadow: "0px 4px 4px 0px rgba(0, 0, 0, 0.25)",
             width: "85%",
-            height: "84%",
+            padding: '20px',
             flexShrink: 0,
             position: "absolute",
             left: "-15%",
-            overflowY: "auto",
+            overflowY: "hidden",
             maxHeight: "84%"
           }}
         >
           <Box
             sx={{
-              my: 4,
+              mb: 4,
+              mt: 2,
               mx: 4,
               display: "flex",
               flexDirection: "column",
@@ -253,7 +253,7 @@ export default function SignUpSide({ setToken }) {
               sx={{ mt: 3 }}
             >
               <Grid container spacing={2}>
-                <Grid item xs={12}>
+                <Grid item xs={6} className="">
                   <TextField
                     autoComplete="Họ và tên lót"
                     name="lastName"
@@ -264,10 +264,10 @@ export default function SignUpSide({ setToken }) {
                     onChange={handleChangeInputValue}
                     onBlur={saveInputValue("lastName")}
                   />
+                  {lastNameError !== '' ?
+                    <Alert sx={{ background: 'transparent' }} severity="error">{lastNameError}</Alert> : null}
                 </Grid>
-                {lastNameError !== '' ? 
-                  <Alert sx={{ background: 'transparent', paddingLeft: '10' }} severity="error">{lastNameError}</Alert>: null}
-                <Grid item xs={12}>
+                <Grid item xs={6}>
                   <TextField
                     required
                     fullWidth
@@ -278,9 +278,9 @@ export default function SignUpSide({ setToken }) {
                     onChange={handleChangeInputValue}
                     onBlur={saveInputValue("firstName")}
                   />
+                  {firstNameError !== '' ?
+                    <Alert sx={{ background: 'transparent'}} severity="error">{firstNameError}</Alert> : null}
                 </Grid>
-                {firstNameError !== '' ? 
-                  <Alert sx={{ background: 'transparent', paddingLeft: '10' }} severity="error">{firstNameError}</Alert>: null}
                 <Grid item xs={12}>
                   <TextField
                     required
@@ -289,11 +289,11 @@ export default function SignUpSide({ setToken }) {
                     label="Tên đăng nhập"
                     type="username"
                     id="username"
-                    autoComplete="username"onChange={handleChangeInputValue}
+                    autoComplete="username" onChange={handleChangeInputValue}
                     onBlur={saveInputValue("username")}
                   />
+                  {usernameError !== '' ? <Alert sx={{ background: 'transparent'}} severity="error">{usernameError}</Alert> : null}
                 </Grid>
-                {usernameError !== '' ? <Alert sx={{ background: 'transparent', paddingLeft: '10' }} severity="error">{usernameError}</Alert> : null}
                 <Grid item xs={12}>
                   <TextField
                     required
@@ -305,9 +305,10 @@ export default function SignUpSide({ setToken }) {
                     onChange={handleChangeInputValue}
                     onBlur={saveInputValue("email")}
                   />
+                  {emailError !== '' ? <Alert sx={{ background: 'transparent'}} severity="error">{emailError}</Alert> : null}
                 </Grid>
-                {emailError !== '' ? <Alert sx={{ background: 'transparent', paddingLeft: '10' }} severity="error">{emailError}</Alert> : null}
-                <Grid item xs={12}>
+
+                <Grid item xs={6}>
                   <TextField
                     required
                     fullWidth
@@ -319,9 +320,9 @@ export default function SignUpSide({ setToken }) {
                     onChange={handleChangeInputValue}
                     onBlur={saveInputValue("password")}
                   />
+                  {passwordError !== '' ? <Alert sx={{ background: 'transparent'}} severity="error">{passwordError}</Alert> : null}
                 </Grid>
-                {passwordError !== '' ? <Alert sx={{ background: 'transparent', paddingLeft: '10' }} severity="error">{passwordError}</Alert> : null}
-                <Grid item xs={12}>
+                <Grid item xs={6}>
                   <TextField
                     required
                     fullWidth
@@ -333,8 +334,8 @@ export default function SignUpSide({ setToken }) {
                     onChange={handleChangeInputValue}
                     onBlur={saveInputValue("rePassword")}
                   />
+                  {rePasswordError !== '' ? <Alert sx={{ background: 'transparent', paddingLeft: '10' }} severity="error">{rePasswordError}</Alert> : null}
                 </Grid>
-                {rePasswordError !== '' ? <Alert sx={{ background: 'transparent', paddingLeft: '10' }} severity="error">{rePasswordError}</Alert> : null}
                 {/* <Grid item xs={12}>
                   <FormControlLabel
                     control={<Checkbox value="allowExtraEmails" color="primary" />}
@@ -350,7 +351,7 @@ export default function SignUpSide({ setToken }) {
               >
                 Đăng Ký
               </Button>
-              {signInStatus != "" && (
+              {signInStatus !== "" && (
                 <Grid container justifyContent="flex-start">
                   <Typography
                     variant="body2"
@@ -363,7 +364,7 @@ export default function SignUpSide({ setToken }) {
               <Grid container justifyContent="flex-start">
                 <Grid item>
                   <Typography variant="body2">
-                    Đã có tài khoản?
+                    Đã có tài khoản?&nbsp;
                     <Link to="/signin">Đăng nhập</Link>
                   </Typography>
                 </Grid>
