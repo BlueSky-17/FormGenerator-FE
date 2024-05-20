@@ -59,13 +59,13 @@ function History() {
     return (
         <Box>
             <DrawerHeader />
-            <Box sx={{ backgroundColor: 'white', border: "2px solid #DEDEDE", paddingTop: '5px' }}>
-                <Typography sx={{ color: '#364F6B', padding: '15px', fontWeight: 600 }} variant="h6" noWrap component="div">
+            <Box sx={{ backgroundColor: 'white', border: "2px solid #DEDEDE", paddingTop: '5px', height:'100%' }}>
+                <Typography sx={{ color: '#364F6B', padding: '10px', paddingLeft:'15px', fontWeight: 600 }} variant="h6" noWrap component="div">
                     LỊCH SỬ ĐIỀN FORM
                 </Typography>
                 <Divider />
 
-                <Box sx={{ display: 'flex', alignItems: 'center', padding: '5px', marginTop: '10px', marginBottom: '10px' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', padding: '5px', paddingLeft: '15px', marginTop: '10px', marginBottom: '10px' }}>
                     <Search sx={{ border: '2px solid #DEDEDE' }}>
                         <SearchIconWrapper>
                             <SearchIcon />

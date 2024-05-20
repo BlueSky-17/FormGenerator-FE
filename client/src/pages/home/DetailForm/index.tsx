@@ -1,43 +1,42 @@
-import React, { useState, useEffect, useLayoutEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useLocation } from "react-router-dom";
+import React, { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 
-import { Box, Typography, Drawer, Avatar, IconButton, Toolbar, List, Divider, Icon, Modal, Grid, Switch } from '@mui/material'
-import { styled, useTheme, alpha } from '@mui/material/styles';
+import { Box, Divider, IconButton, Typography } from '@mui/material';
 import Button from '@mui/material/Button';
+import Paper from '@mui/material/Paper';
+import Popover from '@mui/material/Popover';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
-import Popover from '@mui/material/Popover';
+import { styled } from '@mui/material/styles';
 
-import EditIcon from '@mui/icons-material/Edit';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown';
 import ArrowCircleUpIcon from '@mui/icons-material/ArrowCircleUp';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 import SettingsIcon from '@mui/icons-material/Settings';
 
-import Select, { SelectChangeEvent } from '@mui/material/Select';
+import { SelectChangeEvent } from '@mui/material/Select';
+import { GridColDef } from '@mui/x-data-grid';
 import { useParams } from 'react-router-dom';
-import { DataGrid, GridColDef, GridValueGetterParams, GridRowModel, } from '@mui/x-data-grid';
-import jsonData from '../../../assets/i18n/vi.json'
+import jsonData from '../../../assets/i18n/vi.json';
 
+import Responses from '../Responses';
+import EditModal from './editmodal';
+import { Date, MultiChoice, ShortText } from './interface';
 import { MainModal } from './mainmodal';
 import { SubModal } from './submodal';
-import Responses from '../Responses';
-import { ShortText, MultiChoice, Date } from './interface';
-import EditModal from './editmodal';
 
-import CircleButton from '../../../components/custom-button/circleButton';
 import AcceptButton from '../../../components/custom-button/acceptButton';
+import CircleButton from '../../../components/custom-button/circleButton';
 
-import { Navigate } from 'react-router-dom';
 import Error404 from '../../../components/error-page/404';
 import LoadingPage from '../../../components/loading-page/loading';
+import COLORS from '../../../constants/colors';
 import HomePage from '../home.page';
 
 const DrawerHeader = styled('div')(({ theme }) => ({
@@ -83,6 +82,14 @@ function DetailForm() {
                     setLoading(false);
                     setNotFound(true);
                     // throw new Error('Server returned ' + response.status);
+                    if (response.status === 401) {
+                        localStorage.removeItem('token')
+                        navigate('/signin')
+                    }
+                    else if (response.status === 404) {
+                        setLoading(false);
+                        setNotFound(true);
+                    }
                 }
                 return response.json();
             })
@@ -537,6 +544,10 @@ function DetailForm() {
         setSubOpen("")
     }
 
+    const handleSharing = () => {
+        setSubOpen('sharing')
+    }
+
     const [OTPNumber, setOTPNumber] = useState<number>(12);
 
     // console.log(formDetail);
@@ -581,14 +592,21 @@ function DetailForm() {
                     >
                         <Button
                             onClick={viewForm}
-                            sx={{ p: 2, fontWeight: 500, color: 'black', textTransform: 'initial', fontSize: '15px' }}
+                            sx={{ p: 2, fontWeight: 500, color: COLORS.darkBlue, textTransform: 'initial', fontSize: '15px' }}
                         >
                             Xem trước
                         </Button>
                         <Divider />
                         <Button
+                            onClick={handleSharing}
+                            sx={{ p: 2, fontWeight: 500, color: COLORS.darkBlue, textTransform: 'initial', fontSize: '15px' }}
+                        >
+                            Chia sẻ
+                        </Button>
+                        <Divider />
+                        <Button
                             onClick={handleOpenEditModal}
-                            sx={{ p: 2, fontWeight: 500, color: 'black', textTransform: 'initial', fontSize: '15px' }}>
+                            sx={{ p: 2, fontWeight: 500, color: COLORS.darkBlue, textTransform: 'initial', fontSize: '15px' }}>
                             Sửa chủ đề
                         </Button>
                         <Divider />
@@ -596,11 +614,11 @@ function DetailForm() {
                             formState ?
                                 <Button
                                     onClick={confirmFormState("closeForm")}
-                                    sx={{ p: 2, fontWeight: 500, color: 'black', textTransform: 'initial', fontSize: '15px' }}>Đóng Form
+                                    sx={{ p: 2, fontWeight: 500, color: COLORS.darkBlue, textTransform: 'initial', fontSize: '15px' }}>Đóng form
                                 </Button> :
                                 <Button
                                     onClick={confirmFormState("openForm")}
-                                    sx={{ p: 2, fontWeight: 500, color: 'black', textTransform: 'initial', fontSize: '15px' }}>Mở Form
+                                    sx={{ p: 2, fontWeight: 500, color: COLORS.darkBlue, textTransform: 'initial', fontSize: '15px' }}>Mở form
                                 </Button>
                         }
                     </Popover>
@@ -773,6 +791,7 @@ function DetailForm() {
             />
 
             <SubModal
+                formDetail={formDetail}
                 subopen={subopen}
                 handleSubClose={handleSubClose}
                 excelData={excelData}
