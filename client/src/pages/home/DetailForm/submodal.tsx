@@ -1,20 +1,33 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 import { Box, Typography, IconButton, Modal, TextField } from '@mui/material'
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 
 import CloseIcon from '@mui/icons-material/Close';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import DoneIcon from '@mui/icons-material/Done';
 
 import { DataGrid } from '@mui/x-data-grid';
 import { modalStyle } from '../home.page';
 import AcceptButton from '../../../components/custom-button/acceptButton';
 import CancelButton from '../../../components/custom-button/cancelButton';
+import COLORS from '../../../constants/colors';
 
 export function SubModal(props) {
+
+    const [copied, setCopied] = useState<boolean>(false)
 
     const solveMultiOptions = () => {
         props.convertTextToOptionList(props.inputText);
         props.setInputText('');
     }
+
+    const handleCloseSharing = () => {
+        props.handleSubClose()
+        setCopied(false)
+    }
+
+    console.log(props.formDetail)
 
     return (
         <div>
@@ -109,6 +122,32 @@ export function SubModal(props) {
                             <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'right' }} >
                                 <AcceptButton title='Xác nhận' onClick={props.handleOpenForm} />
                                 <CancelButton title='Hủy' onClick={props.handleSubClose} />
+                            </Box>
+                        </Box>
+                        : null
+                    }
+                    {props.subopen === 'sharing' ?
+                        <Box>
+                            <Typography variant='h5'><b>Chia sẻ "{props.formDetail.name}"</b></Typography>
+
+                            <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%', alignItems: 'center', margin: '5px' }}>
+                                <Typography variant='body1' sx={{ whiteSpace: 'nowrap', width: '70%', overflow: 'hidden', textOverflow: 'ellipsis', color: COLORS.darkBlue }}>{process.env.REACT_APP_DOMAIN}form/{props.formDetail.id}/view</Typography>
+
+
+                                <CopyToClipboard text={process.env.REACT_APP_DOMAIN + `form/${props.formDetail.id}/view`}
+                                    onCopy={() => setCopied(true)}>
+                                    {!copied ?
+                                        <IconButton>
+                                            <ContentCopyIcon />
+                                        </IconButton> :
+                                        <IconButton>
+                                            <DoneIcon />
+                                        </IconButton>}
+                                </CopyToClipboard>
+                            </Box>
+
+                            <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'right' }} >
+                                <CancelButton title='Hủy' onClick={handleCloseSharing} />
                             </Box>
                         </Box>
                         : null
