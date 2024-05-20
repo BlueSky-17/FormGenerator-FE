@@ -43,6 +43,8 @@ function MyForms() {
     const formState = useAppSelector((state) => state.formReducer)
     const dispatch = useAppDispatch()
 
+    const navigate = useNavigate();
+
     // Page Pagination
     const [currentPage, setCurrentPage] = React.useState<number | undefined>(1);
     function handleChangePagination(event: React.ChangeEvent<unknown>, value: number) {
@@ -63,8 +65,14 @@ function MyForms() {
         })
             .then(response => {
                 if (!response.ok) {
-                    setLoading(false);
-                    setNotFound(true);
+                    if (response.status === 401) {
+                        localStorage.removeItem('token')
+                        navigate('/signin')
+                    }
+                    else if (response.status === 404) {
+                        setLoading(false);
+                        setNotFound(true);
+                    }
                 }
                 return response.json();
             })
@@ -117,7 +125,6 @@ function MyForms() {
     }
 
     // Navigate when click edit form
-    const navigate = useNavigate();
     const editForm = (id: string, typeView: string) => (event: any) => {
         navigate('/form/' + id, { state: typeView });
     };
@@ -183,7 +190,7 @@ function MyForms() {
                                             <TableCell sx={{ padding: 1, paddingLeft: 5, fontWeight: 500, fontSize: '1.05rem' }} component="th" scope="row" align="left">
                                                 {index + 1}
                                             </TableCell>
-                                            <TableCell  sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="left">{form.name}</TableCell>
+                                            <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="left">{form.name}</TableCell>
                                             <TableCell sx={{ padding: 1, fontWeight: 400, fontSize: '1.05rem' }} align="center">
                                                 {form.owner === JSON.parse(localStorage.getItem('token') as string)?.user.ID ? 'tôi' : 'tôi'}
                                             </TableCell>

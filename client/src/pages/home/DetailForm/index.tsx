@@ -82,6 +82,14 @@ function DetailForm() {
                     setLoading(false);
                     setNotFound(true);
                     // throw new Error('Server returned ' + response.status);
+                    if (response.status === 401) {
+                        localStorage.removeItem('token')
+                        navigate('/signin')
+                    }
+                    else if (response.status === 404) {
+                        setLoading(false);
+                        setNotFound(true);
+                    }
                 }
                 return response.json();
             })
