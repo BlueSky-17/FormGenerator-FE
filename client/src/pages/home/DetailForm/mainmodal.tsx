@@ -75,6 +75,10 @@ export function MainModal(props) {
         else if (props.type === 'file' && props.fileType.length === 0) {
             setTypeError('Vui lòng chọn các loại file được cho phép')
         }
+        else if (props.OTPNumber > 15) {
+            console.log('Lỗi rùi')
+            return;
+        }
         else {
             const newQuestion: Question = {
                 Question: props.titleQuestion,
@@ -129,7 +133,7 @@ export function MainModal(props) {
             }
             else if (props.type === "OTPInput") {
                 const updateOTPInput: OTPInput = {
-                    OtpInput: props.OTPNumber as number
+                    OtpInput: Number(props.OTPNumber)
                 };
 
                 props.formDetail.Questions[ques].Content = {};
@@ -220,6 +224,10 @@ export function MainModal(props) {
                 props.formDetail.Questions[props.quesEdit].Content.Table.ListOfColumn = props.columnList;
             }
             else if (props.type === 'OTPInput') {
+                if (props.OTPNumber > 15) {
+                    console.log('Lỗi rùi')
+                    return;
+                }
                 props.formDetail.Questions[props.quesEdit].Content.OtpInput = Number(props.OTPNumber);
                 console.log(typeof (props.formDetail.Questions[props.quesEdit].Content.OtpInput))
             }
@@ -275,6 +283,9 @@ export function MainModal(props) {
             ])
             setColumnName('');
             props.setColumnType('')
+        }
+        else if (props.type === 'OTPInput'){
+            props.setOTPNumber(12)
         }
         props.setQuesEdit(-1)
     }
@@ -904,7 +915,7 @@ export function MainModal(props) {
                         : null
                     }
                     {props.type === 'OTPInput' ?
-                        <TextField value={props.OTPNumber} onChange={handleOTPNumber} sx={{ width: '100%' }} id="standard-basic" label="Nhập số lượng ô" variant="standard" />
+                        <TextField value={props.OTPNumber} error={props.OTPNumber > 15} onChange={handleOTPNumber} sx={{ width: '100%' }} id="standard-basic" label="Nhập số lượng ô (Giá trị tối đa: 15)" variant="standard" />
                         : null
                     }
                     {props.type !== '' &&
