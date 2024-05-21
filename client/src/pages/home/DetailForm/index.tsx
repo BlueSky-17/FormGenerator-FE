@@ -114,10 +114,38 @@ function DetailForm() {
                 'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem('token') as string)?.accessToken
             }
         })
-            .then(data => data.json())
-            .then(responses => {
-                if (responses === null) setFormResponses([]);
-                else setFormResponses(responses);
+            .then(data => {
+                if (!data.ok) {
+                    setLoading(false);
+                    setNotFound(true);
+                    // throw new Error('Server returned ' + response.status);
+                    if (data.status === 401) {
+                        localStorage.removeItem('token')
+                        navigate('/signin')
+                    }
+                    else if (data.status === 404) {
+                        setLoading(false);
+                        setNotFound(true);
+                    }
+                }
+                return data.json()
+            })
+            .then(response => {
+                // if (!response.ok) {
+                //     setLoading(false);
+                //     setNotFound(true);
+                //     // throw new Error('Server returned ' + response.status);
+                //     if (response.status === 401) {
+                //         localStorage.removeItem('token')
+                //         navigate('/signin')
+                //     }
+                //     else if (response.status === 404) {
+                //         setLoading(false);
+                //         setNotFound(true);
+                //     }
+                // }
+                if (response === null) setFormResponses([]);
+                else setFormResponses(response);
             })
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
