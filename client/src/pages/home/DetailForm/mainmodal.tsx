@@ -284,7 +284,7 @@ export function MainModal(props) {
             setColumnName('');
             props.setColumnType('')
         }
-        else if (props.type === 'OTPInput'){
+        else if (props.type === 'OTPInput') {
             props.setOTPNumber(12)
         }
         props.setQuesEdit(-1)
@@ -492,8 +492,19 @@ export function MainModal(props) {
         let fileType = ['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'text/csv'];
         let selectedFile = e.target.files[0];
 
+        console.log(selectedFile)
+
         if (selectedFile) {
-            if (selectedFile && fileType.includes(selectedFile.type)) {
+            if (!fileType.includes(selectedFile.type)){
+                setTypeError('Vui lòng lựa chọn dạng file excel');
+                setFile('');
+                return;
+            }
+            else if (selectedFile.size > 120000) {
+                setTypeError('File vượt quá số dòng/kích thước cho phép')
+                return;
+            }
+            else if (selectedFile && fileType.includes(selectedFile.type)) {
                 setTypeError('');
                 setFile(e.target.files[0]);
                 const reader = new FileReader();
@@ -517,10 +528,6 @@ export function MainModal(props) {
                     }
                 };
                 reader.readAsArrayBuffer(selectedFile);
-            }
-            else {
-                setTypeError('Vui lòng lựa chọn dạng file excel');
-                setFile('');
             }
         }
         else {

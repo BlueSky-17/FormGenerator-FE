@@ -46,13 +46,12 @@ import { deleteFile, uploadFileToS3 } from '../../apis/file';
 import Error404 from '../../components/error-page/404';
 import LoadingPage from '../../components/loading-page/loading';
 // import { addResponsetoDatabase } from '../../apis/responses';
-
+import './style.css'
 
 
 function FormViewer() {
     // render: use to re-render after create or delete form
     const [render, setRender] = useState(false);
-    const [height, setHeight] = useState('100%')
 
     const [loading, setLoading] = useState<boolean>(true);
     const [notFound, setNotFound] = useState<boolean>(false);
@@ -62,7 +61,7 @@ function FormViewer() {
 
     const FormDetailAPI_URL = process.env.REACT_APP_ROOT_URL + `form/${useParams()?.formID}`;
 
-    const ResponsesAPI_URL = process.env.REACT_APP_ROOT_URL  + `form-response/${useParams()?.formID}`
+    const ResponsesAPI_URL = process.env.REACT_APP_ROOT_URL + `form-response/${useParams()?.formID}`
 
     const addResponsetoDatabase = async (data) => {
         try {
@@ -770,7 +769,6 @@ function FormViewer() {
                 "responses": formResponses
             });
             setSubmit(true)
-            setHeight('100vh')
         }
         //Failed: Not fill required questions
         else if (!checkRequired) {
@@ -791,15 +789,17 @@ function FormViewer() {
     // console.log(formDetail);
     return (
         <div>
-            <Box sx={{
-                backgroundImage: `url(${bg})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                backgroundRepeat: 'no-repeat',
-                border: "2px solid #DEDEDE",
-                height: { height },
-                width: '100vw'
-            }}>
+            <Box
+                sx={{
+                    backgroundImage: `url(${bg})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    backgroundRepeat: 'no-repeat',
+                    border: "2px solid #DEDEDE",
+                    paddingBottom: '40px',
+                    height: submit || !formDetail.formState || formDetail.Questions.length < 2 ? '100dvh' : '100%',
+                    width: '100vw',
+                }}>
                 <Box sx={{ backgroundColor: 'white', border: "2px solid #DEDEDE", borderRadius: '10px', marginX: '25vw', marginTop: '70px' }}>
                     {/* Header of Form */}
                     <Box sx={{ textAlign: 'center', backgroundColor: '#008272', paddingY: '30px', borderRadius: '10px 10px 0 0' }}>
@@ -814,8 +814,8 @@ function FormViewer() {
                     <Divider />
 
                     {/* Body of Form | In case: Unsubmit form */}
-                    {!submit && <Box sx={{ margin: '60px' }}>
-                        {formDetail.Questions !== undefined ? formDetail.QuestionOrder.map((ques, index) => (
+                    {!submit && formDetail.formState && <Box sx={{ margin: '60px' }}>
+                        {formDetail.Questions !== undefined && formDetail.Questions.length > 0 ? formDetail.QuestionOrder.map((ques, index) => (
                             <Box
                                 key={index}
                                 sx={{ marginY: '15px' }}
@@ -1195,7 +1195,7 @@ function FormViewer() {
                                                         : null
                                                     }
                                                 </Grid>
-                                            )):null
+                                            )) : null
                                             }
                                         </Grid>
                                         : null
@@ -1348,9 +1348,11 @@ function FormViewer() {
                                     }
                                 </Box>
                             </Box>
-                        ))
-                            : null}
+                        )) : (formDetail.Questions !== undefined && formDetail.Questions.length === 0) ?
+                            <Box sx={{display:'flex', justifyContent:'center'}}>Biểu mẫu chưa tạo câu hỏi</Box> : null}
                     </Box>}
+
+                    {!submit && !formDetail.formState && <Box sx={{ margin: '60px', display: 'flex', justifyContent: 'center' }}> Biểu mẫu đã dừng nhận phản hồi</Box>}
 
                     {/* Body of Form | In case: Form submitted */}
                     {submit && <Box sx={{ margin: '50px' }}>
@@ -1358,13 +1360,14 @@ function FormViewer() {
                     </Box>
                     }
                 </Box>
-                {!submit && <Box sx={{ display: 'grid', justifyItems: 'right', width: '100%' }}>
+                {!submit && formDetail.formState && formDetail.Questions.length > 0 && <Box sx={{ display: 'grid', justifyItems: 'right', width: '100%' }}>
                     <Button
                         onClick={handleSubmitForm}
                         sx={{
                             background: '#008272', color: 'white', marginRight: '30vw', marginBottom: '30px', marginTop: '30px', width: '100px', height: '50px', '&:hover': {
                                 backgroundColor: '#008272', // Màu nền thay đổi khi hover
-                                color: 'white'
+                                color: 'white',
+                                opacity: '70%'
                             },
                         }}>
                         Gửi
