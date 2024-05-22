@@ -47,7 +47,7 @@ export default function SignUpSide({ setToken }) {
           email: data.get("email"),
           password: data.get("password"),
         };
-        const response = await fetch(process.env.REACT_APP_ROOT_URL + "/signup", {
+        const response = await fetch(process.env.REACT_APP_ROOT_URL + "signup", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

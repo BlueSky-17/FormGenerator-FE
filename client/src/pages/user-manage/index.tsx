@@ -60,7 +60,7 @@ function UserManage() {
 
     //API GET: fetch forms by UserId
     useEffect(() => {
-        fetch(process.env.REACT_APP_ROOT_URL + `/user`, {
+        fetch(process.env.REACT_APP_ROOT_URL + `user`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',

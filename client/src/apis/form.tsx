@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 
 //API POST: create new form
 export const createForm = async (data) => {
-    const API_URL: string = process.env.REACT_APP_ROOT_URL + `/form`;
+    const API_URL: string = process.env.REACT_APP_ROOT_URL + `form`;
 
     try {
         const response = await fetch(API_URL, {
@@ -30,7 +30,7 @@ export const createForm = async (data) => {
 // API PUT: Update form 
 export const updateObjectInDatabase = async (updateData) => {
     try {
-        const response = await fetch(process.env.REACT_APP_ROOT_URL + `/update-form/${useParams()?.formID}`, {
+        const response = await fetch(process.env.REACT_APP_ROOT_URL + `update-form/${useParams()?.formID}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -52,7 +52,7 @@ export const updateObjectInDatabase = async (updateData) => {
 
 // API DELETE: delete form by FormId
 export const deleteForm = async (objectId) => {
-    const API_URL: string = process.env.REACT_APP_ROOT_URL + `/form`;
+    const API_URL: string = process.env.REACT_APP_ROOT_URL + `form`;
 
     try {
         const response = await fetch(API_URL + `/${objectId}`, {

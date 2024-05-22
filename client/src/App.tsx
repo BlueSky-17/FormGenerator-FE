@@ -31,7 +31,7 @@ function App() {
       return userToken;
     }
     catch (error) {
-      console.log(error);
+      // console.log(error);
     }
   }
 

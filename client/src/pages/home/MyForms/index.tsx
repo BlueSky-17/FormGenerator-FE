@@ -56,7 +56,7 @@ function MyForms() {
 
     //API GET: fetch forms by UserId
     useEffect(() => {
-        fetch(process.env.REACT_APP_ROOT_URL + `/forms/${JSON.parse(localStorage.getItem('token') as string)?.user.ID}?name=${keyword}&page=${currentPage}`, {
+        fetch(process.env.REACT_APP_ROOT_URL + `forms/${JSON.parse(localStorage.getItem('token') as string)?.user.ID}?name=${keyword}&page=${currentPage}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -85,7 +85,7 @@ function MyForms() {
     // Temp: get Form.length to page pagination (not affect the number of renders)
     const [formsLength, setFormsLength] = useState([])
     useEffect(() => {
-        fetch(process.env.REACT_APP_ROOT_URL + `/forms/${JSON.parse(localStorage.getItem('token') as string)?.user.ID}`, {
+        fetch(process.env.REACT_APP_ROOT_URL + `forms/${JSON.parse(localStorage.getItem('token') as string)?.user.ID}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',

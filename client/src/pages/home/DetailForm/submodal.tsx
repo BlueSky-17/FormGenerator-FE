@@ -50,7 +50,7 @@ export function SubModal(props) {
                                 rows={8}
                                 sx={{ width: '100%' }}
                             />
-                            {props.type === 'multi-choice' ?
+                            {props.type === 'multi-choice' || props.type === 'checkbox' || props.type === 'dropdown' ?
                                 <AcceptButton title='Xử lý dữ liệu' onClick={solveMultiOptions} />
                                 : null}
                             {props.type === 'table' ?
