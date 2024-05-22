@@ -121,6 +121,8 @@ function Responses(props) {
         width: 20,
       });
 
+      worksheet.columns = columns;
+
       let count = 2;
       for (let i in formDetail.QuestionOrder) {
         let question: any = formDetail.Questions[i];
@@ -136,14 +138,14 @@ function Responses(props) {
         for (let curr of response.Responses) {
           if (curr.Type === "longText") {
             rowData[countR + curr.Index] = htmlToFormattedExcelCell(
-              `${curr.Content.LongText}`
-            );
+              `${curr.Content.ShortText}`
+            ).v;
           } else if (curr.Type === "OTPInput") {
             rowData[countR + curr.Index] = `${curr.Content.OTPInput}`;
           } else if (curr.Type === "email") {
-            rowData[countR + curr.Index] = `${curr.Content.Email}`;
+            rowData[countR + curr.Index] = `${curr.Content.SpecialText}`;
           } else if (curr.Type === "phone") {
-            rowData[countR + curr.Index] = `${curr.Content.Phone}`;
+            rowData[countR + curr.Index] = `${curr.Content.SpecialText}`;
           } else if (curr.Type === "shortText") {
             rowData[countR + curr.Index] = `${curr.Content.ShortText}`;
           } else if (

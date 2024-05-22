@@ -1,58 +1,56 @@
-export interface Date{
-    Range: any
-    Single: any
+export interface Date {
+  Range: any;
+  Single: any;
 }
-export interface LinearRange{
-    lowerLabel: string
-    upperLabel: string
-    lowerLimit: number
-    upperLimit: number
-    chosenValue: number
-}
-
-export interface MultiChoice{
-    Options: string[]
-    Result: boolean[]
+export interface LinearRange {
+  lowerLabel: string;
+  upperLabel: string;
+  lowerLimit: number;
+  upperLimit: number;
+  chosenValue: number;
 }
 
-export interface Files{
-    fileName: String
-    fileURL:  String
-    type:    String
-    size:     Number
+export interface MultiChoice {
+  Options: string[];
+  Result: boolean[];
 }
 
-export interface Content{
-    Date: Date
-    LinearRange: LinearRange
-    LinkedDate: any
-    MultiChoice: MultiChoice
-    ShortText: string
-    LongText: string
-    Email: string
-    Phone: string
-    OTPInput: string
-    Table: any
-    Files: Files[]
+export interface Files {
+  fileName: String;
+  fileURL: String;
+  type: String;
+  size: Number;
 }
 
-
-export interface Response{
-    QuestionName: string
-    Type: string
-    Content: Content
-    Index: number
-    Error: boolean
-    Required: boolean
+export interface Content {
+  Date: Date;
+  LinearRange: LinearRange;
+  LinkedDate: any;
+  MultiChoice: MultiChoice;
+  ShortText: string;
+  LongText: string;
+  SpecialText: string;
+  Phone: string;
+  OTPInput: string;
+  Table: any;
+  Files: Files[];
 }
 
-export interface Answer{
-    id: string
-    FormID: string
-    FormName: string
-    Username: string
-    UserID: string
-    SubmitTime: Date
-    Responses: Response[]
+export interface Response {
+  QuestionName: string;
+  Type: string;
+  Content: Content;
+  Index: number;
+  Error: boolean;
+  Required: boolean;
 }
 
+export interface Answer {
+  id: string;
+  FormID: string;
+  FormName: string;
+  Username: string;
+  UserID: string;
+  SubmitTime: Date;
+  Responses: Response[];
+}
