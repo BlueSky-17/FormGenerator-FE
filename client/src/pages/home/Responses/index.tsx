@@ -65,7 +65,32 @@ function Responses(props) {
     // Create a temporary element to parse HTML
     const tempDiv = document.createElement("div");
     tempDiv.innerHTML = htmlString;
-    const text = tempDiv.textContent || tempDiv.innerText || "";
+
+    const extractTextContent = (node) => {
+      let text = "";
+
+      if (node.nodeType === Node.TEXT_NODE) {
+        text += node.textContent || "";
+      } else if (node.nodeName === "P") {
+        if (text !== "") {
+          text += "\n";
+        }
+        text += node.textContent || "";
+      } else if (node.nodeName === "BR") {
+        text += "\n";
+      }
+      // Iterate over child nodes recursively
+      else if (node.childNodes && node.childNodes.length > 0) {
+        node.childNodes.forEach((childNode) => {
+          text += extractTextContent(childNode);
+          text += "\n";
+        });
+      }
+
+      return text;
+    };
+
+    let text = extractTextContent(tempDiv);
 
     // Define styles
     const styles = {
@@ -130,6 +155,8 @@ function Responses(props) {
         worksheet.getCell(1, count).value = question.Question;
       }
 
+      let containLongText = false;
+
       // Add rows based on responses
       for (let response of responses) {
         let rowData: any = [];
@@ -140,6 +167,7 @@ function Responses(props) {
             rowData[countR + curr.Index] = htmlToFormattedExcelCell(
               `${curr.Content.ShortText}`
             ).v;
+            containLongText = true;
           } else if (curr.Type === "OTPInput") {
             rowData[countR + curr.Index] = `${curr.Content.OTPInput}`;
           } else if (curr.Type === "email") {
@@ -184,7 +212,13 @@ function Responses(props) {
         }
         worksheet.addRow(rowData);
       }
-
+      if (containLongText === true) {
+        worksheet.eachRow({ includeEmpty: true }, (row) => {
+          row.eachCell({ includeEmpty: true }, (cell) => {
+            cell.alignment = { wrapText: true };
+          });
+        });
+      }
       const buffer = await workbook.xlsx.writeBuffer();
 
       // Create a Blob from the buffer
