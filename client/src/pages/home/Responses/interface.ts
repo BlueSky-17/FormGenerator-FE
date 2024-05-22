@@ -28,6 +28,10 @@ export interface Content{
     LinkedDate: any
     MultiChoice: MultiChoice
     ShortText: string
+    LongText: string
+    Email: string
+    Phone: string
+    OTPInput: string
     Table: any
     Files: Files[]
 }
