@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 // MUI COMPONENTs
-import { Box, Typography, TextField, Modal, Button, Divider } from '@mui/material'
+import { Box, Typography, TextField, Modal, Button, Divider, Alert } from '@mui/material'
 
 // APIs
 import { createForm, generateFormByDescription, } from '../../../apis/form';
@@ -34,9 +34,9 @@ function ModalAdd(props) {
 
     const [descriptionData, setDescriptionData] = useState<string>('')
 
+    const [error, setError] = useState<string>('')
+
     const handleCreateForm = async () => {
-        // Close modal
-        dispatch(setModal({ modal: '', isOpen: false }))
 
         if (addType === 'manual') {
             // Call API POST to create a new form
@@ -58,28 +58,50 @@ function ModalAdd(props) {
                 }
             )
 
-            navigate('/form/' + dataFromServer.newID, { state: 'ViewEdit' });
-
-            // Return default value of Create Modal
-            dispatch(setName(''));
-            dispatch(setDescription(''));
+            if (dataFromServer) {
+                navigate('/form/' + dataFromServer.newID, { state: 'ViewEdit' });
+                // Return default value of Create Modal
+                dispatch(setName(''));
+                dispatch(setDescription(''));
+            }
+            else {
+                setError('Vui lòng điền thông tin bắt buộc')
+                return;
+            }
         }
         else if (addType === 'data') {
             if (fileData) {
                 const dataFromServer = await generateFormByDataSheet(fileData)
 
-                navigate('/form/' + dataFromServer.id, { state: 'ViewEdit' });
+                if (dataFromServer) {
+                    navigate('/form/' + dataFromServer.id, { state: 'ViewEdit' });
+                }
+                else {
+                    setError('Không xử lý được file .xlsx')
+                    return;
+                }
+            }
+            else {
+                setError('Không xử lý được file .xlsx')
+                return;
             }
         }
         else if (addType === 'describe') {
+
             const dataFromServer = await generateFormByDescription(descriptionData)
 
-            navigate('/form/' + dataFromServer.id, { state: 'ViewEdit' });
-
-            setDescriptionData('')
+            if (dataFromServer) {
+                navigate('/form/' + dataFromServer.id, { state: 'ViewEdit' });
+                setDescriptionData('')
+            }
+            else {
+                setError('Vui lòng điền mô tả hợp lệ')
+                return;
+            }
         }
 
-
+        // Close modal
+        dispatch(setModal({ modal: '', isOpen: false }))
     }
 
     const handleCloseModal = () => dispatch(setModal({ modal: '', isOpen: false }))
@@ -89,6 +111,8 @@ function ModalAdd(props) {
     const [fileData, setFileData] = useState<File>();
 
     const [errorFile, setErrorFile] = useState<string>('');
+
+    console.log(error)
 
     return (
         <Modal
@@ -135,6 +159,7 @@ function ModalAdd(props) {
                                         variant="outlined"
                                         placeholder='Mô tả'
                                     />
+                                    {error === 'Vui lòng điền thông tin bắt buộc' && <Alert severity="error">{error}</Alert>}
                                 </Box>
                                 : null
                             }
@@ -164,6 +189,7 @@ function ModalAdd(props) {
                                         + Giới tính (Nam, nữ)
                                         + Năm sinh'
                                     />
+                                    {error === 'Vui lòng điền mô tả hợp lệ' && <Alert severity="error">{error}</Alert>}
                                 </Box>
                                 : null
                             }
@@ -182,6 +208,7 @@ function ModalAdd(props) {
                                         <span style={{ color: 'gray' }}>Chỉ chấp nhận file .pdf .png .jpg</span>
                                         <span style={{ color: 'gray' }}>Kích thước giới hạn: 5MB</span>
                                     </Typography>
+                                    {error === 'Không xử lý được file ảnh/PDF' && <Alert severity="error">{error}</Alert>}
                                 </Box>
                                 : null
                             }
@@ -199,6 +226,7 @@ function ModalAdd(props) {
                                     <Typography variant='subtitle1' component="div" sx={{ display: 'flex', flexDirection: 'column' }}>
                                         <span style={{ color: 'gray' }}>Chỉ chấp nhận file .xlsx</span>
                                     </Typography>
+                                    {error === 'Không xử lý được file .xlsx' && <Alert severity="error">{error}</Alert>}
                                 </Box>
                                 : null
                             }
