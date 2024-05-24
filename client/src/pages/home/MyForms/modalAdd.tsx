@@ -72,7 +72,11 @@ function ModalAdd(props) {
             }
         }
         else if (addType === 'describe') {
-            generateFormByDescription(descriptionData)
+            const dataFromServer = await generateFormByDescription(descriptionData)
+
+            navigate('/form/' + dataFromServer.id, { state: 'ViewEdit' });
+
+            setDescriptionData('')
         }
 
 
