@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom'
 import { Box, Typography, TextField, Modal, Button, Divider } from '@mui/material'
 
 // APIs
-import { createForm, } from '../../../apis/form';
+import { createForm, generateFormByDescription, } from '../../../apis/form';
 
 // REDUX
 import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
@@ -19,7 +19,7 @@ import SelectButton from '../../../components/custom-button/selectButton';
 import InputFileUpload from '../../../components/custom-button/fileUploadButton';
 import COLORS from '../../../constants/colors';
 import { error } from 'console';
-import { generateFormByDataSheet } from '../../../apis/file';
+import { generateFormByDataSheet } from '../../../apis/form';
 
 type ADD_TYPE = 'manual' | 'describe' | 'image' | 'data'
 
@@ -31,6 +31,8 @@ function ModalAdd(props) {
     const dispatch = useAppDispatch()
 
     const [addType, setAddType] = useState<ADD_TYPE>('manual')
+
+    const [descriptionData, setDescriptionData] = useState<string>('')
 
     const handleCreateForm = async () => {
         // Close modal
@@ -65,9 +67,12 @@ function ModalAdd(props) {
         else if (addType === 'data') {
             if (fileData) {
                 const dataFromServer = await generateFormByDataSheet(fileData)
-                
+
                 navigate('/form/' + dataFromServer.id, { state: 'ViewEdit' });
             }
+        }
+        else if (addType === 'describe') {
+            generateFormByDescription(descriptionData)
         }
 
 
@@ -135,15 +140,25 @@ function ModalAdd(props) {
                                     <Typography variant='subtitle1' component="div">
                                         <b>Nhập mô tả biểu mẫu</b>
                                     </Typography>
+                                    <p>
+                                        Cấu trúc của mô tả: <br />
+                                        &lt;Tiêu đề của biểu mẫu&gt;:
+                                        + &lt;Câu hỏi&gt; &lt;Lựa chọn của câu hỏi (nếu có)&gt;
+                                    </p>
                                     <TextField
                                         required
                                         multiline
                                         rows={5}
+                                        value={descriptionData}
                                         // value={formState.name}
-                                        // onChange={e => { dispatch(setName(e.target.value)) }}
+                                        onChange={e => setDescriptionData(e.target.value)}
                                         sx={{ width: '100%', marginY: '10px' }}
                                         variant="outlined"
-                                        placeholder='Biểu mẫu gồm các trường...'
+                                        placeholder='Ví dụ:
+                                        Biểu mẫu thông tin sinh viên:
+                                        + Họ và tên
+                                        + Giới tính (Nam, nữ)
+                                        + Năm sinh'
                                     />
                                 </Box>
                                 : null

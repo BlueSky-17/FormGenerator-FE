@@ -4,7 +4,7 @@ import Button from '@mui/material/Button';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import COLORS from '../../constants/colors';
 import SelectType from '../select-type/select-type';
-import { generateFormByDataSheet } from '../../apis/file';
+import { generateFormByDataSheet } from '../../apis/form';
 
 type InputFileProps = {
     setFileProps: (file: File) => void
