@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom'
 import { Box, Typography, TextField, Modal, Button, Divider, Alert } from '@mui/material'
 
 // APIs
-import { createForm, generateFormByDescription, } from '../../../apis/form';
+import { createForm, generateFormByDescription, generateFormByImage, generateFormByDataSheet } from '../../../apis/form';
 
 // REDUX
 import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
@@ -18,8 +18,6 @@ import CancelButton from '../../../components/custom-button/cancelButton';
 import SelectButton from '../../../components/custom-button/selectButton';
 import InputFileUpload from '../../../components/custom-button/fileUploadButton';
 import COLORS from '../../../constants/colors';
-import { error } from 'console';
-import { generateFormByDataSheet } from '../../../apis/form';
 
 type ADD_TYPE = 'manual' | 'describe' | 'image' | 'data'
 
@@ -35,8 +33,11 @@ function ModalAdd(props) {
     const [descriptionData, setDescriptionData] = useState<string>('')
 
     const [error, setError] = useState<string>('')
+    const [loading, setLoading] = useState<boolean>(false)
 
     const handleCreateForm = async () => {
+
+        setLoading(true)
 
         if (addType === 'manual') {
             // Call API POST to create a new form
@@ -66,6 +67,7 @@ function ModalAdd(props) {
             }
             else {
                 setError('Vui lòng điền thông tin bắt buộc')
+                setLoading(false)
                 return;
             }
         }
@@ -96,9 +98,34 @@ function ModalAdd(props) {
             }
             else {
                 setError('Vui lòng điền mô tả hợp lệ')
+                setLoading(false)
                 return;
             }
         }
+        else if (addType === 'image') {
+            if (fileImage) {
+                const dataFromServer = await generateFormByImage(fileImage)
+
+                console.log(dataFromServer)
+
+                if (dataFromServer) {
+                    navigate('/form/' + dataFromServer.id, { state: 'ViewEdit' });
+                    setDescriptionData('')
+                }
+                else {
+                    setError('Không xử lý được file ảnh/PDF')
+                    setLoading(false)
+                    return;
+                }
+            }
+            else {
+                setError('Không xử lý được file ảnh/PDF')
+                setLoading(false)
+                return;
+            }
+        }
+
+        setLoading(false)
 
         // Close modal
         dispatch(setModal({ modal: '', isOpen: false }))
@@ -112,7 +139,7 @@ function ModalAdd(props) {
 
     const [errorFile, setErrorFile] = useState<string>('');
 
-    console.log(error)
+    console.log(loading)
 
     return (
         <Modal
@@ -179,7 +206,6 @@ function ModalAdd(props) {
                                         multiline
                                         rows={5}
                                         value={descriptionData}
-                                        // value={formState.name}
                                         onChange={e => setDescriptionData(e.target.value)}
                                         sx={{ width: '100%', marginY: '10px' }}
                                         variant="outlined"
@@ -232,7 +258,8 @@ function ModalAdd(props) {
                             }
 
                             <Box sx={{ display: 'flex', flexDirection: 'row-reverse' }} >
-                                <AcceptButton title='Xác nhận' onClick={handleCreateForm} />
+                                {!loading ? <AcceptButton title='Xác nhận' onClick={handleCreateForm} />:
+                                <AcceptButton disabled={true} title='Đang xử lý...'/>}
                                 <CancelButton title='Hủy' onClick={handleCloseModal} />
                             </Box>
                         </Box>
