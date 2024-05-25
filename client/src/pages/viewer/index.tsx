@@ -843,7 +843,7 @@ function FormViewer() {
                                                     defaultValue="female"
                                                     name="radio-buttons-group"
                                                 >
-                                                    {formDetail.Questions[ques].Content.MultiChoice.Options.map((item, index) => (
+                                                    {formDetail.Questions[ques].Content.MultiChoice.Options !== null ? formDetail.Questions[ques].Content.MultiChoice.Options.map((item, index) => (
                                                         <FormControlLabel
                                                             key={index}
                                                             onChange={handleChange(ques, index)}
@@ -851,7 +851,7 @@ function FormViewer() {
                                                             control={<Radio />}
                                                             label={item}
                                                         />
-                                                    ))}
+                                                    )) : null}
                                                 </RadioGroup>
                                             </FormControl>
                                             {formResponses[ques].error !== '' ? <Alert sx={{ background: 'transparent', p: '0' }} severity="error">Vui lòng hoàn thành câu hỏi bắt buộc</Alert> : null}
@@ -1349,7 +1349,7 @@ function FormViewer() {
                                 </Box>
                             </Box>
                         )) : (formDetail.Questions !== undefined && formDetail.Questions.length === 0) ?
-                            <Box sx={{display:'flex', justifyContent:'center'}}>Biểu mẫu chưa tạo câu hỏi</Box> : null}
+                            <Box sx={{ display: 'flex', justifyContent: 'center' }}>Biểu mẫu chưa tạo câu hỏi</Box> : null}
                     </Box>}
 
                     {!submit && !formDetail.formState && <Box sx={{ margin: '60px', display: 'flex', justifyContent: 'center' }}> Biểu mẫu đã dừng nhận phản hồi</Box>}

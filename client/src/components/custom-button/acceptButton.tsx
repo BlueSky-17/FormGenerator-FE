@@ -6,7 +6,7 @@ export type CustomButtonProps = {
     title: string;
     style?: React.CSSProperties;
     disabled?: boolean;
-    onClick: () => void;
+    onClick?: () => void;
 };
 
 const AcceptButton: FC<CustomButtonProps> = memo(
