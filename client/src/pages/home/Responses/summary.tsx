@@ -49,7 +49,7 @@ function Summary(props) {
 
         let temp: Map<string, number>[] = []
         for (let i = 0; i < questionLength; i++) {
-            if (responses[0].Responses[i].Type === "multi-choice" || responses[0].Responses[i].Type === 'checkbox') {
+            if (responses[0].Responses[i].Type === "multi-choice" || responses[0].Responses[i].Type === 'checkbox' || responses[0].Responses[i].Type === 'dropdown') {
                 temp.push(getLabelResultForMultiChoice(responses, i))
             }
             else {
@@ -59,7 +59,7 @@ function Summary(props) {
 
 
         for (let i = 0; i < questionLength; i++) {
-            if (responses[0].Responses[i].Type === "multi-choice" || responses[0].Responses[i].Type === 'checkbox') {
+            if (responses[0].Responses[i].Type === "multi-choice" || responses[0].Responses[i].Type === 'checkbox' || responses[0].Responses[i].Type === 'dropdown') {
                 temp[i] = reduceToNLabel(temp[i], 6)
             }
         }
@@ -102,7 +102,7 @@ function Summary(props) {
             })
         }
     }, [])
-    
+
     return (
         <Box sx={{ height: '100%' }}>
             {props.responses.length > 0 && hasSummary
