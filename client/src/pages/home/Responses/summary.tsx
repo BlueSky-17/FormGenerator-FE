@@ -87,7 +87,7 @@ function Summary(props) {
     }
 
     const size = {
-        width: 600,
+        width: 1050,
         height: 400,
     };
     // if (props.responses.length > 0) getLabelResultForMultiChoice(props.responses, 1);
