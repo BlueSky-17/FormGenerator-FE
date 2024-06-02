@@ -300,7 +300,7 @@ function FormViewer() {
 
             if (!checkSelect) {
                 // checkRequired = false;
-                formResponses[ques].error = 'Vui lòng hoàn thành những câu hỏi bắt buộc';
+                formResponses[ques].error = 'Vui lòng hoàn thành câu hỏi bắt buộc';
             }
             else {
                 formResponses[ques].error = '';
@@ -341,6 +341,11 @@ function FormViewer() {
                 break;
             default:
                 break;
+        }
+
+        if (formResponses[ques].required) {
+            formResponses[ques].error = 'Vui lòng hoàn thành những câu hỏi bắt buộc'
+            setRender(!render)
         }
     };
 
@@ -712,7 +717,7 @@ function FormViewer() {
                     let checkSelect = item.content.multiChoice.result.some((giaTri) => giaTri === true);
                     if (!checkSelect) {
                         checkRequired = false;
-                        item.error = 'Vui lòng hoàn thành những câu hỏi bắt buộc';
+                        item.error = 'Vui lòng hoàn thành câu hỏi bắt buộc';
                     }
                     else {
                         item.error = '';
@@ -721,7 +726,8 @@ function FormViewer() {
                 else if (item.type === 'shortText') {
                     if (item.content.shortText === '') {
                         checkRequired = false;
-                        item.error = 'Vui lòng hoàn thành những câu hỏi bắt buộc';
+                        item.error = 'Vui lòng hoàn thành câu hỏi bắt buộc';
+                        setRender(!render)
                     }
                     else {
                         item.error = '';
@@ -730,7 +736,7 @@ function FormViewer() {
                 else if (item.type === 'file') {
                     if (item.content.files.length === 0) {
                         checkRequired = false;
-                        item.error = 'Vui lòng hoàn thành những câu hỏi bắt buộc';
+                        item.error = 'Vui lòng hoàn thành câu hỏi bắt buộc';
                     }
                     else {
                         item.error = '';
@@ -739,7 +745,7 @@ function FormViewer() {
                 else if (item.type === 'date-range') {
                     if (item.content.files.length === 0) {
                         checkRequired = false;
-                        item.error = 'Vui lòng hoàn thành những câu hỏi bắt buộc';
+                        item.error = 'Vui lòng hoàn thành câu hỏi bắt buộc';
                     }
                     else {
                         item.error = '';
@@ -836,25 +842,28 @@ function FormViewer() {
                                 <Box sx={{ display: 'flex', flexDirection: 'column', marginX: '30px', marginY: '15px' }}>
                                     {formDetail.Questions[ques].Type === 'multi-choice' ?
                                         <Box>
-                                            <FormControl>
-                                                <RadioGroup
-                                                    key={index}
-                                                    aria-labelledby="demo-radio-buttons-group-label"
-                                                    defaultValue="female"
-                                                    name="radio-buttons-group"
-                                                >
-                                                    {formDetail.Questions[ques].Content.MultiChoice.Options !== null ? formDetail.Questions[ques].Content.MultiChoice.Options.map((item, index) => (
-                                                        <FormControlLabel
+                                            {formResponses[ques] ?
+                                                <Box>
+                                                    <FormControl>
+                                                        <RadioGroup
                                                             key={index}
-                                                            onChange={handleChange(ques, index)}
-                                                            value={item}
-                                                            control={<Radio />}
-                                                            label={item}
-                                                        />
-                                                    )) : null}
-                                                </RadioGroup>
-                                            </FormControl>
-                                            {formResponses[ques].error !== '' ? <Alert sx={{ background: 'transparent', p: '0' }} severity="error">Vui lòng hoàn thành câu hỏi bắt buộc</Alert> : null}
+                                                            aria-labelledby="demo-radio-buttons-group-label"
+                                                            defaultValue="female"
+                                                            name="radio-buttons-group"
+                                                        >
+                                                            {formDetail.Questions[ques].Content.MultiChoice.Options !== null ? formDetail.Questions[ques].Content.MultiChoice.Options.map((item, index) => (
+                                                                <FormControlLabel
+                                                                    key={index}
+                                                                    onChange={handleChange(ques, index)}
+                                                                    value={item}
+                                                                    control={<Radio />}
+                                                                    label={item}
+                                                                />
+                                                            )) : null}
+                                                        </RadioGroup>
+                                                    </FormControl>
+                                                    {formResponses[ques].error !== '' ? <Alert sx={{ background: 'transparent', p: '0' }} severity="error">Vui lòng hoàn thành câu hỏi bắt buộc</Alert> : null}
+                                                </Box> : null}
                                         </Box>
                                         : null
                                     }
@@ -881,42 +890,49 @@ function FormViewer() {
                                     }
                                     {formDetail.Questions[ques].Type === 'checkbox' ?
                                         <Box>
-                                            {formResponses[ques].content.multiChoice.constraint === 'at-most' ?
-                                                <Typography sx={{ color: 'gray', paddingBottom: '10px' }}>Vui lòng chọn tối đa {formResponses[ques].content.multiChoice.maxOptions} phương án.</Typography>
-                                                : null
-                                            }
-                                            <FormControl>
-                                                {formDetail.Questions[ques].Content.MultiChoice.Options.map((item, index) => (
-                                                    <FormControlLabel
-                                                        key={index}
-                                                        onChange={handleChangeCheckbox(ques, index)}
-                                                        // onBlur={checkErrCheckbox(ques)}
-                                                        value={item}
-                                                        control={<Checkbox
-                                                            disabled={formResponses[ques].content.multiChoice.disabled && (formResponses[ques].content.multiChoice.result[index] !== true)}
-                                                        />}
-                                                        label={item}
-                                                    />
-                                                ))}
-                                            </FormControl>
-                                            {formResponses[ques].error !== '' ? <Alert sx={{ background: 'transparent', p: '0' }} severity="error">{formResponses[ques].error}</Alert> : null}
+                                            {formResponses[ques] ?
+                                                <Box>
+                                                    {formResponses[ques].content.multiChoice.constraint === 'at-most' ?
+                                                        <Typography sx={{ color: 'gray', paddingBottom: '10px' }}>Vui lòng chọn tối đa {formResponses[ques].content.multiChoice.maxOptions} phương án.</Typography>
+                                                        : null
+                                                    }
+                                                    <FormControl>
+                                                        {formDetail.Questions[ques].Content.MultiChoice.Options.map((item, index) => (
+                                                            <FormControlLabel
+                                                                key={index}
+                                                                onChange={handleChangeCheckbox(ques, index)}
+                                                                // onBlur={checkErrCheckbox(ques)}
+                                                                value={item}
+                                                                control={<Checkbox
+                                                                    disabled={formResponses[ques].content.multiChoice.disabled && (formResponses[ques].content.multiChoice.result[index] !== true)}
+                                                                />}
+                                                                label={item}
+                                                            />
+                                                        ))}
+                                                    </FormControl>
+                                                    {formResponses[ques].error !== '' ? <Alert sx={{ background: 'transparent', p: '0' }} severity="error">{formResponses[ques].error}</Alert> : null}
+                                                </Box> : null}
                                         </Box>
                                         : null
                                     }
                                     {formDetail.Questions[ques].Type === 'shortText' ?
                                         <Box>
-                                            <TextField
-                                                fullWidth
-                                                value={ques === active ? inputValue : formResponses[ques].content.shortText}
-                                                onChange={(e) => setInputValue(e.target.value)}
-                                                onBlur={saveInputValue(ques)}
-                                                onClick={handleActive(ques)}
-                                                sx={{ mb: '1px' }}
-                                                id="outlined-basic"
-                                                label="Điền ngắn"
-                                                variant="outlined" />
-                                            {formResponses[ques].error === 'Vui lòng hoàn thành câu hỏi bắt buộc' ? <Alert sx={{ background: 'transparent', p: '0' }} severity="error">Vui lòng hoàn thành câu hỏi bắt buộc</Alert> : null}
+                                            {formResponses[ques] ?
+                                                <Box>
+                                                    <TextField
+                                                        fullWidth
+                                                        value={ques === active ? inputValue : formResponses[ques].content.shortText}
+                                                        onChange={(e) => setInputValue(e.target.value)}
+                                                        onBlur={saveInputValue(ques)}
+                                                        onClick={handleActive(ques)}
+                                                        sx={{ mb: '1px' }}
+                                                        id="outlined-basic"
+                                                        label="Điền ngắn"
+                                                        variant="outlined" />
+                                                    {formResponses[ques].error === 'Vui lòng hoàn thành câu hỏi bắt buộc' ? <Alert sx={{ background: 'transparent', p: '0' }} severity="error">Vui lòng hoàn thành câu hỏi bắt buộc</Alert> : null}
+                                                </Box> : null}
                                         </Box>
+
                                         : null
                                     }
                                     {formDetail.Questions[ques].Type === 'longText' ?
@@ -1202,7 +1218,7 @@ function FormViewer() {
                                     }
                                     {formDetail.Questions[ques].Type === 'table' ?
                                         <TableContainer component={Paper}>
-                                            <Table aria-label="simple table">
+                                            {formDetail.Questions[ques].Content.Table.ListOfColumn ? <Table aria-label="simple table">
                                                 <TableHead>
                                                     <TableRow>
                                                         {formDetail.Questions[ques].Content.Table.ListOfColumn.map((item) => (
@@ -1301,21 +1317,25 @@ function FormViewer() {
                                                         Thêm 1 dòng
                                                     </Button>
                                                 </TableBody>
-                                            </Table>
+                                            </Table> : null}
                                         </TableContainer> : null
                                     }
                                     {formDetail.Questions[ques].Type === 'phone' ?
                                         <Box>
-                                            <TextField
-                                                fullWidth
-                                                name='phoneNumber'
-                                                value={ques === active ? phone : formResponses[ques].content.specialText}
-                                                variant='outlined'
-                                                onChange={(e) => setPhone(e.target.value)}
-                                                onBlur={saveInputValue(ques)}
-                                                onClick={handleActive(ques)}
-                                            />
-                                            {formResponses[ques].error === 'Số điện thoại không hợp lệ' ? <Alert sx={{ background: 'transparent', p: '0' }} severity="error">Số điện thoại không hợp lệ</Alert> : null}
+                                            {formResponses[ques] ?
+                                                <Box>
+                                                    <TextField
+                                                        fullWidth
+                                                        name='phoneNumber'
+                                                        value={ques === active ? phone : formResponses[ques].content.specialText}
+                                                        variant='outlined'
+                                                        onChange={(e) => setPhone(e.target.value)}
+                                                        onBlur={saveInputValue(ques)}
+                                                        onClick={handleActive(ques)}
+                                                    />
+                                                    {formResponses[ques].error === 'Số điện thoại không hợp lệ' ? <Alert sx={{ background: 'transparent', p: '0' }} severity="error">Số điện thoại không hợp lệ</Alert> : null}
+                                                </Box>
+                                                : null}
                                         </Box>
                                         : null
                                     }

@@ -495,7 +495,7 @@ export function MainModal(props) {
         console.log(selectedFile)
 
         if (selectedFile) {
-            if (!fileType.includes(selectedFile.type)){
+            if (!fileType.includes(selectedFile.type)) {
                 setTypeError('Vui lòng lựa chọn dạng file excel');
                 setFile('');
                 return;
@@ -605,7 +605,7 @@ export function MainModal(props) {
                         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                             <Box sx={{ maxHeight: '200px', overflowY: 'scroll' }}>
                                 {
-                                    props.optionList.map((item, index) => (
+                                    props.optionList ? props.optionList.map((item, index) => (
                                         <Box key={index} sx={{ display: 'flex', alignItems: 'center' }}>
                                             {props.type === 'multi-choice' && <RadioButtonUncheckedIcon
                                                 sx={{ color: 'gray', marginRight: '10px' }}
@@ -640,7 +640,7 @@ export function MainModal(props) {
                                                 <ClearIcon />
                                             </IconButton>
                                         </Box>
-                                    ))
+                                    )) : null
                                 }
                             </Box>
                             <Box>
@@ -832,7 +832,7 @@ export function MainModal(props) {
                         <Box sx={{ display: 'flex', flexDirection: 'column', mt: '10px' }}>
                             <Box sx={{ maxHeight: '200px', overflowY: 'scroll' }}>
                                 {
-                                    props.columnList.map((item, index) => (
+                                    props.columnList ? props.columnList.map((item, index) => (
                                         <Box key={index} sx={{ display: 'flex', flexDirection: 'column' }}>
                                             <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: 'row', width: '100%' }}>
                                                 <Typography sx={{ color: 'gray', marginRight: '10px' }}>
@@ -906,7 +906,7 @@ export function MainModal(props) {
                                                 }
                                             </Box>
                                         </Box>
-                                    ))
+                                    )) : null
                                 }
                             </Box>
                             <Box>
